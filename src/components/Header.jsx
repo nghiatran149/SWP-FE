@@ -6,14 +6,14 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
-    { name: 'Trang chủ', href: '#', active: true },
+    { name: 'Trang chủ', href: 'home', active: true },
     { name: 'Blog', href: '#' },
     { name: 'Khóa học', href: '#' },
     { name: 'Đặt lịch', href: '#' },
   ];
 
   const userMenuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, href: '#' },
+    { name: 'Dashboard', icon: LayoutDashboard, href: 'dashboard' },
     { name: 'Lịch sử', icon: History, href: '#' },
     { name: 'Thông báo', icon: Bell, href: '#' },
     { name: 'Cài đặt', icon: Settings, href: '#' },
