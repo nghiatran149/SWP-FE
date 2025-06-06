@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, ChevronDown, LayoutDashboard, LogOut, History, Settings, Bell, Menu, X } from 'lucide-react';
+import { User, ChevronDown, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 
 const Header = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -7,16 +7,13 @@ const Header = () => {
 
   const navigationItems = [
     { name: 'Trang chủ', href: 'home', active: true },
-    { name: 'Blog', href: '#' },
-    { name: 'Khóa học', href: '#' },
+    { name: 'Blog', href: 'blog' },
+    { name: 'Khóa học', href: 'courses' },
     { name: 'Đặt lịch', href: '#' },
   ];
 
   const userMenuItems = [
     { name: 'Dashboard', icon: LayoutDashboard, href: 'dashboard' },
-    { name: 'Lịch sử', icon: History, href: '#' },
-    { name: 'Thông báo', icon: Bell, href: '#' },
-    { name: 'Cài đặt', icon: Settings, href: '#' },
     { name: 'Đăng xuất', icon: LogOut, href: '#', divider: true },
   ];
 

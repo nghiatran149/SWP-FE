@@ -31,7 +31,7 @@ const courses = [
 const FeaturedCourses = () => {
   return (
     <section className="py-12 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-8">
         {/* Section Header */}
         <div className="flex justify-between items-end mb-12">
           <div>

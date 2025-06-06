@@ -9,6 +9,7 @@ import {
   BarChart3, 
   User,
   Users,
+  IdCardLanyard,
   Settings, 
   LogOut
 } from 'lucide-react';
@@ -22,6 +23,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
     { id: 'programs', label: 'Chương trình', icon: Activity },
     { id: 'statistics', label: 'Thống kê', icon: BarChart3 },
     { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
+    { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
   ];
 
   const bottomItems = [
@@ -51,6 +53,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
               case 'programs': to = '/programs'; break;
               case 'statistics': to = '/statistics'; break;
               case 'usermanagement': to = '/usermanagement'; break;
+              case 'consultantmanagement': to = '/consultantmanagement'; break;
               default: to = '#';
             }
             return (
@@ -77,15 +80,26 @@ const Sidebar = ({ activeItem = 'overview' }) => {
         <ul className="space-y-2">
           {bottomItems.map((item) => {
             const Icon = item.icon;
+            let to = '#';
+            switch(item.id) {
+              case 'profile': to = '/profile'; break;
+              case 'settings': to = '/settings'; break;
+              case 'logout': to = '/logout'; break;
+              default: to = '#';
+            }
             return (
               <li key={item.id}>
-                <a
-                  href="#"
-                  className="flex items-center px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                <Link
+                  to={to}
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                    activeItem === item.id
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
                 >
                   <Icon className="mr-3 h-5 w-5" />
                   {item.label}
-                </a>
+                </Link>
               </li>
             );
           })}

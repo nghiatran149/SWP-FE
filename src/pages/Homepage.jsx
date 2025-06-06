@@ -132,7 +132,7 @@ const Homepage = () => {
 
       {/* Why Choose Us Section */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Tại sao chọn chúng tôi?
@@ -169,7 +169,7 @@ const Homepage = () => {
 
       {/* Risk Assessment Section */}
       <section className="py-12 bg-gradient-to-br from-cyan-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             <div>
@@ -238,7 +238,7 @@ const Homepage = () => {
           <div className="absolute top-1/2 right-10 w-20 h-20 border border-white rounded-full"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 relative z-10">
+        <div className="max-w-7xl mx-auto px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
 
             <div>
