@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Shield, ArrowRight, Book, Calendar, Users, ShieldCheck, GraduationCap, Heart, CheckCircle, BarChart2 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 import FeaturedCourses from '../components/FeaturedCourses';
 
@@ -57,6 +59,19 @@ const assessments = [
 ];
 
 const Homepage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (location.state?.justLoggedIn && !sessionStorage.getItem('justLoggedInToast')) {
+      sessionStorage.setItem('justLoggedInToast', '1'); 
+      toast.success('Đăng nhập thành công!', {
+        duration: 2000,
+        position: 'top-center',
+      });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.key]); 
+
   return (
     <div>
       <section className="relative min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
