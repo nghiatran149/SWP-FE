@@ -47,7 +47,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
             let to = '#';
             switch(item.id) {
               case 'overview': to = '/dashboard'; break;
-              case 'courses': to = '/courses'; break;
+              case 'courses': to = '/mycourses'; break;
               case 'schedule': to = '/schedule'; break;
               case 'pricing': to = '/pricing'; break;
               case 'programs': to = '/programs'; break;

@@ -8,69 +8,99 @@ import ConsultantManagement from "./pages/ConsultantManagement";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import MyCourse from "./pages/MyCourse";
+import CourseDetail from "./pages/CourseDetail";
+import CertificateDetail from "./pages/CertificateDetail";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/home"
-          element={
-            <Layout>
-              <Homepage />
-            </Layout>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <LayoutDashboard activeMenuItem="overview">
-              <Dashboard />
-            </LayoutDashboard>
-          }
-        />
-        <Route
-          path="/usermanagement"
-          element={
-            <LayoutDashboard activeMenuItem="usermanagement">
-              <UserManagement />
-            </LayoutDashboard>
-          }
-        />
-        <Route
-          path="/consultantmanagement"
-          element={
-            <LayoutDashboard activeMenuItem="consultantmanagement">
-              <ConsultantManagement />
-            </LayoutDashboard>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <LayoutDashboard activeMenuItem="profile">
-              <Profile />
-            </LayoutDashboard>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <Layout>
-              <Login />
-            </Layout>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <Layout>
-              <Register />
-            </Layout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Toaster />
+        <Routes>
+          <Route
+            path="/home"
+            element={
+              <Layout>
+                <Homepage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <LayoutDashboard activeMenuItem="overview">
+                <Dashboard />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/usermanagement"
+            element={
+              <LayoutDashboard activeMenuItem="usermanagement">
+                <UserManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/consultantmanagement"
+            element={
+              <LayoutDashboard activeMenuItem="consultantmanagement">
+                <ConsultantManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <LayoutDashboard activeMenuItem="profile">
+                <Profile />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/mycourses"
+            element={
+              <LayoutDashboard activeMenuItem="courses">
+                <MyCourse />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/coursedetail"
+            element={
+              <LayoutDashboard activeMenuItem="courses">
+                <CourseDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/certificate"
+            element={
+              <LayoutDashboard activeMenuItem="courses">
+                <CertificateDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <Layout>
+                <Login />
+              </Layout>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Layout>
+                <Register />
+              </Layout>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

@@ -13,8 +13,8 @@ const Header = () => {
   ];
 
   const userMenuItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, href: 'dashboard' },
-    { name: 'Đăng xuất', icon: LogOut, href: '#', divider: true },
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+    { name: 'Đăng xuất', icon: LogOut, href: '#', onClick: handleLogout, divider: true },
   ];
 
   return (
