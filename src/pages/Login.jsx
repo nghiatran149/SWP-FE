@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
+import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -8,31 +10,48 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    // Basic validation
+  
     if (!email || !password) {
       setError("Vui lòng nhập đầy đủ thông tin");
       return;
     }
-
+  
     try {
       setIsLoading(true);
-
-      // Replace this with your actual authentication logic
-      // const response = await loginUser(email, password);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Handle successful login
-      console.log("Login successful");
-      // navigate('/dashboard'); // Redirect after successful login
+      const response = await fetch('https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
+      const result = await response.json();
+      console.log('API login result:', result);
+  
+      if (result.resultStatus === 'Success' && result.data) {
+        const userInfo = {
+          userId: result.data.userId,
+          username: result.data.username,
+          email: result.data.email,
+          roleId: result.data.roleId,
+          roleName: result.data.roleName,
+          token: result.data.token,
+          tokenExpires: result.data.tokenExpires
+        };
+        login(userInfo);
+        navigate('/home', { state: { justLoggedIn: true } });
+      } else {
+        setError(result.messages?.[0] || 'Đăng nhập thất bại!');
+      }
     } catch (err) {
-      setError("Email hoặc mật khẩu không đúng");
+      setError("Lỗi kết nối đến server!");
       console.error("Login error:", err);
     } finally {
       setIsLoading(false);

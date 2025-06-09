@@ -209,9 +209,9 @@ const CourseDetail = () => {
                   <Play className="w-4 h-4" />
                   <span>Tiếp tục học</span>
                 </button>
-                <button className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                <Link to="/certificate" className="flex items-center gap-2 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                   <span>Xem chứng chỉ</span>
-                </button>
+                </Link>
               </div>
             </div>
 

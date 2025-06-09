@@ -171,21 +171,6 @@ const CertificateDetail = () => {
                     <span>Chia sẻ</span>
                   </button>
                 </div>
-
-                {/* Additional Info */}
-                {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <span className="text-blue-600 text-sm font-bold">i</span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-800">
-                        <strong>Lưu ý:</strong> Chứng chỉ này có giá trị chính thức và được công nhận bởi Trung tâm Phòng chống Ma túy Quốc gia. 
-                        Bạn có thể sử dụng mã ID để xác thực tính hợp lệ của chứng chỉ.
-                      </p>
-                    </div>
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -193,9 +178,9 @@ const CertificateDetail = () => {
 
         {/* Back Button */}
         <div className="mt-8 text-center">
-          <button className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+          <Link to="/mycourses" className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors">
             Quay lại khóa học
-          </button>
+          </Link>
         </div>
       </div>
     </div>
