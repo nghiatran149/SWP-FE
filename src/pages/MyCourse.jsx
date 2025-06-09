@@ -132,9 +132,9 @@ const MyCourse = () => {
             <h1 className="text-2xl font-bold text-gray-900">Khóa học của tôi</h1>
             <p className="text-gray-600 mt-1">Quản lý và theo dõi tiến độ các khóa học của bạn về phòng chống ma túy.</p>
           </div>
-          <button className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+          <Link to="/home" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
             Về trang chủ
-          </button>
+          </Link>
         </div>
       </div>
 

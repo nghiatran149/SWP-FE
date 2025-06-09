@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
-import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -13,8 +10,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
   const navigate = useNavigate();
   const { login } = useAuth();
 
