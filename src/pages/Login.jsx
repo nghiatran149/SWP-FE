@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
+import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -12,15 +15,19 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
   
+  
     if (!email || !password) {
       setError("Vui lòng nhập đầy đủ thông tin");
       return;
     }
+  
   
     try {
       setIsLoading(true);
@@ -51,6 +58,7 @@ const Login = () => {
         setError(result.messages?.[0] || 'Đăng nhập thất bại!');
       }
     } catch (err) {
+      setError("Lỗi kết nối đến server!");
       setError("Lỗi kết nối đến server!");
       console.error("Login error:", err);
     } finally {
