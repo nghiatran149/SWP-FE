@@ -70,20 +70,18 @@ const UserManagement = () => {
     }
   };
 
-  // Khi bấm nút sửa
   const handleEditClick = (user) => {
     setEditingUser(user);
     setEditForm({
       username: user.username,
       email: user.email,
-      password: '', // Để trống, chỉ nhập nếu muốn đổi
+      password: '',
       isActive: user.isActive,
       emailVerified: user.emailVerified,
       roleId: user.roleId,
     });
   };
 
-  // Khi thay đổi trường trong form
   const handleEditFormChange = (e) => {
     const { name, value, type, checked } = e.target;
     setEditForm((prev) => ({
@@ -92,7 +90,6 @@ const UserManagement = () => {
     }));
   };
 
-  // Khi lưu chỉnh sửa
   const handleEditSave = async () => {
     if (!editingUser) return;
     setLoading(true);
@@ -102,10 +99,10 @@ const UserManagement = () => {
         ...editForm,
         roleId: Number(editForm.roleId),
       };
-      // Nếu password rỗng thì không gửi lên
+
       if (!body.password) delete body.password;
       const res = await axios.put(`${BASE_URL}/User/${editingUser.userId}`, body);
-      // Cập nhật lại user trong danh sách
+
       setUsers((prev) => prev.map((u) => u.userId === editingUser.userId ? res.data.data : u));
       setEditingUser(null);
     } catch (err) {
@@ -115,12 +112,10 @@ const UserManagement = () => {
     }
   };
 
-  // Khi hủy chỉnh sửa
   const handleEditCancel = () => {
     setEditingUser(null);
   };
 
-  // Khi xem chi tiết user
   const handleViewClick = async (userId) => {
     setLoading(true);
     setError(null);
@@ -142,7 +137,6 @@ const UserManagement = () => {
     setViewingUser(null);
   };
 
-  // Khi bấm nút thêm người dùng
   const handleAddNewUserClick = () => {
     setAddingUser(true);
     setAddForm({
@@ -153,7 +147,6 @@ const UserManagement = () => {
     });
   };
 
-  // Khi thay đổi trường trong form thêm người dùng
   const handleAddFormChange = (e) => {
     const { name, value } = e.target;
     setAddForm((prev) => ({
@@ -162,14 +155,12 @@ const UserManagement = () => {
     }));
   };
 
-  // Khi lưu người dùng mới
   const handleAddUserSave = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${BASE_URL}/User/admin/register-user`, addForm);
+      const res = await axios.post(`${BASE_URL}/User/admin/Create-user`, addForm);
       if (res.data && res.data.data) {
-        // Fetch lại toàn bộ danh sách users để có dữ liệu mới nhất (bao gồm cả isActive, emailVerified...)
         const response = await axios.get(`${BASE_URL}/User`);
         if (response.data && response.data.data) {
           setUsers(response.data.data);
@@ -185,7 +176,6 @@ const UserManagement = () => {
     }
   };
 
-  // Khi hủy thêm người dùng
   const handleAddCancel = () => {
     setAddingUser(false);
   };
