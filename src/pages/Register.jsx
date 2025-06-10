@@ -1,32 +1,73 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { AlertCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import {
+  AlertCircle,
+  Mail,
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  Phone,
+} from "lucide-react";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Xử lý riêng cho trường số điện thoại
+    if (name === "phoneNumber") {
+      // Chỉ cho phép nhập số và tối đa 10 ký tự
+      const regex = /^[0-9\b]+$/;
+
+      // Nếu rỗng hoặc là số và chưa quá 10 ký tự
+      if (value === "" || (regex.test(value) && value.length <= 10)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
+
+      // Kiểm tra và hiển thị lỗi về định dạng số điện thoại
+      if (value && (value.length !== 10 || !value.startsWith("0"))) {
+        setPhoneError("Số điện thoại phải có 10 số và bắt đầu bằng số 0");
+      } else {
+        setPhoneError("");
+      }
+    } else {
+      // Xử lý các trường khác bình thường
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
+    // Kiểm tra số điện thoại trước khi submit
+    if (
+      formData.phoneNumber &&
+      (formData.phoneNumber.length !== 10 ||
+        !formData.phoneNumber.startsWith("0"))
+    ) {
+      setPhoneError("Số điện thoại phải có 10 số và bắt đầu bằng số 0");
+      return;
+    }
+
     // Basic validation
     if (
       !formData.fullName ||
       !formData.email ||
+      !formData.phoneNumber ||
       !formData.password ||
       !formData.confirmPassword
     ) {
@@ -97,7 +138,7 @@ const Register = () => {
                 htmlFor="fullName"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Họ và tên
+                Họ và tên <span className="text-red-600">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -122,7 +163,7 @@ const Register = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Email
+                Email <span className="text-red-600">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -142,13 +183,49 @@ const Register = () => {
               </div>
             </div>
 
+            {/* Phone Number - Trường mới thêm vào */}
+            <div>
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Số điện thoại <span className="text-red-600">*</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  type="tel"
+                  pattern="[0-9]{10}"
+                  required
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  className={`appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border ${
+                    phoneError ? "border-red-300" : "border-gray-300"
+                  } placeholder-gray-500 text-gray-900 focus:outline-none ${
+                    phoneError
+                      ? "focus:ring-red-500 focus:border-red-500"
+                      : "focus:ring-blue-500 focus:border-blue-500"
+                  }`}
+                  placeholder="Số điện thoại"
+                  maxLength={10}
+                />
+              </div>
+              {phoneError && (
+                <p className="mt-1 text-sm text-red-600">{phoneError}</p>
+              )}
+            </div>
+
             {/* Password */}
             <div>
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Mật khẩu
+                Mật khẩu <span className="text-red-600">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -184,7 +261,7 @@ const Register = () => {
                 htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Xác nhận mật khẩu
+                Xác nhận mật khẩu <span className="text-red-600">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
