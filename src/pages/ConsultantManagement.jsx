@@ -1,51 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 
-const consultants = [
-  {
-    id: 1,
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    phone: '0912345678',
-    dob: '1990-01-01',
-    certificate: 'Thạc sĩ Tâm lý học, Chứng chỉ Tư vấn nghiện chất gây nghiện',
-    schedule: 'Thứ 2-6, 8:00-17:00',
-    specialty: 'Tư vấn cá nhân, Liệu pháp nhóm',
-  },
-  {
-    id: 2,
-    name: 'Trần Thị B',
-    email: 'tranthib@example.com',
-    phone: '0987654321',
-    dob: '1992-05-12',
-    certificate: 'Chuyên viên phòng ngừa chất gây nghiện',
-    schedule: 'Thứ 3-7, 9:00-18:00',
-    specialty: 'Tư vấn cá nhân',
-  },
-  {
-    id: 3,
-    name: 'Lê Văn C',
-    email: 'levanc@example.com',
-    phone: '0909123456',
-    dob: '1988-09-23',
-    certificate: 'Chuyên gia hỗ trợ cai nghiện cộng đồng',
-    schedule: 'Thứ 2-6, 7:30-16:30',
-    specialty: 'Liệu pháp nhóm',
-  },
-  {
-    id: 4,
-    name: 'Phạm Thị D',
-    email: 'phamthid@example.com',
-    phone: '0934567890',
-    dob: '1995-12-30',
-    certificate: 'Thạc sĩ Tâm lý học, Chứng chỉ Tư vấn nghiện chất gây nghiện',
-    schedule: 'Thứ 2-7, 8:00-17:00',
-    specialty: 'Tư vấn cá nhân, Liệu pháp nhóm',
-  },
-];
+const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
 
 const ConsultantManagement = () => {
+  const [consultants, setConsultants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch both consultants and users in parallel
+        const [consultantsRes, usersRes] = await Promise.all([
+          fetch(`${BASE_URL}/Consultant`),
+          fetch(`${BASE_URL}/User`)
+        ]);
+
+        const consultantsData = await consultantsRes.json();
+        const usersData = await usersRes.json();
+
+        if (consultantsData.resultStatus === 'Success' && usersData.resultStatus === 'Success') {
+          // Filter users to only get consultants by roleId 4
+          const consultantUsers = usersData.data.filter(user => user.roleId === 4);
+          
+          // Create a map of user data for easy lookup
+          const userMap = new Map(consultantUsers.map(user => [user.userId, user]));
+          
+          // Combine consultant and user data
+          const combinedData = consultantsData.data.map(consultant => ({
+            ...consultant,
+            userInfo: userMap.get(consultant.userId) || null
+          }));
+
+          setConsultants(combinedData);
+        } else {
+          setError('Failed to fetch data');
+        }
+      } catch (err) {
+        setError('Error fetching data: ' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
+
   return (
     <>
       <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -65,37 +70,53 @@ const ConsultantManagement = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Họ và Tên</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">SĐT</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ngày sinh</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider max-w-xl">Chứng chỉ</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lịch làm việc</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Chuyên môn</th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Hành động</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">License Number</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Specialization</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Experience</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Qualifications</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Consultation Fee</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Working Hours</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Rating</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Consultations</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Account Status</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
               {consultants.map((consultant) => (
-                <tr key={consultant.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.email}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.phone}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.dob}</td>
-                  <td className="px-6 py-4 max-w-xl text-sm text-gray-900 break-words">{consultant.certificate}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.schedule}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.specialty}</td>
+                <tr key={consultant.consultantId} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.userInfo?.username || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.userInfo?.email || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.licenseNumber || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.specialization || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.yearsOfExperience || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.qualifications || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.consultationFee || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs ${consultant.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {consultant.isAvailable ? 'Available' : 'Unavailable'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.workingHours || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.rating || 'N/A'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{consultant.totalConsultations}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs ${consultant.userInfo?.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {consultant.userInfo?.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem thông tin">
+                      <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="View details">
                         <Eye className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa thông tin">
+                      <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Edit">
                         <Pencil className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa người dùng">
+                      <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Delete">
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
