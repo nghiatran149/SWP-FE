@@ -4,7 +4,7 @@ import { AlertCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -25,7 +25,7 @@ const Register = () => {
 
     // Basic validation
     if (
-      !formData.fullName ||
+      !formData.username ||
       !formData.email ||
       !formData.password ||
       !formData.confirmPassword
@@ -91,27 +91,27 @@ const Register = () => {
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md space-y-4">
-            {/* Full Name */}
+            {/* Username */}
             <div>
               <label
-                htmlFor="fullName"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Họ và tên <span className="text-red-600">*</span>
+                Tài khoản <span className="text-red-600">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="fullName"
-                  name="fullName"
+                  id="username"
+                  name="username"
                   type="text"
                   required
-                  value={formData.fullName}
+                  value={formData.username}
                   onChange={handleChange}
                   className="appearance-none rounded-md relative block w-full px-3 py-3 pl-10 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Họ và tên"
+                  placeholder="Tên tài khoản"
                 />
               </div>
             </div>
