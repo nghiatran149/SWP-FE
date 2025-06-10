@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AlertCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import axios from "axios";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -12,6 +14,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -22,6 +25,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMessage(""); // Clear previous success message
 
     // Basic validation
     if (
@@ -47,18 +51,59 @@ const Register = () => {
     try {
       setIsLoading(true);
 
-      // Replace with your actual registration API call
-      // For example: await registerUser(formData);
+      const response = await axios.post(
+        "https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User/register-member",
+        {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }
+      );
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
 
-      // Redirect after successful registration or show success message
-      console.log("Registration successful");
-      // navigate('/login');
+      // Check for successful registration - could be 200 or 201
+      if (response.status === 200 || response.status === 201) {
+        console.log("Registration successful:", response.data);
+        setSuccessMessage("Đăng ký thành công! Đang chuyển hướng...");
+        
+        // Clear form data
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+        
+        // Redirect to login page after showing success message
+        setTimeout(() => {
+          navigate("/login", { replace: true });
+        }, 2000);
+      } else {
+        // Unexpected status code
+        setError("Đăng ký thất bại, vui lòng thử lại");
+      }
     } catch (err) {
-      setError(err.message || "Đăng ký thất bại, vui lòng thử lại");
       console.error("Registration error:", err);
+      
+      if (err.response) {
+        console.log("Error response status:", err.response.status);
+        console.log("Error response data:", err.response.data);
+        
+        // Handle specific error cases
+        if (err.response.status === 400) {
+          setError(err.response.data.message || "Thông tin đăng ký không hợp lệ");
+        } else if (err.response.status === 409) {
+          setError("Tài khoản hoặc email đã tồn tại");
+        } else {
+          setError(err.response.data.message || "Đăng ký thất bại, vui lòng thử lại");
+        }
+      } else if (err.request) {
+        setError("Không thể kết nối đến máy chủ, vui lòng thử lại sau");
+      } else {
+        setError("Đăng ký thất bại, vui lòng thử lại");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -86,6 +131,13 @@ const Register = () => {
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-500" />
             <span>{error}</span>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-green-500" />
+            <span>{successMessage}</span>
           </div>
         )}
 
