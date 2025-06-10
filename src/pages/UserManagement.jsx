@@ -1,17 +1,47 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
+import axios from 'axios';
+
+const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
+
+const ROLE_OPTIONS = [
+  { value: 1, label: 'Admin' },
+  { value: 2, label: 'Manager' },
+  { value: 3, label: 'Staff' },
+  { value: 4, label: 'Consultant' },
+  { value: 5, label: 'Member' },
+];
+
+const ADD_USER_ROLE_OPTIONS = ROLE_OPTIONS.filter(role => role.value !== 1); // Exclude Admin for adding new users
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    isActive: true,
+    emailVerified: true,
+    roleId: 3,
+  });
+  const [viewingUser, setViewingUser] = useState(null);
+  const [addingUser, setAddingUser] = useState(false);
+  const [addForm, setAddForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    roleName: 'Member', // Default role
+  });
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User');
-        const data = await response.json();
+        const response = await axios.get(`${BASE_URL}/User`);
+        const data = response.data;
         if (data && data.data) {
           setUsers(data.data);
         } else {
@@ -26,6 +56,140 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await axios.delete(`${BASE_URL}/User/${userId}`);
+      setUsers((prev) => prev.filter((u) => u.userId !== userId));
+    } catch (err) {
+      setError('Lỗi khi xóa người dùng.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Khi bấm nút sửa
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+    setEditForm({
+      username: user.username,
+      email: user.email,
+      password: '', // Để trống, chỉ nhập nếu muốn đổi
+      isActive: user.isActive,
+      emailVerified: user.emailVerified,
+      roleId: user.roleId,
+    });
+  };
+
+  // Khi thay đổi trường trong form
+  const handleEditFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  // Khi lưu chỉnh sửa
+  const handleEditSave = async () => {
+    if (!editingUser) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const body = {
+        ...editForm,
+        roleId: Number(editForm.roleId),
+      };
+      // Nếu password rỗng thì không gửi lên
+      if (!body.password) delete body.password;
+      const res = await axios.put(`${BASE_URL}/User/${editingUser.userId}`, body);
+      // Cập nhật lại user trong danh sách
+      setUsers((prev) => prev.map((u) => u.userId === editingUser.userId ? res.data.data : u));
+      setEditingUser(null);
+    } catch (err) {
+      setError('Lỗi khi cập nhật người dùng.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Khi hủy chỉnh sửa
+  const handleEditCancel = () => {
+    setEditingUser(null);
+  };
+
+  // Khi xem chi tiết user
+  const handleViewClick = async (userId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${BASE_URL}/User/${userId}`);
+      if (response.data && response.data.data) {
+        setViewingUser(response.data.data);
+      } else {
+        setError('Không tìm thấy thông tin người dùng.');
+      }
+    } catch (err) {
+      setError('Lỗi khi tải thông tin người dùng.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewClose = () => {
+    setViewingUser(null);
+  };
+
+  // Khi bấm nút thêm người dùng
+  const handleAddNewUserClick = () => {
+    setAddingUser(true);
+    setAddForm({
+      username: '',
+      email: '',
+      password: '',
+      roleName: 'Member',
+    });
+  };
+
+  // Khi thay đổi trường trong form thêm người dùng
+  const handleAddFormChange = (e) => {
+    const { name, value } = e.target;
+    setAddForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Khi lưu người dùng mới
+  const handleAddUserSave = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.post(`${BASE_URL}/User/admin/register-user`, addForm);
+      if (res.data && res.data.data) {
+        // Fetch lại toàn bộ danh sách users để có dữ liệu mới nhất (bao gồm cả isActive, emailVerified...)
+        const response = await axios.get(`${BASE_URL}/User`);
+        if (response.data && response.data.data) {
+          setUsers(response.data.data);
+        }
+      } else {
+        setError(res.data.messages?.[0] || 'Lỗi khi thêm người dùng.');
+      }
+      setAddingUser(false);
+    } catch (err) {
+      setError('Lỗi khi thêm người dùng.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Khi hủy thêm người dùng
+  const handleAddCancel = () => {
+    setAddingUser(false);
+  };
+
   return (
     <>
     <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -39,6 +203,14 @@ const UserManagement = () => {
             </Link>
           </div>
         </div>
+      <div className="px-8 py-4 flex justify-end">
+        <button
+          onClick={handleAddNewUserClick}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+        >
+          Thêm người dùng
+        </button>
+      </div>
       <div className="p-5">
         <div className="bg-white rounded-xl shadow border border-gray-200 overflow-x-auto">
           {loading ? (
@@ -64,20 +236,20 @@ const UserManagement = () => {
                 <tr key={user.userId} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.username}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.roleName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ROLE_OPTIONS.find(r => r.value === user.roleId)?.label || user.roleName}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.isActive ? '✔️' : '❌'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.emailVerified ? '✔️' : '❌'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.createdAt ? new Date(user.createdAt).toLocaleString() : '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem thông tin">
+                      <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem thông tin" onClick={() => handleViewClick(user.userId)}>
                         <Eye className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa thông tin">
+                      <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa thông tin" onClick={() => handleEditClick(user)}>
                         <Pencil className="w-5 h-5" />
                       </button>
-                      <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa người dùng">
+                      <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa người dùng" onClick={() => handleDeleteUser(user.userId)}>
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
@@ -89,6 +261,107 @@ const UserManagement = () => {
           )}
         </div>
       </div>
+
+      {/* Form chỉnh sửa user */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Chỉnh sửa người dùng</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Username</label>
+                <input type="text" name="username" value={editForm.username} onChange={handleEditFormChange} className="w-full border rounded px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input type="email" name="email" value={editForm.email} onChange={handleEditFormChange} className="w-full border rounded px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Password (để trống nếu không đổi)</label>
+                <input type="password" name="password" value={editForm.password} onChange={handleEditFormChange} className="w-full border rounded px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Role</label>
+                <select name="roleId" value={editForm.roleId} onChange={handleEditFormChange} className="w-full border rounded px-3 py-2">
+                  {ROLE_OPTIONS.map((role) => (
+                    <option key={role.value} value={role.value}>{role.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" name="isActive" checked={editForm.isActive} onChange={handleEditFormChange} /> Active
+                </label>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" name="emailVerified" checked={editForm.emailVerified} onChange={handleEditFormChange} /> Email Verified
+                </label>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={handleEditCancel}>Hủy</button>
+              <button className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" onClick={handleEditSave}>Lưu</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal xem chi tiết user */}
+      {viewingUser && (
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">Thông tin người dùng</h2>
+            <div className="space-y-4 text-gray-700">
+              <p><strong>User ID:</strong> {viewingUser.userId}</p>
+              <p><strong>Username:</strong> {viewingUser.username}</p>
+              <p><strong>Email:</strong> {viewingUser.email}</p>
+              <p><strong>Role:</strong> {ROLE_OPTIONS.find(r => r.value === viewingUser.roleId)?.label || viewingUser.roleName}</p>
+              <p><strong>Active:</strong> {viewingUser.isActive ? '✔️' : '❌'}</p>
+              <p><strong>Email Verified:</strong> {viewingUser.emailVerified ? '✔️' : '❌'}</p>
+              <p><strong>Created At:</strong> {viewingUser.createdAt ? new Date(viewingUser.createdAt).toLocaleString() : '-'}</p>
+              <p><strong>Updated At:</strong> {viewingUser.updatedAt ? new Date(viewingUser.updatedAt).toLocaleString() : '-'}</p>
+              <p><strong>Last Login:</strong> {viewingUser.lastLogin ? new Date(viewingUser.lastLogin).toLocaleString() : '-'}</p>
+            </div>
+            <div className="flex justify-end mt-6">
+              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={handleViewClose}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal thêm người dùng */}
+      {addingUser && (
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Thêm người dùng mới</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Username</label>
+                <input type="text" name="username" value={addForm.username} onChange={handleAddFormChange} className="w-full border rounded px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Email</label>
+                <input type="email" name="email" value={addForm.email} onChange={handleAddFormChange} className="w-full border rounded px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Password</label>
+                <input type="password" name="password" value={addForm.password} onChange={handleAddFormChange} className="w-full border rounded px-3 py-2" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Role</label>
+                <select name="roleName" value={addForm.roleName} onChange={handleAddFormChange} className="w-full border rounded px-3 py-2">
+                  {ADD_USER_ROLE_OPTIONS.map((role) => (
+                    <option key={role.value} value={role.label}>{role.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={handleAddCancel}>Hủy</button>
+              <button className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700" onClick={handleAddUserSave}>Thêm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
