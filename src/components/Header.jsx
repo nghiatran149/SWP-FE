@@ -34,7 +34,7 @@ const Header = () => {
           {/* Logo/Brand Name */}
           <div className="flex-shrink-0">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
-              DrugFree Vietnam
+              Drug Prevention
             </h1>
           </div>
 
