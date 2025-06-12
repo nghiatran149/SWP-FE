@@ -40,7 +40,19 @@ const UserManagement = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/User`);
+        const userInfoString = localStorage.getItem('userInfo');
+        let token = null;
+        if (userInfoString) {
+          const userInfo = JSON.parse(userInfoString);
+          token = userInfo.token;
+        }
+
+        const headers = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await axios.get(`${BASE_URL}/User`, { headers: headers });
         const data = response.data;
         if (data && data.data) {
           setUsers(data.data);
@@ -61,7 +73,19 @@ const UserManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      await axios.delete(`${BASE_URL}/User/${userId}`);
+      const userInfoString = localStorage.getItem('userInfo');
+      let token = null;
+      if (userInfoString) {
+        const userInfo = JSON.parse(userInfoString);
+        token = userInfo.token;
+      }
+
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      await axios.delete(`${BASE_URL}/User/${userId}`, { headers: headers });
       setUsers((prev) => prev.filter((u) => u.userId !== userId));
     } catch (err) {
       setError('Lỗi khi xóa người dùng.');
@@ -95,13 +119,25 @@ const UserManagement = () => {
     setLoading(true);
     setError(null);
     try {
+      const userInfoString = localStorage.getItem('userInfo');
+      let token = null;
+      if (userInfoString) {
+        const userInfo = JSON.parse(userInfoString);
+        token = userInfo.token;
+      }
+
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const body = {
         ...editForm,
         roleId: Number(editForm.roleId),
       };
 
       if (!body.password) delete body.password;
-      const res = await axios.put(`${BASE_URL}/User/${editingUser.userId}`, body);
+      const res = await axios.put(`${BASE_URL}/User/${editingUser.userId}`, body, { headers: headers });
 
       setUsers((prev) => prev.map((u) => u.userId === editingUser.userId ? res.data.data : u));
       setEditingUser(null);
@@ -120,7 +156,19 @@ const UserManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${BASE_URL}/User/${userId}`);
+      const userInfoString = localStorage.getItem('userInfo');
+      let token = null;
+      if (userInfoString) {
+        const userInfo = JSON.parse(userInfoString);
+        token = userInfo.token;
+      }
+
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await axios.get(`${BASE_URL}/User/${userId}`, { headers: headers });
       if (response.data && response.data.data) {
         setViewingUser(response.data.data);
       } else {
@@ -159,9 +207,20 @@ const UserManagement = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.post(`${BASE_URL}/User/admin/Create-user`, addForm);
+      const userInfoString = localStorage.getItem('userInfo');
+      let token = null;
+      if (userInfoString) {
+        const userInfo = JSON.parse(userInfoString);
+        token = userInfo.token;
+      }
+
+      const headers = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const res = await axios.post(`${BASE_URL}/User/admin/Create-user`, addForm, { headers: headers });
       if (res.data && res.data.data) {
-        const response = await axios.get(`${BASE_URL}/User`);
+        const response = await axios.get(`${BASE_URL}/User`, { headers: headers }); // Re-fetch all users after adding
         if (response.data && response.data.data) {
           setUsers(response.data.data);
         }

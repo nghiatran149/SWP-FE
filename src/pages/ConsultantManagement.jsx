@@ -12,10 +12,26 @@ const ConsultantManagement = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const userInfoString = localStorage.getItem('userInfo');
+        let token = null;
+        if (userInfoString) {
+          const userInfo = JSON.parse(userInfoString);
+          token = userInfo.token;
+        }
+
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        };
+
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
         // Fetch both consultants and users in parallel
         const [consultantsRes, usersRes] = await Promise.all([
-          fetch(`${BASE_URL}/Consultant`),
-          fetch(`${BASE_URL}/User`)
+          fetch(`${BASE_URL}/Consultant`, { headers: headers }),
+          fetch(`${BASE_URL}/User`, { headers: headers })
         ]);
 
         const consultantsData = await consultantsRes.json();
