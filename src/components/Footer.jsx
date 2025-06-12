@@ -61,7 +61,7 @@ const Footer = () => {
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-300 to-blue-300 bg-clip-text text-transparent">
-                DrugFree Vietnam
+                Drug Prevention
               </h3>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
@@ -76,7 +76,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center text-gray-300">
                 <Mail className="w-4 h-4 mr-3 text-teal-400" />
-                <span>info@drugfree.vn</span>
+                <span>info@drugprevention.vn</span>
               </div>
               <div className="flex items-start text-gray-300">
                 <MapPin className="w-4 h-4 mr-3 mt-1 text-teal-400 flex-shrink-0" />
@@ -186,7 +186,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
               <p className="text-gray-400 text-sm">
-                © 2024 DrugFree Vietnam. Được phát triển với{' '}
+                © 2025 Drug Prevention. Được phát triển với{' '}
                 <Heart className="w-4 h-4 inline text-red-500" /> tại Việt Nam
               </p>
             </div>

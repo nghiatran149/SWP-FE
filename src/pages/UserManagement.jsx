@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search } from 'lucide-react';
 import axios from 'axios';
 
 const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
@@ -36,6 +36,10 @@ const UserManagement = () => {
     password: '',
     roleName: 'Member', // Default role
   });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -55,7 +59,8 @@ const UserManagement = () => {
         const response = await axios.get(`${BASE_URL}/User`, { headers: headers });
         const data = response.data;
         if (data && data.data) {
-          setUsers(data.data);
+          // setUsers(data.data);
+          setUsers(data.data.filter(user => user.roleId !== 1));
         } else {
           setUsers([]);
         }
@@ -67,6 +72,38 @@ const UserManagement = () => {
     };
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    // Apply filters whenever users, searchTerm, roleFilter, or activeFilter changes
+    // First sort users by createdAt and updatedAt
+    const sortedUsers = [...users].sort((a, b) => {
+      // Convert dates to timestamps for comparison
+      const aDate = new Date(a.updatedAt || a.createdAt).getTime();
+      const bDate = new Date(b.updatedAt || b.createdAt).getTime();
+      // Sort in descending order (newest first)
+      return bDate - aDate;
+    });
+
+    // Then apply filters
+    const filtered = sortedUsers.filter(user => {
+      const matchesSearch =
+        user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesRole =
+        roleFilter === 'all' ? true :
+          user.roleId === Number(roleFilter);
+
+      const matchesActive =
+        activeFilter === 'all' ? true :
+          activeFilter === 'active' ? user.isActive :
+            !user.isActive;
+
+      return matchesSearch && matchesRole && matchesActive;
+    });
+
+    setFilteredUsers(filtered);
+  }, [users, searchTerm, roleFilter, activeFilter]);
 
   const handleDeleteUser = async (userId) => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa người dùng này?')) return;
@@ -241,24 +278,68 @@ const UserManagement = () => {
 
   return (
     <>
-    <div className="bg-white border-b border-gray-200 px-8 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h1>
-              <p className="text-gray-600 mt-1">Xem thông tin và quản lý tất cả người dùng trên hệ thống</p>
-            </div>
-            <Link to="/home" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
-              Về trang chủ
-            </Link>
+      <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h1>
+            <p className="text-gray-600 mt-1">Xem thông tin và quản lý tất cả người dùng trên hệ thống</p>
           </div>
+          <Link to="/home" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+            Về trang chủ
+          </Link>
         </div>
-      <div className="px-8 py-4 flex justify-end">
-        <button
-          onClick={handleAddNewUserClick}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-        >
-          Thêm người dùng
-        </button>
+      </div>
+      <div className="px-8 py-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Search and Filters */}
+          <div className="flex items-center gap-4 flex-1">
+            {/* Search Bar */}
+            <div className="relative flex-1 max-w-md">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo tên, email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            {/* Role Filter */}
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+              className="block w-34 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">Tất cả vai trò</option>
+              {/* {ROLE_OPTIONS.map(role => ( */}
+              {ROLE_OPTIONS.filter(role => role.value !== 1).map(role => (
+                <option key={role.value} value={role.value}>{role.label}</option>
+              ))}
+            </select>
+
+            {/* Active Status Filter */}
+            <select
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+              className="block w-40 px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Đang hoạt động</option>
+              <option value="inactive">Không hoạt động</option>
+            </select>
+          </div>
+
+          {/* Add Button */}
+          <button
+            onClick={handleAddNewUserClick}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+          >
+            Thêm người dùng
+          </button>
+        </div>
       </div>
       <div className="p-5">
         <div className="bg-white rounded-xl shadow border border-gray-200 overflow-x-auto">
@@ -267,46 +348,46 @@ const UserManagement = () => {
           ) : error ? (
             <div className="p-6 text-center text-red-500">{error}</div>
           ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Active</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email Verified</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created At</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Updated At</th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Hành động</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
-              {users.map((user) => (
-                <tr key={user.userId} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.username}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ROLE_OPTIONS.find(r => r.value === user.roleId)?.label || user.roleName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.isActive ? '✔️' : '❌'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.emailVerified ? '✔️' : '❌'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.createdAt ? new Date(user.createdAt).toLocaleString() : '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem thông tin" onClick={() => handleViewClick(user.userId)}>
-                        <Eye className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa thông tin" onClick={() => handleEditClick(user)}>
-                        <Pencil className="w-5 h-5" />
-                      </button>
-                      <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa người dùng" onClick={() => handleDeleteUser(user.userId)}>
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Active</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email Verified</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created At</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Updated At</th>
+                  <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Hành động</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {filteredUsers.map((user) => (
+                  <tr key={user.userId} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.username}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ROLE_OPTIONS.find(r => r.value === user.roleId)?.label || user.roleName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.isActive ? '✔️' : '❌'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.emailVerified ? '✔️' : '❌'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.createdAt ? new Date(user.createdAt).toLocaleString() : '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem thông tin" onClick={() => handleViewClick(user.userId)}>
+                          <Eye className="w-5 h-5" />
+                        </button>
+                        <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa thông tin" onClick={() => handleEditClick(user)}>
+                          <Pencil className="w-5 h-5" />
+                        </button>
+                        <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa người dùng" onClick={() => handleDeleteUser(user.userId)}>
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>

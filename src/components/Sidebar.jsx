@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { 
   Home, 
   BookOpen, 
@@ -15,16 +16,35 @@ import {
 } from 'lucide-react';
 
 const Sidebar = ({ activeItem = 'overview' }) => {
-  const menuItems = [
-    { id: 'overview', label: 'Tổng quan', icon: Home },
-    { id: 'courses', label: 'Khóa học', icon: BookOpen },
-    { id: 'schedule', label: 'Lịch hẹn', icon: Calendar },
-    { id: 'pricing', label: 'Đánh giá', icon: DollarSign },
-    { id: 'programs', label: 'Chương trình', icon: Activity },
-    { id: 'statistics', label: 'Thống kê', icon: BarChart3 },
-    { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
-    { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
-  ];
+  const { user } = useAuth();
+
+  // Define menu items for each role
+  const getMenuItemsByRole = () => {
+    const commonItems = [
+      { id: 'overview', label: 'Tổng quan', icon: Home },
+      { id: 'courses', label: 'Khóa học', icon: BookOpen },
+      { id: 'schedule', label: 'Lịch hẹn', icon: Calendar },
+      { id: 'pricing', label: 'Đánh giá', icon: DollarSign },
+      { id: 'programs', label: 'Chương trình', icon: Activity },
+      { id: 'statistics', label: 'Thống kê', icon: BarChart3 },
+    ];
+
+    // Admin specific items
+    const adminItems = [
+      { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
+      { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
+    ];
+
+    // Return menu items based on user role
+    if (user?.roleName === 'Admin') {
+      return [...commonItems, ...adminItems];
+    }
+
+    // For other roles, only show common items
+    return commonItems;
+  };
+
+  const menuItems = getMenuItemsByRole();
 
   const bottomItems = [
     { id: 'profile', label: 'Hồ sơ', icon: User },
@@ -36,7 +56,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
     <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
 
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-800">DrugFree Vietnam</h1>
+        <h1 className="text-xl font-bold text-gray-800">Drug Prevention</h1>
       </div>
 
       {/* Main Menu */}
