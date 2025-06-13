@@ -5,6 +5,7 @@ import {
   Home, 
   BookOpen, 
   Calendar, 
+  ClipboardPenLine, 
   DollarSign, 
   Activity, 
   BarChart3, 
@@ -33,6 +34,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
     const adminItems = [
       { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
       { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
+      { id: 'surveymanagement', label: 'Quản lý khảo sát', icon: ClipboardPenLine },
     ];
 
     // Return menu items based on user role
@@ -74,6 +76,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
               case 'statistics': to = '/statistics'; break;
               case 'usermanagement': to = '/usermanagement'; break;
               case 'consultantmanagement': to = '/consultantmanagement'; break;
+              case 'surveymanagement': to = '/surveymanagement'; break;
               default: to = '#';
             }
             return (
