@@ -9,6 +9,7 @@ import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetail from "./pages/SurveyDetail";
+import QuestionDetail from "./pages/QuestionDetail";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -23,6 +24,22 @@ function App() {
         <Toaster />
         <Routes>
           <Route
+            path="/login"
+            element={
+              <Layout>
+                <Login />
+              </Layout>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Layout>
+                <Register />
+              </Layout>
+            }
+          />
+          <Route
             path="/home"
             element={
               <Layout>
@@ -35,6 +52,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="overview">
                 <Dashboard />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <LayoutDashboard activeMenuItem="profile">
+                <Profile />
               </LayoutDashboard>
             }
           />
@@ -71,10 +96,10 @@ function App() {
             }
           />
           <Route
-            path="/profile"
+            path="/surveydetail/:surveyId/questiondetail/:questionId"
             element={
-              <LayoutDashboard activeMenuItem="profile">
-                <Profile />
+              <LayoutDashboard activeMenuItem="surveymanagement">
+                <QuestionDetail />
               </LayoutDashboard>
             }
           />
@@ -100,22 +125,6 @@ function App() {
               <LayoutDashboard activeMenuItem="courses">
                 <CertificateDetail />
               </LayoutDashboard>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Layout>
-                <Login />
-              </Layout>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <Layout>
-                <Register />
-              </Layout>
             }
           />
         </Routes>

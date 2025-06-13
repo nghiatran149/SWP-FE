@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Eye, Pencil, Trash2, Search } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, Plus } from 'lucide-react';
 import axios from 'axios';
 
 const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
@@ -335,8 +335,9 @@ const UserManagement = () => {
           {/* Add Button */}
           <button
             onClick={handleAddNewUserClick}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap flex items-center gap-2"
           >
+            <Plus className="w-5 h-5" />
             Thêm người dùng
           </button>
         </div>
