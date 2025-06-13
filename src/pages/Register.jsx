@@ -67,7 +67,7 @@ const Register = () => {
       if (response.status === 200 || response.status === 201) {
         console.log("Registration successful:", response.data);
         setSuccessMessage("Đăng ký thành công! Đang chuyển hướng...");
-        
+
         // Clear form data
         setFormData({
           username: "",
@@ -75,7 +75,7 @@ const Register = () => {
           password: "",
           confirmPassword: "",
         });
-        
+
         // Redirect to login page after showing success message
         setTimeout(() => {
           navigate("/login", { replace: true });
@@ -86,18 +86,22 @@ const Register = () => {
       }
     } catch (err) {
       console.error("Registration error:", err);
-      
+
       if (err.response) {
         console.log("Error response status:", err.response.status);
         console.log("Error response data:", err.response.data);
-        
+
         // Handle specific error cases
         if (err.response.status === 400) {
-          setError(err.response.data.message || "Thông tin đăng ký không hợp lệ");
+          setError(
+            err.response.data.message || "Thông tin đăng ký không hợp lệ"
+          );
         } else if (err.response.status === 409) {
           setError("Tài khoản hoặc email đã tồn tại");
         } else {
-          setError(err.response.data.message || "Đăng ký thất bại, vui lòng thử lại");
+          setError(
+            err.response.data.message || "Đăng ký thất bại, vui lòng thử lại"
+          );
         }
       } else if (err.request) {
         setError("Không thể kết nối đến máy chủ, vui lòng thử lại sau");
