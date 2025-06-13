@@ -7,6 +7,8 @@ import Homepage from "./pages/Homepage";
 import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
+import SurveyManagement from "./pages/SurveyManagement";
+import SurveyDetail from "./pages/SurveyDetail";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -49,6 +51,22 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="consultantmanagement">
                 <ConsultantManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/surveymanagement"
+            element={
+              <LayoutDashboard activeMenuItem="surveymanagement">
+                <SurveyManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/surveydetail/:surveyId"
+            element={
+              <LayoutDashboard activeMenuItem="surveymanagement">
+                <SurveyDetail />
               </LayoutDashboard>
             }
           />
