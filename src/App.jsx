@@ -8,6 +8,7 @@ import Homepage from "./pages/Homepage";
 import Assessment from "./pages/Assessment";
 import Course from "./pages/Course";
 import Booking from "./pages/Booking";
+import Blog from "./pages/Blog";
 import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
@@ -20,7 +21,6 @@ import Register from "./pages/Register";
 import MyCourse from "./pages/MyCourse";
 import CourseDetail from "./pages/CourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
-
 
 function App() {
   return (
@@ -74,6 +74,14 @@ function App() {
             element={
               <Layout>
                 <Booking />
+              </Layout>
+            }
+          />
+          <Route
+            path="/blog"
+            element={
+              <Layout>
+                <Blog />
               </Layout>
             }
           />

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Book, Clock, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const courses = [
   {
@@ -42,10 +43,10 @@ const FeaturedCourses = () => {
               Các khóa học được thiết kế phù hợp với từng đối tượng
             </p>
           </div>
-          <button className="hidden md:flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200">
+          <Link to="/courses" className="hidden md:flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors duration-200">
             Xem tất cả khóa học
             <ArrowRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
 
         {/* Courses Grid */}
