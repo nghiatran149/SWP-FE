@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { User, ChevronDown, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Header = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
 
   const navigationItems = [
-    { name: 'Trang chủ', href: 'home', active: true },
-    { name: 'Blog', href: 'blog' },
-    { name: 'Khóa học', href: 'courses' },
-    { name: 'Đặt lịch', href: '#' },
+    { name: 'Trang chủ', href: '/home' },
+    { name: 'Khóa học', href: '/courses' },
+    { name: 'Đánh giá', href: '/assessments' },
+    { name: 'Đặt lịch', href: '/booking' },
+    { name: 'Blog', href: '/blog' },
   ];
 
   const handleLogout = () => {
@@ -41,17 +43,17 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
             {navigationItems.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                  item.active
+                  location.pathname === item.href
                     ? 'text-teal-600 bg-teal-50 border-b-2 border-teal-600'
                     : 'text-gray-700 hover:text-teal-600 hover:bg-gray-50'
                 }`}
               >
                 {item.name}
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -132,17 +134,17 @@ const Header = () => {
           <div className="md:hidden border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navigationItems.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href}
                   className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                    item.active
+                    location.pathname === item.href
                       ? 'text-teal-600 bg-teal-50'
                       : 'text-gray-700 hover:text-teal-600 hover:bg-gray-50'
                   }`}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
             </div>
             
