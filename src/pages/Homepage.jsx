@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Shield, ArrowRight, Book, Calendar, Users, ShieldCheck, GraduationCap, Heart, CheckCircle, BarChart2 } from 'lucide-react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 import FeaturedCourses from '../components/FeaturedCourses';
@@ -105,20 +105,20 @@ const Homepage = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <button className="bg-teal-600 hover:bg-teal-700 text-white border-none h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-colors duration-200">
+            <Link to="/assessments" className="bg-teal-600 hover:bg-teal-700 text-white border-none h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-colors duration-200">
               Đánh giá nguy cơ
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </Link>
 
-            <button className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-all duration-200">
+            <Link to="/courses" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-all duration-200">
               <Book className="w-4 h-4" />
               Khám phá khóa học
-            </button>
+            </Link>
 
-            <button className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-all duration-200">
+            <Link to="/booking" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-all duration-200">
               <Calendar className="w-4 h-4" />
               Đặt lịch tư vấn
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -211,10 +211,10 @@ const Homepage = () => {
                 ))}
               </div>
 
-              <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-2 group">
+              <Link to="/assessments" className="w-1/3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors duration-200 flex items-center gap-1 group">
                 Làm bài đánh giá
                 <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
-              </button>
+              </Link>
             </div>
 
             <div className="relative">
@@ -290,10 +290,10 @@ const Homepage = () => {
                 </div>
               </div>
 
-              <button className="bg-white text-blue-900 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2 group">
+              <Link to="/booking" className="w-1/3 bg-white text-blue-900 font-semibold px-8 py-4 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2 group">
                 Đặt lịch ngay
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
-              </button>
+              </Link>
             </div>
 
             <div className="relative">

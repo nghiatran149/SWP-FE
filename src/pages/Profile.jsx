@@ -15,7 +15,6 @@ import {
   Check,
 } from "lucide-react";
 import axios from "axios";
-// Loại bỏ import jwt-decode
 
 const ProfilePage = () => {
   // State để lưu trữ dữ liệu
@@ -41,9 +40,9 @@ const ProfilePage = () => {
   // Lấy token từ localStorage
   const getToken = () => localStorage.getItem("token");
 
-  // Hàm lấy userId từ localStorage - Đã thay đổi để không sử dụng jwt-decode
+  // Hàm lấy userId từ localStorage
   const getUserId = () => {
-    // Thử lấy từ userInfo nếu được lưu dưới dạng object
+    // Lấy từ userInfo nếu được lưu dưới dạng object
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       try {
@@ -54,11 +53,11 @@ const ProfilePage = () => {
       }
     }
 
-    // Thử lấy trực tiếp từ userId trong localStorage nếu được lưu riêng
+    // Lấy trực tiếp từ userId trong localStorage nếu được lưu riêng
     const userId = localStorage.getItem("userId");
     if (userId) return userId;
 
-    // Thử lấy từ user nếu được lưu dưới dạng object khác
+    // Lấy từ user nếu được lưu dưới dạng object khác
     const user = localStorage.getItem("user");
     if (user) {
       try {
@@ -192,10 +191,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Phần còn lại của code giữ nguyên
-  // ...
-
-  // Hàm xử lý thay đổi form - Đã sửa để không validate quá nghiêm ngặt trong quá trình nhập
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -214,7 +209,8 @@ const ProfilePage = () => {
       const profileId = profileData.profileId;
       const userId = profileData.userId;
 
-      console.log("Updating profile with ID:", profileId);
+      // Log trước khi định dạng để debug
+      console.log("Before formatting - Phone:", formData.phoneNumber);
 
       // Format dữ liệu để khớp với yêu cầu của API
       const formattedData = {
@@ -226,7 +222,7 @@ const ProfilePage = () => {
           ? formatDateForAPI(formData.dateOfBirth)
           : null,
         gender: formData.gender,
-        phoneNumber: formData.phoneNumber,
+        phoneNumber: formData.phoneNumber ? formData.phoneNumber.trim() : "", // Loại bỏ khoảng trắng
         address: formData.address,
         city: formData.city,
         occupation: formData.occupation,
@@ -236,161 +232,47 @@ const ProfilePage = () => {
         specialization: formData.specialization,
       };
 
-      console.log("Sending profile update:", formattedData);
+      console.log("After formatting - Data being sent:", formattedData);
 
-      try {
-        // Method 1: Thử POST đến endpoint chính
-        console.log("Trying POST method to main endpoint...");
-        const response = await axios.post(
-          "https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile",
-          formattedData,
-          {
-            headers: {
-              Authorization: `Bearer ${getToken()}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log("POST response:", response.data);
-
-        if (response.data && response.data.resultStatus === "Success") {
-          await fetchProfileData();
-          setIsEditing(false);
-          alert("Cập nhật thông tin thành công!");
-          return;
+      // Sử dụng chỉ một endpoint chính xác đã xác định
+      const response = await axios.put(
+        `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${profileId}`,
+        formattedData,
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "Content-Type": "application/json",
+          },
         }
-      } catch (err1) {
-        console.error("POST method failed:", err1);
+      );
 
-        try {
-          // Method 2: Thử PUT đến endpoint có ID
-          console.log("Trying PUT method with ID...");
-          const putResponse = await axios.put(
-            `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${profileId}`,
-            formattedData,
-            {
-              headers: {
-                Authorization: `Bearer ${getToken()}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+      console.log("Update response:", response.data);
 
-          console.log("PUT response:", putResponse.data);
-
-          if (putResponse.data && putResponse.data.resultStatus === "Success") {
-            await fetchProfileData();
-            setIsEditing(false);
-            alert("Cập nhật thông tin thành công!");
-            return;
-          }
-        } catch (err2) {
-          console.error("PUT method failed:", err2);
-
-          try {
-            // Method 3: Thử PATCH đến endpoint có ID
-            console.log("Trying PATCH method...");
-            const patchResponse = await axios.patch(
-              `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${profileId}`,
-              formattedData,
-              {
-                headers: {
-                  Authorization: `Bearer ${getToken()}`,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-
-            console.log("PATCH response:", patchResponse.data);
-
-            if (
-              patchResponse.data &&
-              patchResponse.data.resultStatus === "Success"
-            ) {
-              await fetchProfileData();
-              setIsEditing(false);
-              alert("Cập nhật thông tin thành công!");
-              return;
-            }
-          } catch (err3) {
-            console.error("PATCH method failed:", err3);
-
-            // Method 4: Cuối cùng thử lại với endpoint "/update"
-            try {
-              console.log("Trying method with '/update' endpoint...");
-
-              // Dùng phương thức PUT với endpoint cụ thể
-              const finalResponse = await axios({
-                method: "put", // hoặc có thể thử post
-                url: `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/update/${profileId}`,
-                data: formattedData,
-                headers: {
-                  Authorization: `Bearer ${getToken()}`,
-                  "Content-Type": "application/json",
-                },
-              });
-
-              console.log("Final attempt response:", finalResponse.data);
-
-              if (
-                finalResponse.data &&
-                finalResponse.data.resultStatus === "Success"
-              ) {
-                await fetchProfileData();
-                setIsEditing(false);
-                alert("Cập nhật thông tin thành công!");
-                return;
-              }
-            } catch (finalErr) {
-              console.error("All API methods failed:", finalErr);
-
-              // Tạo thông báo lỗi chi tiết
-              let errorMsg = "Không thể cập nhật thông tin hồ sơ: ";
-
-              if (finalErr.response) {
-                errorMsg += `(${finalErr.response.status}) `;
-                if (finalErr.response.data && finalErr.response.data.title) {
-                  errorMsg += finalErr.response.data.title;
-                } else if (finalErr.response.data) {
-                  errorMsg += JSON.stringify(finalErr.response.data).substring(
-                    0,
-                    100
-                  );
-                }
-              } else {
-                errorMsg += finalErr.message || "Lỗi không xác định";
-              }
-
-              setError(errorMsg);
-            }
-          }
-        }
+      if (response.data && response.data.resultStatus === "Success") {
+        await fetchProfileData();
+        setIsEditing(false);
+        alert("Cập nhật thông tin thành công!");
+      } else {
+        // Log lỗi nếu có
+        console.log("Update not successful:", response.data);
+        setError("Không thể cập nhật thông tin. Vui lòng thử lại.");
       }
     } catch (err) {
       console.error("Error updating profile:", err);
 
-      // Xử lý chi tiết lỗi
-      if (err.response) {
-        console.log("Error response:", err.response.data);
-        console.log("Error status:", err.response.status);
+      // Hiển thị chi tiết lỗi
+      if (err.response && err.response.data) {
+        console.log("Error details:", err.response.data);
 
-        if (err.response.status === 405) {
+        // Kiểm tra lỗi liên quan đến phoneNumber
+        if (err.response.data.errors && err.response.data.errors.PhoneNumber) {
           setError(
-            `Lỗi phương thức API (405): Sever không cho phép phương thức này. Vui lòng liên hệ quản trị viên.`
-          );
-        } else if (err.response.status === 400) {
-          setError(
-            `Lỗi dữ liệu không hợp lệ (400): ${JSON.stringify(
-              err.response.data.errors || err.response.data
+            `Lỗi số điện thoại: ${err.response.data.errors.PhoneNumber.join(
+              ", "
             )}`
           );
         } else {
-          setError(
-            `Không thể cập nhật thông tin (${
-              err.response.status
-            }): ${JSON.stringify(err.response.data)}`
-          );
+          setError(`Lỗi cập nhật: ${JSON.stringify(err.response.data)}`);
         }
       } else {
         setError("Không thể cập nhật thông tin. Vui lòng thử lại sau.");
@@ -473,9 +355,6 @@ const ProfilePage = () => {
               {error}
             </div>
           )}
-
-          {/* Phần còn lại của giao diện giữ nguyên */}
-          {/* ... */}
 
           {/* Action buttons */}
           <div className="flex justify-end gap-3">

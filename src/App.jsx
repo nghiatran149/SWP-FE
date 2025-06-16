@@ -1,9 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import ScrollToTop from './components/ScrollToTop';
 import Layout from "./components/Layout";
 import LayoutDashboard from "./components/LayoutDashboard";
 import Homepage from "./pages/Homepage";
+import Assessment from "./pages/Assessment";
+import Course from "./pages/Course";
+import Booking from "./pages/Booking";
+import Blog from "./pages/Blog";
 import Dashboard from "./pages/Dashboard";
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
@@ -21,6 +26,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Toaster />
         <Routes>
           <Route
@@ -44,6 +50,38 @@ function App() {
             element={
               <Layout>
                 <Homepage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/assessments"
+            element={
+              <Layout>
+                <Assessment />
+              </Layout>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <Layout>
+                <Course />
+              </Layout>
+            }
+          />
+          <Route
+            path="/booking"
+            element={
+              <Layout>
+                <Booking />
+              </Layout>
+            }
+          />
+          <Route
+            path="/blog"
+            element={
+              <Layout>
+                <Blog />
               </Layout>
             }
           />
