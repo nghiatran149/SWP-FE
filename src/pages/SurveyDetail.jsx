@@ -3,7 +3,8 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, ArrowLeft, Plus } from 'lucide-react';
 import axios from 'axios';
 
-const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
+// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
+const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
 
 const QUESTION_TYPE_OPTIONS = [
     { value: 'SINGLE_CHOICE', label: 'Chọn một đáp án' },
@@ -24,7 +25,7 @@ const SurveyDetail = () => {
     const [addingQuestion, setAddingQuestion] = useState(false);
     const [addForm, setAddForm] = useState({
         questionText: '',
-        questionType: 'string',
+        questionType: 'SINGLE_CHOICE',
         sequence: 1,
     });
     const [editingQuestion, setEditingQuestion] = useState(null);
@@ -96,7 +97,7 @@ const SurveyDetail = () => {
         setAddingQuestion(true);
         setAddForm({
             questionText: '',
-            questionType: 'string',
+            questionType: 'SINGLE_CHOICE',
             sequence: nextSequence,
         });
     };
