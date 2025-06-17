@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster } from 'react-hot-toast';
-import { AuthProvider } from './contexts/AuthContext';
+import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "./contexts/AuthContext";
 import Layout from "./components/Layout";
 import LayoutDashboard from "./components/LayoutDashboard";
 import Homepage from "./pages/Homepage";
@@ -16,6 +16,7 @@ import Register from "./pages/Register";
 import MyCourse from "./pages/MyCourse";
 import CourseDetail from "./pages/CourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
+import Book from "./pages/Book";
 
 function App() {
   return (
@@ -28,6 +29,14 @@ function App() {
             element={
               <Layout>
                 <Login />
+              </Layout>
+            }
+          />
+                    <Route
+            path="/book"
+            element={
+              <Layout>
+                <Book />
               </Layout>
             }
           />
