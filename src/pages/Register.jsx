@@ -52,7 +52,7 @@ const Register = () => {
       setIsLoading(true);
 
       const response = await axios.post(
-        "https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User/register-member",
+        "http://drugpreventionsystem.somee.com/api/User/register-member",
         {
           username: formData.username,
           email: formData.email,

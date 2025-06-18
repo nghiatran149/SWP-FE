@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Pencil, Trash2, Search, ArrowLeft, Plus } from 'lucide-react';
 import axios from 'axios';
 
-const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
+const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
 
 const QuestionDetail = () => {
     const { questionId, surveyId } = useParams();
