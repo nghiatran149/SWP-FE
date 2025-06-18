@@ -240,7 +240,7 @@ const MyCourse = () => {
 
                 {/* Action Buttons */}
                 <div className="flex justify-between items-center">
-                  <Link to="/coursedetail" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">
+                  <Link to="/mycoursedetail" className="text-gray-600 text-sm hover:text-gray-900 transition-colors">
                     Xem chi tiết
                   </Link>
                   {getStatusButton(course, activeTab)}

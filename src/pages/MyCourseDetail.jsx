@@ -120,7 +120,7 @@ const CourseDetail = () => {
             <h1 className="text-2xl font-bold text-gray-900">{courseData.title}</h1>
             <p className="text-gray-600 mt-1">{courseData.description}</p>
           </div>
-          <Link to="/mycourses" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
+          <Link to="/mycourse" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" />
             <span>Quay lại khóa học</span>
           </Link>
