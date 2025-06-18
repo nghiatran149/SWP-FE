@@ -21,7 +21,6 @@ import Register from "./pages/Register";
 import MyCourse from "./pages/MyCourse";
 import CourseDetail from "./pages/CourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
-import Booking from "./pages/Booking";
 
 function App() {
   return (
