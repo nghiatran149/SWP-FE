@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 
+const BASE_URL = "http://drugpreventionsystem.somee.com/api";
 const ProfilePage = () => {
   // State để lưu trữ dữ liệu
   const [profileData, setProfileData] = useState(null); // Lưu trữ dữ liệu profile từ API
@@ -142,8 +143,7 @@ const ProfilePage = () => {
 
       // Sử dụng template literals đúng cách để đưa userId vào URL
       const response = await axios.get(
-        // `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${userId}/UserProfile`,
-        `http://drugpreventionsystem.somee.com/api/UserProfile/${userId}/UserProfile`,
+        `${BASE_URL}/UserProfile/${userId}/UserProfile`,
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
@@ -237,8 +237,7 @@ const ProfilePage = () => {
 
       // Sử dụng chỉ một endpoint chính xác đã xác định
       const response = await axios.put(
-        // `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${profileId}`,
-        `http://drugpreventionsystem.somee.com/api/UserProfile/${profileId}`,
+        `${BASE_URL}/UserProfile/${profileId}`,
         formattedData,
         {
           headers: {

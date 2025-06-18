@@ -21,6 +21,8 @@ import Register from "./pages/Register";
 import MyCourse from "./pages/MyCourse";
 import CourseDetail from "./pages/CourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
+import MyBooking from "./pages/MyBooking";
+import MyAssessment from "./pages/MyAssessment";
 
 function App() {
   return (
@@ -106,6 +108,22 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="profile">
                 <Profile />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/schedule"
+            element={
+              <LayoutDashboard activeMenuItem="myBooking">
+                <MyBooking />
+              </LayoutDashboard>
+            }
+          />
+                    <Route
+            path="/pricing"
+            element={
+              <LayoutDashboard activeMenuItem="myAssessment">
+                <MyAssessment />
               </LayoutDashboard>
             }
           />
