@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, Plus } from 'lucide-react';
 import axios from 'axios';
 
-const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
+// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
+const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
 
 const SurveyManagement = () => {
   const [surveys, setSurveys] = useState([]);

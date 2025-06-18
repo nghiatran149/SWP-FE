@@ -50,8 +50,8 @@ const Sidebar = ({ activeItem = 'overview' }) => {
 
   const bottomItems = [
     { id: 'profile', label: 'Hồ sơ', icon: User },
-    { id: 'settings', label: 'Cài đặt', icon: Settings },
-    { id: 'logout', label: 'Đăng xuất', icon: LogOut }
+    // { id: 'settings', label: 'Cài đặt', icon: Settings },
+    // { id: 'logout', label: 'Đăng xuất', icon: LogOut }
   ];
 
   return (
@@ -106,8 +106,8 @@ const Sidebar = ({ activeItem = 'overview' }) => {
             let to = '#';
             switch(item.id) {
               case 'profile': to = '/profile'; break;
-              case 'settings': to = '/settings'; break;
-              case 'logout': to = '/logout'; break;
+              // case 'settings': to = '/settings'; break;
+              // case 'logout': to = '/logout'; break;
               default: to = '#';
             }
             return (

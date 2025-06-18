@@ -25,7 +25,8 @@ const Login = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        "https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User/login",
+        // "https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User/login",
+        "http://drugpreventionsystem.somee.com/api/User/login",
         {
           method: "POST",
           headers: {

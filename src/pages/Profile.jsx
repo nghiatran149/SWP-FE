@@ -142,7 +142,8 @@ const ProfilePage = () => {
 
       // Sử dụng template literals đúng cách để đưa userId vào URL
       const response = await axios.get(
-        `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${userId}/UserProfile`,
+        // `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${userId}/UserProfile`,
+        `http://drugpreventionsystem.somee.com/api/UserProfile/${userId}/UserProfile`,
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
@@ -236,7 +237,8 @@ const ProfilePage = () => {
 
       // Sử dụng chỉ một endpoint chính xác đã xác định
       const response = await axios.put(
-        `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${profileId}`,
+        // `https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/UserProfile/${profileId}`,
+        `http://drugpreventionsystem.somee.com/api/UserProfile/${profileId}`,
         formattedData,
         {
           headers: {
