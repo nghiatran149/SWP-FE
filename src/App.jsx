@@ -37,6 +37,14 @@ function App() {
               </Layout>
             }
           />
+                    <Route
+            path="/booking"
+            element={
+              <Layout>
+                <Booking />
+              </Layout>
+            }
+          />
           <Route
             path="/register"
             element={
