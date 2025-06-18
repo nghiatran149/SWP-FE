@@ -12,6 +12,8 @@ import {
   User,
   Users,
   IdCardLanyard,
+  FileText,
+  BookOpenCheck,
   Settings, 
   LogOut
 } from 'lucide-react';
@@ -23,10 +25,10 @@ const Sidebar = ({ activeItem = 'overview' }) => {
   const getMenuItemsByRole = () => {
     const commonItems = [
       { id: 'overview', label: 'Tổng quan', icon: Home },
-      { id: 'courses', label: 'Khóa học', icon: BookOpen },
-      { id: 'schedule', label: 'Lịch hẹn', icon: Calendar },
-      { id: 'pricing', label: 'Đánh giá', icon: DollarSign },
-      { id: 'programs', label: 'Chương trình', icon: Activity },
+      { id: 'mycourse', label: 'Khóa học của tôi', icon: BookOpen },
+      { id: 'myappointment', label: 'Lịch hẹn của tôi', icon: Calendar },
+      { id: 'myassessment', label: 'Đánh giá của tôi', icon: FileText },
+      { id: 'mycampaign', label: 'Chương trình của tôi', icon: BookOpenCheck },
       { id: 'statistics', label: 'Thống kê', icon: BarChart3 },
     ];
 
@@ -69,10 +71,10 @@ const Sidebar = ({ activeItem = 'overview' }) => {
             let to = '#';
             switch(item.id) {
               case 'overview': to = '/dashboard'; break;
-              case 'courses': to = '/mycourses'; break;
-              case 'schedule': to = '/schedule'; break;
-              case 'pricing': to = '/pricing'; break;
-              case 'programs': to = '/programs'; break;
+              case 'mycourse': to = '/mycourse'; break;
+              case 'myappointment': to = '/myappointment'; break;
+              case 'myassessment': to = '/myassessment'; break;
+              case 'mycampaign': to = '/mycampaign'; break;
               case 'statistics': to = '/statistics'; break;
               case 'usermanagement': to = '/usermanagement'; break;
               case 'consultantmanagement': to = '/consultantmanagement'; break;

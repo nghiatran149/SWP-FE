@@ -1,90 +1,92 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, 
-  TrendingUp, 
-  FileText, 
-  BarChart2, 
+import {
+  ArrowRight,
+  TrendingUp,
+  FileText,
+  BarChart2,
   Calendar,
   Clock,
   ChevronLeft,
   ChevronRight,
   Info,
+  Plus,
   AlertTriangle
 } from 'lucide-react';
 
 const MyAssessment = () => {
   const [activeTab, setActiveTab] = useState('history');
-  
+
   // Mock data for assessments
   const assessments = {
     upcoming: [
       {
         id: 1,
         type: 'AUDIT',
-        scheduledDate: '11/20/2023',
-        description: 'Follow-up assessment for alcohol use'
+        scheduledDate: '20/11/2023',
+        description: 'Đánh giá theo dõi việc sử dụng rượu'
       },
     ],
     history: [
       {
         id: 2,
         type: 'ASSIST',
-        date: '10/15/2023',
+        date: '15/10/2023',
         score: 18,
-        risk: 'Moderate Risk',
-        substances: ['Alcohol', 'Cannabis'],
-        recommendation: 'Consider brief intervention and monitoring'
+        risk: 'Nguy cơ trung bình',
+        substances: ['Rượu', 'Cần sa'],
+        recommendation: 'Xem xét can thiệp ngắn hạn và theo dõi'
       },
       {
         id: 3,
         type: 'CRAFFT',
-        date: '9/1/2023',
+        date: '01/09/2023',
         score: 3,
-        risk: 'High Risk',
-        substances: ['Alcohol'],
-        recommendation: 'Referral to specialized assessment recommended'
+        risk: 'Nguy cơ cao',
+        substances: ['Rượu'],
+        recommendation: 'Khuyến nghị chuyển sang đánh giá chuyên sâu'
       },
       {
         id: 4,
         type: 'DAST',
-        date: '8/10/2023',
+        date: '10/08/2023',
         score: 4,
-        risk: 'Moderate Risk',
-        substances: ['Stimulants'],
-        recommendation: 'Brief intervention advised'
+        risk: 'Nguy cơ trung bình',
+        substances: ['Chất kích thích'],
+        recommendation: 'Khuyến nghị can thiệp ngắn hạn'
       }
     ]
   };
   
+
   // Function to render assessment trend chart placeholder
   const renderTrendChart = () => {
     return (
       <div className="flex items-center justify-center h-60 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-        <p className="text-gray-500">Assessment trend chart will appear here</p>
+        <p className="text-gray-500">Biểu đồ xu hướng đánh giá sẽ hiển thị ở đây</p>
       </div>
     );
   };
-  
+
   // Function to render risk badge
   const renderRiskBadge = (risk) => {
     let colorClass = '';
-    
-    if (risk === 'High Risk') {
+    if (risk === 'Nguy cơ cao' || risk === 'High Risk') {
       colorClass = 'bg-red-500 text-white';
-    } else if (risk === 'Moderate Risk') {
+    } else if (risk === 'Nguy cơ trung bình' || risk === 'Moderate Risk') {
       colorClass = 'bg-orange-400 text-white';
-    } else if (risk === 'Low Risk') {
+    } else if (risk === 'Nguy cơ thấp' || risk === 'Low Risk') {
       colorClass = 'bg-green-500 text-white';
+    } else {
+      colorClass = 'bg-gray-200 text-gray-800';
     }
-    
     return (
-      <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
+      <span className={`px-5 py-2 rounded-full text-sm font-semibold ${colorClass}`}>
         {risk}
       </span>
     );
   };
-  
+
   // Function to render substance pill
   const renderSubstancePill = (substance) => {
     return (
@@ -100,36 +102,36 @@ const MyAssessment = () => {
       <div key={assessment.id} className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="text-lg font-bold">{assessment.type} Assessment</h3>
-            <p className="text-sm text-gray-500">Taken on {assessment.date}</p>
+            <h3 className="text-lg font-bold">Bài đánh giá {assessment.type}</h3>
+            <p className="text-sm text-gray-500">Làm vào ngày {assessment.date}</p>
           </div>
           {assessment.risk && renderRiskBadge(assessment.risk)}
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <p className="text-sm text-gray-500">Score</p>
+            <p className="text-sm text-gray-500">Điểm</p>
             <p className="text-2xl font-bold">{assessment.score}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-500">Substances</p>
+            <p className="text-sm text-gray-500">Chất sử dụng</p>
             <div className="flex flex-wrap mt-1">
               {assessment.substances.map(substance => renderSubstancePill(substance))}
             </div>
           </div>
         </div>
-        
+
         <div className="mb-4">
-          <p className="text-sm text-gray-500">Recommendations</p>
+          <p className="text-sm text-gray-500">Khuyến nghị</p>
           <p className="text-gray-800">{assessment.recommendation}</p>
         </div>
-        
+
         <div className="flex justify-between mt-4">
-          <button className="flex items-center text-blue-600 hover:text-blue-800">
-            <FileText className="h-4 w-4 mr-1" /> View Detailed Results
+          <button className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-md hover:bg-gray-50 font-medium">
+            <FileText className="h-4 w-4 mr-1" /> Xem kết quả chi tiết
           </button>
-          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900">
-            Retake <ArrowRight className="h-4 w-4 ml-1" />
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+            Làm lại <ArrowRight className="h-4 w-4 ml-1" />
           </button>
         </div>
       </div>
@@ -141,18 +143,18 @@ const MyAssessment = () => {
     return (
       <div key={assessment.id} className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
         <div className="mb-3">
-          <h3 className="text-lg font-bold">{assessment.type} Assessment</h3>
-          <p className="text-sm text-gray-500">Scheduled for {assessment.scheduledDate}</p>
+          <h3 className="text-lg font-bold">Bài đánh giá {assessment.type}</h3>
+          <p className="text-sm text-gray-500">Đã lên lịch vào {assessment.scheduledDate}</p>
         </div>
-        
+
         <p className="text-gray-700 mb-4">{assessment.description}</p>
-        
+
         <div className="flex justify-between mt-4">
           <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-            Reschedule
+            Lên lịch lại
           </button>
-          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900">
-            Take Now <ArrowRight className="h-4 w-4 ml-1" />
+          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            Làm ngay <ArrowRight className="h-4 w-4 ml-1" />
           </button>
         </div>
       </div>
@@ -173,12 +175,12 @@ const MyAssessment = () => {
   // Function to render the recommendation section
   const renderRecommendation = () => {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
         <div className="flex items-start">
-          <TrendingUp  className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
+          <TrendingUp className="h-5 w-5 text-blue-600 mr-2 mt-1" />
           <div>
-            <h3 className="font-medium">Assessment Recommendation</h3>
-            <p className="text-sm text-gray-600">Based on your previous results, we recommend taking the AUDIT assessment to monitor your progress. Take AUDIT Assessment</p>
+            <h3 className="font-medium">Khuyến nghị đánh giá</h3>
+            <p className="text-sm text-gray-600">Dựa trên kết quả trước đó của bạn, chúng tôi khuyến nghị bạn nên làm bài đánh giá AUDIT để theo dõi tiến trình của mình. Làm bài đánh giá AUDIT</p>
           </div>
         </div>
       </div>
@@ -186,73 +188,56 @@ const MyAssessment = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen px-4 py-6 font-sans">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-2">
-            <button className="p-2 rounded hover:bg-gray-100">
-              <ChevronLeft className="h-5 w-5 text-gray-600" />
-            </button>
+    <div className="bg-gray-50 min-h-screen">
+      <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Các bài đánh giá của tôi</h1>
+            <p className="text-gray-600 mt-1">Quản lý và xem kết quả của các bài đánh giá của bạn về phòng chống ma túy.</p>
           </div>
-          <Link to="/home" className="text-blue-600 hover:text-blue-800">
+          <Link to="/home" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
             Về trang chủ
           </Link>
         </div>
-        
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Assessments</h1>
-            <p className="text-gray-600">Track your assessment history and schedule follow-ups</p>
-          </div>
-          <button className="flex items-center px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-black">
-            Take New Assessment
-            <Info className="h-4 w-4 ml-2" />
-          </button>
-        </div>
-        
+      </div>
+      <div className="p-8 mx-auto">
+
         {renderRecommendation()}
-        
+
         <div className="mb-6">
-          <div className="flex">
-            <button
-              onClick={() => setActiveTab('history')}
-              className={`px-6 py-3 text-sm font-medium flex-1 transition-colors ${
-                activeTab === 'history' 
-                  ? 'bg-white text-gray-800 border-t border-l border-r border-gray-200' 
-                  : 'bg-gray-100 text-gray-600 border-b border-gray-200'
-              }`}
-            >
-              Assessment History
-            </button>
-            <button
-              onClick={() => setActiveTab('upcoming')}
-              className={`px-6 py-3 text-sm font-medium flex-1 transition-colors ${
-                activeTab === 'upcoming' 
-                  ? 'bg-white text-gray-800 border-t border-l border-r border-gray-200' 
-                  : 'bg-gray-100 text-gray-600 border-b border-gray-200'
-              }`}
-            >
-              Upcoming
-            </button>
-            <button
-              onClick={() => setActiveTab('insights')}
-              className={`px-6 py-3 text-sm font-medium flex-1 transition-colors ${
-                activeTab === 'insights' 
-                  ? 'bg-white text-gray-800 border-t border-l border-r border-gray-200' 
-                  : 'bg-gray-100 text-gray-600 border-b border-gray-200'
-              }`}
-            >
-              Insights
+          <div className="flex items-center justify-between">
+            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+              {[
+                { id: 'history', label: 'Lịch sử đánh giá', count: assessments.history.length },
+                { id: 'upcoming', label: 'Sắp tới', count: assessments.upcoming.length },
+                { id: 'insights', label: 'Thống kê', count: null },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    activeTab === tab.id
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {tab.label}{tab.count !== null ? ` (${tab.count})` : ''}
+                </button>
+              ))}
+            </div>
+            <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-4">
+              Làm bài đánh giá mới
+              <Plus className="h-4 w-4 ml-2" />
             </button>
           </div>
-          
+
           <div className="mt-6">
             {activeTab === 'history' && (
-              <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {assessments.history.map(assessment => renderAssessmentHistoryCard(assessment))}
               </div>
             )}
-            
+
             {activeTab === 'upcoming' && (
               <div>
                 {assessments.upcoming.length > 0 ? (
@@ -264,7 +249,7 @@ const MyAssessment = () => {
                 )}
               </div>
             )}
-            
+
             {activeTab === 'insights' && renderAssessmentTrends()}
           </div>
         </div>

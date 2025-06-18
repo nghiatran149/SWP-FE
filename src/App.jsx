@@ -4,24 +4,35 @@ import { AuthProvider } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from "./components/Layout";
 import LayoutDashboard from "./components/LayoutDashboard";
+
+//Authorize
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+
+//Landing
 import Homepage from "./pages/Homepage";
-import Assessment from "./pages/Assessment";
 import Course from "./pages/Course";
+import Assessment from "./pages/Assessment";
 import Booking from "./pages/Booking";
 import Blog from "./pages/Blog";
-import Dashboard from "./pages/Dashboard";
+
+//Admin Dashboard
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
+
+//Detail
 import SurveyDetail from "./pages/SurveyDetail";
 import QuestionDetail from "./pages/QuestionDetail";
-import Profile from "./pages/Profile";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import MyCourse from "./pages/MyCourse";
-import CourseDetail from "./pages/CourseDetail";
+import MyCourseDetail from "./pages/MyCourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
-import MyBooking from "./pages/MyBooking";
+import AppointmentDetail from "./pages/AppointmentDetail";
+
+//User Dashboard
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import MyCourse from "./pages/MyCourse";
+import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
 
 function App() {
@@ -36,14 +47,6 @@ function App() {
             element={
               <Layout>
                 <Login />
-              </Layout>
-            }
-          />
-                    <Route
-            path="/booking"
-            element={
-              <Layout>
-                <Booking />
               </Layout>
             }
           />
@@ -112,17 +115,25 @@ function App() {
             }
           />
           <Route
-            path="/schedule"
+            path="/myappointment"
             element={
-              <LayoutDashboard activeMenuItem="myBooking">
-                <MyBooking />
+              <LayoutDashboard activeMenuItem="myappointment">
+                <MyAppointment />
               </LayoutDashboard>
             }
           />
-                    <Route
-            path="/pricing"
+          <Route
+            path="/appointmentdetail"
             element={
-              <LayoutDashboard activeMenuItem="myAssessment">
+              <LayoutDashboard activeMenuItem="myappointment">
+                <AppointmentDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/myassessment"
+            element={
+              <LayoutDashboard activeMenuItem="myassessment">
                 <MyAssessment />
               </LayoutDashboard>
             }
@@ -168,25 +179,25 @@ function App() {
             }
           />
           <Route
-            path="/mycourses"
+            path="/mycourse"
             element={
-              <LayoutDashboard activeMenuItem="courses">
+              <LayoutDashboard activeMenuItem="mycourse">
                 <MyCourse />
               </LayoutDashboard>
             }
           />
           <Route
-            path="/coursedetail"
+            path="/mycoursedetail"
             element={
-              <LayoutDashboard activeMenuItem="courses">
-                <CourseDetail />
+              <LayoutDashboard activeMenuItem="mycourse">
+                <MyCourseDetail />
               </LayoutDashboard>
             }
           />
           <Route
             path="/certificate"
             element={
-              <LayoutDashboard activeMenuItem="courses">
+              <LayoutDashboard activeMenuItem="mycourse">
                 <CertificateDetail />
               </LayoutDashboard>
             }
