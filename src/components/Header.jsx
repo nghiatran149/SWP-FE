@@ -13,7 +13,7 @@ const Header = () => {
     { name: 'Trang chủ', href: 'home', active: true },
     { name: 'Blog', href: 'blog' },
     { name: 'Khóa học', href: 'courses' },
-    { name: 'Đặt lịch', href: 'book' },
+    { name: 'Đặt lịch', href: 'booking' },
   ];
 
   const handleLogout = () => {

@@ -16,7 +16,7 @@ import Register from "./pages/Register";
 import MyCourse from "./pages/MyCourse";
 import CourseDetail from "./pages/CourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
-import Book from "./pages/Book";
+import Booking from "./pages/Booking";
 
 function App() {
   return (
@@ -33,10 +33,10 @@ function App() {
             }
           />
                     <Route
-            path="/book"
+            path="/booking"
             element={
               <Layout>
-                <Book />
+                <Booking />
               </Layout>
             }
           />

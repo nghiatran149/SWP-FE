@@ -1,10 +1,9 @@
 // Trang đặt lịch tư vấn
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Clock, DollarSign, Video, Shield, HelpCircle } from "lucide-react";
 
-//Khai báo và khơi tạo state
-const Book = () => {
+const Booking = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingSuccess, setBookingSuccess] = useState(false);
@@ -24,8 +23,10 @@ const Book = () => {
     referralSource: "",
   });
 
+  // Sửa lại hàm xử lý input để không bị lỗi mất focus khi nhập liệu
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Sử dụng cập nhật state thông thường thay vì functional update
     setFormData({
       ...formData,
       [name]: value,
@@ -55,6 +56,65 @@ const Book = () => {
     setCurrentStep(2);
   };
 
+  // Thông tin hữu ích - có thể sử dụng lại ở nhiều nơi
+  const renderInfoSidebar = () => {
+    return (
+      <div className="w-full md:w-1/3 bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-xl font-semibold text-gray-800 mb-6">
+          Thông tin hữu ích
+        </h2>
+
+        <div className="space-y-6">
+          <div>
+            <h3 className="font-medium text-gray-700 mb-2">
+              Thời gian tư vấn
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Mỗi buổi tư vấn kéo dài 45-60 phút, tùy thuộc vào nhu cầu của
+              bạn.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-medium text-gray-700 mb-2">Chi phí</h3>
+            <p className="text-gray-600 text-sm">
+              Dịch vụ tư vấn của chúng tôi hoàn toàn miễn phí cho tất cả mọi
+              người.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-medium text-gray-700 mb-2">
+              Hình thức tư vấn
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Bạn có thể chọn tư vấn trực tuyến qua video call hoặc tư vấn
+              trực tiếp tại văn phòng của chúng tôi.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-medium text-gray-700 mb-2">Bảo mật</h3>
+            <p className="text-gray-600 text-sm">
+              Thông tin của bạn sẽ được bảo mật hoàn toàn. Chúng tôi luôn
+              tuân thủ nghiêm ngặt các quy định về bảo mật thông tin.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-medium text-gray-700 mb-2">
+              Hỗ trợ khẩn cấp
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Nếu bạn cần hỗ trợ khẩn cấp, vui lòng gọi đường dây nóng:{" "}
+              <span className="font-medium">1800 1234</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderSuccessPage = () => {
     return (
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-sm p-8 text-center">
@@ -71,10 +131,15 @@ const Book = () => {
           <h3 className="font-medium text-gray-800 mb-4">Thông tin cuộc hẹn</h3>
           <div className="bg-gray-100 rounded-lg p-6">
             <div className="space-y-2">
-              <p><span>Ngày: </span><span className="font-medium">20/05/2023</span></p>
-              <p><span>Thời gian: </span><span className="font-medium">10:00</span></p>
-              <p><span>Hình thức: </span><span className="font-medium">Trực tuyến</span></p>
-              <p><span>Chuyên viên tư vấn: </span><span className="font-medium">TS. Nguyễn Văn A</span></p>
+              <p><span>Ngày: </span><span className="font-medium">{formData.appointmentDate || '20/05/2023'}</span></p>
+              <p><span>Thời gian: </span><span className="font-medium">{formData.appointmentTime || '10:00'}</span></p>
+              <p><span>Hình thức: </span><span className="font-medium">{formData.consultType === 'online' ? 'Trực tuyến' : 'Trực tiếp'}</span></p>
+              <p><span>Chuyên viên tư vấn: </span><span className="font-medium">
+                {formData.consultant === '1' ? 'TS. Nguyễn Văn A' : 
+                 formData.consultant === '2' ? 'ThS. Trần Thị B' : 
+                 formData.consultant === '3' ? 'TS. Lê Văn C' : 
+                 'TS. Nguyễn Văn A'}
+              </span></p>
             </div>
           </div>
         </div>
@@ -94,7 +159,9 @@ const Book = () => {
         </div>
         
         <div className="mt-8 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-          <button className="bg-gray-800 text-white py-2 px-6 rounded-md">
+          <button 
+            onClick={() => navigate('/booking-history')}
+            className="bg-gray-800 text-white py-2 px-6 rounded-md">
             Xem lịch hẹn của tôi
           </button>
           <Link to="/home" className="text-gray-600 hover:text-gray-800 py-2 underline">
@@ -108,59 +175,8 @@ const Book = () => {
   const renderStep1 = () => {
     return (
       <div className="flex flex-col md:flex-row gap-8">
-        <div className="w-full md:w-1/3 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            Thông tin hữu ích
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Thời gian tư vấn
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Mỗi buổi tư vấn kéo dài 45-60 phút, tùy thuộc vào nhu cầu của
-                bạn.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Chi phí</h3>
-              <p className="text-gray-600 text-sm">
-                Dịch vụ tư vấn của chúng tôi hoàn toàn miễn phí cho tất cả mọi
-                người.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Hình thức tư vấn
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Bạn có thể chọn tư vấn trực tuyến qua video call hoặc tư vấn
-                trực tiếp tại văn phòng của chúng tôi.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Bảo mật</h3>
-              <p className="text-gray-600 text-sm">
-                Thông tin của bạn sẽ được bảo mật hoàn toàn. Chúng tôi luôn
-                tuân thủ nghiêm ngặt các quy định về bảo mật thông tin.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Hỗ trợ khẩn cấp
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Nếu bạn cần hỗ trợ khẩn cấp, vui lòng gọi đường dây nóng:{" "}
-                <span className="font-medium">1800 1234</span>
-              </p>
-            </div>
-          </div>
-        </div>
+        {renderInfoSidebar()}
+        
         {/* Form đặt lịch */}
         <div className="w-full md:w-2/3 bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -266,59 +282,7 @@ const Book = () => {
     return (
       <div className="flex flex-col md:flex-row gap-8">
         {/* Thông tin hữu ích */}
-        <div className="w-full md:w-1/3 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            Thông tin hữu ích
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Thời gian tư vấn
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Mỗi buổi tư vấn kéo dài 45-60 phút, tùy thuộc vào nhu cầu của
-                bạn.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Chi phí</h3>
-              <p className="text-gray-600 text-sm">
-                Dịch vụ tư vấn của chúng tôi hoàn toàn miễn phí cho tất cả mọi
-                người.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Hình thức tư vấn
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Bạn có thể chọn tư vấn trực tuyến qua video call hoặc tư vấn
-                trực tiếp tại văn phòng của chúng tôi.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Bảo mật</h3>
-              <p className="text-gray-600 text-sm">
-                Thông tin của bạn sẽ được bảo mật hoàn toàn. Chúng tôi luôn
-                tuân thủ nghiêm ngặt các quy định về bảo mật thông tin.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Hỗ trợ khẩn cấp
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Nếu bạn cần hỗ trợ khẩn cấp, vui lòng gọi đường dây nóng:{" "}
-                <span className="font-medium">1800 1234</span>
-              </p>
-            </div>
-          </div>
-        </div>
+        {renderInfoSidebar()}
 
         {/* Form đặt lịch */}
         <div className="w-full md:w-2/3 bg-white rounded-lg shadow-sm p-6">
@@ -397,7 +361,7 @@ const Book = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="" disabled>Chọn thời gian</option>
+                <option value="">Chọn thời gian</option>
                 <option value="08:00">08:00</option>
                 <option value="09:00">09:00</option>
                 <option value="10:00">10:00</option>
@@ -420,7 +384,7 @@ const Book = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               >
-                <option value="" disabled>Chọn chuyên viên tư vấn</option>
+                <option value="">Chọn chuyên viên tư vấn</option>
                 <option value="1">TS. Nguyễn Văn A</option>
                 <option value="2">ThS. Trần Thị B</option>
                 <option value="3">TS. Lê Văn C</option>
@@ -452,59 +416,7 @@ const Book = () => {
     return (
       <div className="flex flex-col md:flex-row gap-8">
         {/* Thông tin hữu ích */}
-        <div className="w-full md:w-1/3 bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            Thông tin hữu ích
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Thời gian tư vấn
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Mỗi buổi tư vấn kéo dài 45-60 phút, tùy thuộc vào nhu cầu của
-                bạn.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Chi phí</h3>
-              <p className="text-gray-600 text-sm">
-                Dịch vụ tư vấn của chúng tôi hoàn toàn miễn phí cho tất cả mọi
-                người.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Hình thức tư vấn
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Bạn có thể chọn tư vấn trực tuyến qua video call hoặc tư vấn
-                trực tiếp tại văn phòng của chúng tôi.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">Bảo mật</h3>
-              <p className="text-gray-600 text-sm">
-                Thông tin của bạn sẽ được bảo mật hoàn toàn. Chúng tôi luôn
-                tuân thủ nghiêm ngặt các quy định về bảo mật thông tin.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700 mb-2">
-                Hỗ trợ khẩn cấp
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Nếu bạn cần hỗ trợ khẩn cấp, vui lòng gọi đường dây nóng:{" "}
-                <span className="font-medium">1800 1234</span>
-              </p>
-            </div>
-          </div>
-        </div>
+        {renderInfoSidebar()}
 
         {/* Form thông tin bổ sung */}
         <div className="w-full md:w-2/3 bg-white rounded-lg shadow-sm p-6">
@@ -529,8 +441,9 @@ const Book = () => {
                 value={formData.reason}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
               >
-                <option value="" disabled selected>Chọn lý do tư vấn</option>
+                <option value="">Chọn lý do tư vấn</option>
                 <option value="addiction">Nghiện ngập</option>
                 <option value="prevention">Phòng ngừa</option>
                 <option value="recovery">Phục hồi</option>
@@ -593,7 +506,7 @@ const Book = () => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="" disabled selected>Chọn nguồn thông tin</option>
+                <option value="">Chọn nguồn thông tin</option>
                 <option value="friend">Bạn bè/Người thân</option>
                 <option value="social">Mạng xã hội</option>
                 <option value="search">Tìm kiếm Google</option>
@@ -651,4 +564,5 @@ const Book = () => {
   );
 };
 
-export default Book;
+export default Booking;
+
