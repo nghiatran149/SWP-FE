@@ -1,53 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { Clock, Users, Brain, Shield } from 'lucide-react';
 
+const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+
 const Assessment = () => {
-  const assessments = [
-    {
-      title: "Bài đánh giá ASSIST",
-      subtitle: "Công cụ sàng lọc sử dụng chất gây nghiện được phát triển bởi WHO",
-      description: "ASSIST (Alcohol, Smoking and Substance Involvement Screening Test) là công cụ sàng lọc được phát triển bởi Tổ chức Y tế Thế giới (WHO) để đánh giá mức độ nguy cơ liên quan đến việc sử dụng các chất gây nghiện, bao gồm rượu, thuốc lá và các loại ma túy khác.",
-      duration: "5-10 phút",
-      target: "Người trưởng thành",
-      icon: Brain,
-      bgColor: "bg-blue-50",
-      iconColor: "text-blue-600"
-    },
-    {
-      title: "Bài đánh giá CRAFFT",
-      subtitle: "Công cụ sàng lọc dành cho thanh thiếu niên",
-      description: "CRAFFT là công cụ sàng lọc ngắn gọn được thiết kế đặc biệt cho thanh thiếu niên để đánh giá nguy cơ sử dụng chất gây nghiện. Tên viết tắt CRAFFT đại diện cho các từ khóa: Car, Relax, Alone, Forget, Friends, Trouble.",
-      duration: "2-3 phút",
-      target: "Thanh thiếu niên",
-      icon: Users,
-      bgColor: "bg-green-50",
-      iconColor: "text-green-600"
-    },
-    {
-      title: "Bài đánh giá DAST-10",
-      subtitle: "Công cụ sàng lọc lạm dụng ma túy",
-      description: "DAST-10 (Drug Abuse Screening Test) là phiên bản rút gọn của công cụ sàng lọc lạm dụng ma túy, giúp xác định mức độ nguy cơ liên quan đến việc sử dụng ma túy trong 12 tháng qua.",
-      duration: "3-5 phút",
-      target: "Người trưởng thành",
-      icon: Shield,
-      bgColor: "bg-purple-50",
-      iconColor: "text-purple-600"
-    },
-    {
-      title: "Bài đánh giá AUDIT",
-      subtitle: "Công cụ sàng lọc rối loạn sử dụng rượu",
-      description: "AUDIT (Alcohol Use Disorders Identification Test) là công cụ sàng lọc được phát triển bởi WHO để xác định những người có mẫu uống rượu nguy hiểm hoặc có hại.",
-      duration: "2-4 phút",
-      target: "Người trưởng thành",
-      icon: Clock,
-      bgColor: "bg-orange-50",
-      iconColor: "text-orange-600"
-    }
-  ];
+  const [surveys, setSurveys] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchSurveys = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/Survey`);
+        const data = response.data;
+        if (data && data.data) {
+          setSurveys(data.data);
+        } else {
+          setSurveys([]);
+        }
+      } catch (err) {
+        setError('Không thể tải dữ liệu đánh giá.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSurveys();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -60,44 +44,23 @@ const Assessment = () => {
 
         {/* Assessment Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {assessments.map((assessment, index) => {
-            const IconComponent = assessment.icon;
-            return (
+          {loading ? (
+            <div className="col-span-2 text-center text-gray-500">Đang tải...</div>
+          ) : error ? (
+            <div className="col-span-2 text-center text-red-500">{error}</div>
+          ) : (
+            surveys.map((survey, index) => (
               <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className={`${assessment.bgColor} p-6`}>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {assessment.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {assessment.subtitle}
-                      </p>
-                    </div>
-                    <div className={`${assessment.iconColor} ml-4`}>
-                      <IconComponent size={32} />
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
-                    <span>{assessment.duration}</span>
-                    <span>•</span>
-                    <span>Đối tượng: {assessment.target}</span>
-                  </div>
-                </div>
-
                 <div className="p-6">
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    {assessment.description}
-                  </p>
-                  
-                  <button className="w-full bg-gray-900 text-white py-3 px-6 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{survey.name}</h3>
+                  <p className="text-gray-700 mb-6 leading-relaxed">{survey.description}</p>
+                  <Link to={`/assessmentdetail/${survey.surveyId}`} className="flex flex-col items-center w-full bg-teal-600 hover:bg-teal-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-200 text-center" style={{display: 'block'}}>
                     Làm bài đánh giá
-                  </button>
+                  </Link>
                 </div>
               </div>
-            );
-          })}
+            ))
+          )}
         </div>
 
         {/* Important Notice Section */}
@@ -110,9 +73,9 @@ const Assessment = () => {
             Nếu bạn lo lắng về việc sử dụng chất gây nghiện của bản thân hoặc người thân, vui lòng tham khảo ý kiến 
             của chuyên viên tư vấn hoặc nhân viên y tế.
           </p>
-          <button className="bg-gray-900 text-white py-3 px-8 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200">
+          <Link to="/booking" className="bg-blue-600 text-white py-3 px-8 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
             Đặt lịch tư vấn
-          </button>
+          </Link>
         </div>
       </div>
     </div>

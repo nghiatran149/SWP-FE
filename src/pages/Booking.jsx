@@ -538,7 +538,7 @@ const Booking = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-10 px-4 md:px-0">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {!bookingSuccess && (
           <div className="text-center mb-12">
             <h1 className="text-3xl font-bold text-gray-800 mb-4">
