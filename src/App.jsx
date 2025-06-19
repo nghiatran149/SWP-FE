@@ -28,6 +28,7 @@ import MyCourseDetail from "./pages/MyCourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import AppointmentDetail from "./pages/AppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
+import AssessmentResult from "./pages/AssessmentResult";
 
 //User Dashboard
 import Dashboard from "./pages/Dashboard";
@@ -35,6 +36,7 @@ import Profile from "./pages/Profile";
 import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
+
 
 function App() {
   return (
@@ -80,6 +82,14 @@ function App() {
             element={
               <Layout>
                 <AssessmentDetail />
+              </Layout>
+            }
+          />
+          <Route
+            path="/assessment-result/:responseId"
+            element={
+              <Layout>
+                <AssessmentResult />
               </Layout>
             }
           />
