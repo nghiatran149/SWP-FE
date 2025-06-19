@@ -27,6 +27,7 @@ import QuestionDetail from "./pages/QuestionDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import AppointmentDetail from "./pages/AppointmentDetail";
+import AssessmentDetail from "./pages/AssessmentDetail";
 
 //User Dashboard
 import Dashboard from "./pages/Dashboard";
@@ -71,6 +72,14 @@ function App() {
             element={
               <Layout>
                 <Assessment />
+              </Layout>
+            }
+          />
+          <Route
+            path="/assessmentdetail/:surveyId"
+            element={
+              <Layout>
+                <AssessmentDetail />
               </Layout>
             }
           />
