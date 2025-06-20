@@ -15,6 +15,7 @@ const Header = () => {
     { name: 'Khóa học', href: '/courses' },
     { name: 'Đánh giá', href: '/assessments' },
     { name: 'Đặt lịch', href: '/booking' },
+    { name: 'Chương trình', href: '/campaigns' },
     { name: 'Blog', href: '/blog' },
   ];
 

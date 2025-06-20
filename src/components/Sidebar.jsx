@@ -14,6 +14,7 @@ import {
   IdCardLanyard,
   FileText,
   BookOpenCheck,
+  AppWindow,
   Settings, 
   LogOut
 } from 'lucide-react';
@@ -28,7 +29,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
       { id: 'mycourse', label: 'Khóa học của tôi', icon: BookOpen },
       { id: 'myappointment', label: 'Lịch hẹn của tôi', icon: Calendar },
       { id: 'myassessment', label: 'Đánh giá của tôi', icon: FileText },
-      { id: 'mycampaign', label: 'Chương trình của tôi', icon: BookOpenCheck },
+      { id: 'mycampaign', label: 'Chương trình của tôi', icon: AppWindow },
       { id: 'statistics', label: 'Thống kê', icon: BarChart3 },
     ];
 

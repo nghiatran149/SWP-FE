@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, BookOpen, Download, Award, CheckCircle, Users, Plus } from 'lucide-react';
+import { Calendar, ArrowRight, Clock, BookOpen, Download, Award, CheckCircle, Users, Plus } from 'lucide-react';
 
 const MyCampaign = () => {
   const [activeTab, setActiveTab] = useState('registered'); // 'registered', 'completed', 'recommended'
@@ -22,7 +22,7 @@ const MyCampaign = () => {
     },
     {
       id: 2,
-      title: "Hội thảo giáo dục phụ huynh",
+      title: "Hội thảo giáo dục phòng ngừa lạm dụng chất gây nghiện cho phụ huynh",
       description: "Chuỗi hội thảo giáo dục dành cho phụ huynh để tìm hiểu về các chiến lược phòng ngừa lạm dụng chất gây nghiện.",
       progress: 30,
       startDate: "10/5/2023",
@@ -154,11 +154,11 @@ const MyCampaign = () => {
           </div>
         </div>
 
-        <div className="flex justify-between mt-4">
-          <button className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-sm font-medium">
+        <div className="flex justify-between mt-5">
+          <button className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium">
             Xem chi tiết
           </button>
-          <button className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 text-sm font-medium flex items-center">
+          <button className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 text-md font-medium flex items-center">
             <Download className="w-4 h-4 mr-1" /> Tải xuống chứng chỉ
           </button>
         </div>
@@ -234,11 +234,11 @@ const MyCampaign = () => {
           </div>
         </div>
 
-        <div className="flex justify-between mt-4">
-          <button className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-sm font-medium">
+        <div className="flex justify-between mt-5">
+          <button className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium">
             Xem chi tiết
           </button>
-          <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 text-sm font-medium">
+          <button className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-md font-medium">
             Tiếp tục chương trình
           </button>
         </div>
@@ -301,11 +301,11 @@ const MyCampaign = () => {
           </div>
         </div>
 
-        <div className="flex justify-between mt-4">
-          <button className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-sm font-medium">
+        <div className="flex justify-between mt-5">
+          <button className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium">
             Tìm hiểu thêm
           </button>
-          <button className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 text-sm font-medium">
+          <button className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-md font-medium">
             Đăng ký ngay
           </button>
         </div>
@@ -391,10 +391,10 @@ const MyCampaign = () => {
                 </button>
               ))}
             </div>
-            <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-4">
-              Duyệt tất cả chương trình
-              <Plus className="h-4 w-4 ml-2" />
-            </button>
+            <Link to="/campaigns" className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-4">
+              Xem tất cả chương trình
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
           </div>
         </div>
 

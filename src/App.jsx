@@ -25,6 +25,7 @@ import MyCampaign from "./pages/MyCampaign";
 //Detail
 import SurveyDetail from "./pages/SurveyDetail";
 import QuestionDetail from "./pages/QuestionDetail";
+import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import AppointmentDetail from "./pages/AppointmentDetail";
@@ -37,6 +38,7 @@ import Profile from "./pages/Profile";
 import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
+
 
 
 function App() {
@@ -99,6 +101,14 @@ function App() {
             element={
               <Layout>
                 <Course />
+              </Layout>
+            }
+          />
+          <Route
+            path="/coursedetail/:courseId"
+            element={
+              <Layout>
+                <CourseDetail />
               </Layout>
             }
           />
