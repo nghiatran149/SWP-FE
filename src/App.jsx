@@ -20,6 +20,7 @@ import Blog from "./pages/Blog";
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
+import MyCampaign from "./pages/MyCampaign";
 
 //Detail
 import SurveyDetail from "./pages/SurveyDetail";
@@ -112,6 +113,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="overview">
                 <Dashboard />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/mycampaign"
+            element={
+              <LayoutDashboard activeMenuItem="mycampaign">
+                <MyCampaign />
               </LayoutDashboard>
             }
           />
