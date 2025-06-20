@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, Plus } from 'lucide-react';
-import axios from 'axios';
-
-// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 const ROLE_OPTIONS = [
   { value: 1, label: 'Admin' },
@@ -57,8 +54,8 @@ const UserManagement = () => {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await axios.get(`${BASE_URL}/User`, { headers: headers });
-        const data = response.data;
+        const userResponse = await api.get('/User', { headers: headers });
+        const data = userResponse.data;
         if (data && data.data) {
           // setUsers(data.data);
           setUsers(data.data.filter(user => user.roleId !== 1));
@@ -123,7 +120,7 @@ const UserManagement = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      await axios.delete(`${BASE_URL}/User/${userId}`, { headers: headers });
+      await api.delete(`/User/${userId}`, { headers: headers });
       setUsers((prev) => prev.filter((u) => u.userId !== userId));
     } catch (err) {
       setError('Lỗi khi xóa người dùng.');
@@ -175,9 +172,9 @@ const UserManagement = () => {
       };
 
       if (!body.password) delete body.password;
-      const res = await axios.put(`${BASE_URL}/User/${editingUser.userId}`, body, { headers: headers });
+      const editResponse = await api.put(`/User/${editingUser.userId}`, body, { headers: headers });
 
-      setUsers((prev) => prev.map((u) => u.userId === editingUser.userId ? res.data.data : u));
+      setUsers((prev) => prev.map((u) => u.userId === editingUser.userId ? editResponse.data.data : u));
       setEditingUser(null);
     } catch (err) {
       setError('Lỗi khi cập nhật người dùng.');
@@ -206,9 +203,9 @@ const UserManagement = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await axios.get(`${BASE_URL}/User/${userId}`, { headers: headers });
-      if (response.data && response.data.data) {
-        setViewingUser(response.data.data);
+      const viewResponse = await api.get(`/User/${userId}`, { headers: headers });
+      if (viewResponse.data && viewResponse.data.data) {
+        setViewingUser(viewResponse.data.data);
       } else {
         setError('Không tìm thấy thông tin người dùng.');
       }
@@ -256,14 +253,14 @@ const UserManagement = () => {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
-      const res = await axios.post(`${BASE_URL}/User/admin/Create-user`, addForm, { headers: headers });
-      if (res.data && res.data.data) {
-        const response = await axios.get(`${BASE_URL}/User`, { headers: headers }); // Re-fetch all users after adding
-        if (response.data && response.data.data) {
-          setUsers(response.data.data);
+      const addUserResponse = await api.post('/User/admin/Create-user', addForm, { headers: headers });
+      if (addUserResponse.data && addUserResponse.data.data) {
+        const userListResponse = await api.get('/User', { headers: headers }); // Re-fetch all users after adding
+        if (userListResponse.data && userListResponse.data.data) {
+          setUsers(userListResponse.data.data);
         }
       } else {
-        setError(res.data.messages?.[0] || 'Lỗi khi thêm người dùng.');
+        setError(addUserResponse.data.messages?.[0] || 'Lỗi khi thêm người dùng.');
       }
       setAddingUser(false);
     } catch (err) {

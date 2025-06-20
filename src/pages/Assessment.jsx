@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 import { Link } from 'react-router-dom';
 import { Clock, Users, Brain, Shield } from 'lucide-react';
-
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
 
 const Assessment = () => {
   const [surveys, setSurveys] = useState([]);
@@ -13,7 +11,7 @@ const Assessment = () => {
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/Survey`);
+        const response = await api.get('/Survey');
         const data = response.data;
         if (data && data.data) {
           setSurveys(data.data);

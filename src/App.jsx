@@ -20,14 +20,17 @@ import Blog from "./pages/Blog";
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
+import SurveyDetailManagement from "./pages/SurveyDetailManagement";
+import MyCampaign from "./pages/MyCampaign";
 
 //Detail
-import SurveyDetail from "./pages/SurveyDetail";
 import QuestionDetail from "./pages/QuestionDetail";
+import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import AppointmentDetail from "./pages/AppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
+import AssessmentResult from "./pages/AssessmentResult";
 
 //User Dashboard
 import Dashboard from "./pages/Dashboard";
@@ -35,6 +38,8 @@ import Profile from "./pages/Profile";
 import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
+
+
 
 function App() {
   return (
@@ -84,10 +89,26 @@ function App() {
             }
           />
           <Route
+            path="/assessment-result/:responseId"
+            element={
+              <Layout>
+                <AssessmentResult />
+              </Layout>
+            }
+          />
+          <Route
             path="/courses"
             element={
               <Layout>
                 <Course />
+              </Layout>
+            }
+          />
+          <Route
+            path="/coursedetail/:courseId"
+            element={
+              <Layout>
+                <CourseDetail />
               </Layout>
             }
           />
@@ -112,6 +133,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="overview">
                 <Dashboard />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/mycampaign"
+            element={
+              <LayoutDashboard activeMenuItem="mycampaign">
+                <MyCampaign />
               </LayoutDashboard>
             }
           />
@@ -172,15 +201,15 @@ function App() {
             }
           />
           <Route
-            path="/surveydetail/:surveyId"
+            path="/surveydetailmanagement/:surveyId"
             element={
               <LayoutDashboard activeMenuItem="surveymanagement">
-                <SurveyDetail />
+                <SurveyDetailManagement />
               </LayoutDashboard>
             }
           />
           <Route
-            path="/surveydetail/:surveyId/questiondetail/:questionId"
+            path="/surveydetailmanagement/:surveyId/questiondetail/:questionId"
             element={
               <LayoutDashboard activeMenuItem="surveymanagement">
                 <QuestionDetail />

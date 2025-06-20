@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Pencil, Trash2, Search, ArrowLeft, Plus } from 'lucide-react';
-import axios from 'axios';
-
-// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 const QuestionDetail = () => {
     const { questionId, surveyId } = useParams();
@@ -44,13 +41,13 @@ const QuestionDetail = () => {
                 }
 
                 // Fetch question details
-                const questionResponse = await axios.get(`${BASE_URL}/SurveyQuestion/${questionId}`, { headers });
+                const questionResponse = await api.get(`/SurveyQuestion/${questionId}`, { headers });
                 if (questionResponse.data && questionResponse.data.data) {
                     setQuestion(questionResponse.data.data);
                 }
 
                 // Fetch options
-                const optionsResponse = await axios.get(`${BASE_URL}/SurveyOption/${questionId}/Options`, { headers });
+                const optionsResponse = await api.get(`/SurveyOption/${questionId}/Options`, { headers });
                 if (optionsResponse.data) {
                     setOptions(Array.isArray(optionsResponse.data) ? optionsResponse.data : []);
                 }
@@ -122,12 +119,12 @@ const QuestionDetail = () => {
                 scoreValue: Number(addForm.scoreValue)
             };
 
-            const response = await axios.post(`${BASE_URL}/SurveyOption`, requestBody, { headers });
+            const response = await api.post('/SurveyOption', requestBody, { headers });
             console.log('Add option res:', response.data);
 
             if (response.data) {
                 // Refresh the options list
-                const optionsResponse = await axios.get(`${BASE_URL}/SurveyOption/${questionId}/Options`, { headers });
+                const optionsResponse = await api.get(`/SurveyOption/${questionId}/Options`, { headers });
                 if (optionsResponse.data) {
                     setOptions(Array.isArray(optionsResponse.data) ? optionsResponse.data : []);
                 }
@@ -197,15 +194,15 @@ const QuestionDetail = () => {
                 scoreValue: Number(editForm.scoreValue)
             };
 
-            const response = await axios.put(
-                `${BASE_URL}/SurveyOption/${editingOption.optionId}`,
+            const editResponse = await api.put(
+                `/SurveyOption/${editingOption.optionId}`,
                 requestBody,
                 { headers }
             );
 
-            if (response.data) {
+            if (editResponse.data) {
                 // Refresh the options list
-                const optionsResponse = await axios.get(`${BASE_URL}/SurveyOption/${questionId}/Options`, { headers });
+                const optionsResponse = await api.get(`/SurveyOption/${questionId}/Options`, { headers });
                 if (optionsResponse.data) {
                     setOptions(Array.isArray(optionsResponse.data) ? optionsResponse.data : []);
                 }
@@ -250,10 +247,10 @@ const QuestionDetail = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            await axios.delete(`${BASE_URL}/SurveyOption/${optionId}`, { headers });
+            await api.delete(`/SurveyOption/${optionId}`, { headers });
 
             // Refresh the options list after successful deletion
-            const optionsResponse = await axios.get(`${BASE_URL}/SurveyOption/${questionId}/Options`, { headers });
+            const optionsResponse = await api.get(`/SurveyOption/${questionId}/Options`, { headers });
             if (optionsResponse.data) {
                 setOptions(Array.isArray(optionsResponse.data) ? optionsResponse.data : []);
             }
@@ -283,7 +280,7 @@ const QuestionDetail = () => {
                             {question ? `Loại câu hỏi: ${question.questionType}` : 'Quản lý các đáp án của câu hỏi'}
                         </p>
                     </div>
-                    <Link to={`/surveydetail/${surveyId}`} className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0">
+                    <Link to={`/surveydetailmanagement/${surveyId}`} className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0">
                         <ArrowLeft className="w-5 h-5" />
                         <span>Quay lại</span>
                     </Link>

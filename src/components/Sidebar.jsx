@@ -1,21 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  Home, 
-  BookOpen, 
-  Calendar, 
-  ClipboardPenLine, 
-  DollarSign, 
-  Activity, 
-  BarChart3, 
-  User,
+import {
+  Home,
+  BookOpen,
+  Calendar,
+  FileText,
+  AppWindow,
+
   Users,
   IdCardLanyard,
-  FileText,
-  BookOpenCheck,
-  Settings, 
-  LogOut
+  ClipboardPenLine,
+  NotebookPen,
+  Newspaper,
+
+  User,
 } from 'lucide-react';
 
 const Sidebar = ({ activeItem = 'overview' }) => {
@@ -25,11 +24,13 @@ const Sidebar = ({ activeItem = 'overview' }) => {
   const getMenuItemsByRole = () => {
     const commonItems = [
       { id: 'overview', label: 'Tổng quan', icon: Home },
+    ];
+
+    const memberItems = [
       { id: 'mycourse', label: 'Khóa học của tôi', icon: BookOpen },
       { id: 'myappointment', label: 'Lịch hẹn của tôi', icon: Calendar },
       { id: 'myassessment', label: 'Đánh giá của tôi', icon: FileText },
-      { id: 'mycampaign', label: 'Chương trình của tôi', icon: BookOpenCheck },
-      { id: 'statistics', label: 'Thống kê', icon: BarChart3 },
+      { id: 'mycampaign', label: 'Chương trình của tôi', icon: AppWindow },
     ];
 
     // Admin specific items
@@ -37,13 +38,17 @@ const Sidebar = ({ activeItem = 'overview' }) => {
       { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
       { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
       { id: 'surveymanagement', label: 'Quản lý khảo sát', icon: ClipboardPenLine },
+      { id: 'coursemanagement', label: 'Quản lý khóa học', icon: NotebookPen },
+      { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
     ];
 
     // Return menu items based on user role
     if (user?.roleName === 'Admin') {
       return [...commonItems, ...adminItems];
     }
-
+    if (user?.roleName === 'Member') {
+      return [...commonItems, ...memberItems];
+    }
     // For other roles, only show common items
     return commonItems;
   };
@@ -69,27 +74,30 @@ const Sidebar = ({ activeItem = 'overview' }) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
             let to = '#';
-            switch(item.id) {
+            switch (item.id) {
               case 'overview': to = '/dashboard'; break;
+
               case 'mycourse': to = '/mycourse'; break;
               case 'myappointment': to = '/myappointment'; break;
               case 'myassessment': to = '/myassessment'; break;
               case 'mycampaign': to = '/mycampaign'; break;
-              case 'statistics': to = '/statistics'; break;
+              
               case 'usermanagement': to = '/usermanagement'; break;
               case 'consultantmanagement': to = '/consultantmanagement'; break;
               case 'surveymanagement': to = '/surveymanagement'; break;
+              case 'coursemanagement': to = '/coursemanagement'; break;
+              case 'blogmanagement': to = '/blogmanagement'; break;
+              
               default: to = '#';
             }
             return (
               <li key={item.id}>
                 <Link
                   to={to}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    activeItem === item.id
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeItem === item.id
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   <Icon className="mr-3 h-5 w-5" />
                   {item.label}
@@ -106,7 +114,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
           {bottomItems.map((item) => {
             const Icon = item.icon;
             let to = '#';
-            switch(item.id) {
+            switch (item.id) {
               case 'profile': to = '/profile'; break;
               // case 'settings': to = '/settings'; break;
               // case 'logout': to = '/logout'; break;
@@ -116,11 +124,10 @@ const Sidebar = ({ activeItem = 'overview' }) => {
               <li key={item.id}>
                 <Link
                   to={to}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
-                    activeItem === item.id
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeItem === item.id
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   <Icon className="mr-3 h-5 w-5" />
                   {item.label}

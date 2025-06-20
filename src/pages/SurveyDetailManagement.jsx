@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, ArrowLeft, Plus } from 'lucide-react';
-import axios from 'axios';
-
-// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 const QUESTION_TYPE_OPTIONS = [
     { value: 'SINGLE_CHOICE', label: 'Chọn một đáp án' },
@@ -53,13 +50,13 @@ const SurveyDetail = () => {
                 }
 
                 // Fetch survey details
-                const surveyResponse = await axios.get(`${BASE_URL}/Survey/${surveyId}`, { headers });
+                const surveyResponse = await api.get('/Survey', { headers });
                 if (surveyResponse.data && surveyResponse.data.data) {
                     setSurvey(surveyResponse.data.data);
                 }
 
                 // Fetch questions
-                const questionsResponse = await axios.get(`${BASE_URL}/SurveyQuestion/${surveyId}/questions`, { headers });
+                const questionsResponse = await api.get('/SurveyQuestion', { headers });
                 if (questionsResponse.data && questionsResponse.data.data) {
                     // Sort questions by sequence
                     const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
@@ -138,11 +135,11 @@ const SurveyDetail = () => {
                 surveyId: surveyId,
             };
 
-            const response = await axios.post(`${BASE_URL}/SurveyQuestion`, requestBody, { headers });
+            const response = await api.post('/SurveyQuestion', requestBody, { headers });
 
             if (response.data && response.data.data) {
                 // Refresh the questions list
-                const questionsResponse = await axios.get(`${BASE_URL}/SurveyQuestion/${surveyId}/questions`, { headers });
+                const questionsResponse = await api.get('/SurveyQuestion', { headers });
                 if (questionsResponse.data && questionsResponse.data.data) {
                     const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
                     setQuestions(sortedQuestions);
@@ -205,15 +202,15 @@ const SurveyDetail = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const response = await axios.put(
-                `${BASE_URL}/SurveyQuestion/${editingQuestion.questionId}`,
+            const response = await api.put(
+                `/SurveyQuestion/${editingQuestion.questionId}`,
                 editForm,
                 { headers }
             );
 
             if (response.data && response.data.data) {
                 // Refresh the questions list
-                const questionsResponse = await axios.get(`${BASE_URL}/SurveyQuestion/${surveyId}/questions`, { headers });
+                const questionsResponse = await api.get('/SurveyQuestion', { headers });
                 if (questionsResponse.data && questionsResponse.data.data) {
                     const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
                     setQuestions(sortedQuestions);
@@ -255,10 +252,10 @@ const SurveyDetail = () => {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            await axios.delete(`${BASE_URL}/SurveyQuestion/${questionId}`, { headers });
+            await api.delete(`/SurveyQuestion/${questionId}`, { headers });
 
             // Refresh the questions list after successful deletion
-            const questionsResponse = await axios.get(`${BASE_URL}/SurveyQuestion/${surveyId}/questions`, { headers });
+            const questionsResponse = await api.get('/SurveyQuestion', { headers });
             if (questionsResponse.data && questionsResponse.data.data) {
                 const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
                 setQuestions(sortedQuestions);
@@ -272,7 +269,7 @@ const SurveyDetail = () => {
     };
 
     const handleViewQuestionDetail = (questionId) => {
-        navigate(`/surveydetail/${surveyId}/questiondetail/${questionId}`);
+        navigate(`/surveydetailmanagement/${surveyId}/questiondetail/${questionId}`);
     };
 
     return (
