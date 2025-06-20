@@ -20,10 +20,10 @@ import Blog from "./pages/Blog";
 import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
+import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import MyCampaign from "./pages/MyCampaign";
 
 //Detail
-import SurveyDetail from "./pages/SurveyDetail";
 import QuestionDetail from "./pages/QuestionDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
@@ -201,15 +201,15 @@ function App() {
             }
           />
           <Route
-            path="/surveydetail/:surveyId"
+            path="/surveydetailmanagement/:surveyId"
             element={
               <LayoutDashboard activeMenuItem="surveymanagement">
-                <SurveyDetail />
+                <SurveyDetailManagement />
               </LayoutDashboard>
             }
           />
           <Route
-            path="/surveydetail/:surveyId/questiondetail/:questionId"
+            path="/surveydetailmanagement/:surveyId/questiondetail/:questionId"
             element={
               <LayoutDashboard activeMenuItem="surveymanagement">
                 <QuestionDetail />

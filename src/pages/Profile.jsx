@@ -14,9 +14,8 @@ import {
   ArrowLeft,
   Check,
 } from "lucide-react";
-import axios from "axios";
+import api from '../api/api';
 
-const BASE_URL = "http://drugpreventionsystem.somee.com/api";
 const ProfilePage = () => {
   // State để lưu trữ dữ liệu
   const [profileData, setProfileData] = useState(null); // Lưu trữ dữ liệu profile từ API
@@ -142,14 +141,11 @@ const ProfilePage = () => {
       console.log("Fetching profile for user ID:", userId);
 
       // Sử dụng template literals đúng cách để đưa userId vào URL
-      const response = await axios.get(
-        `${BASE_URL}/UserProfile/${userId}/UserProfile`,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
+      const response = await api.get(`/UserProfile/${userId}/UserProfile`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
 
       console.log("Profile response:", response.data);
 
@@ -236,16 +232,12 @@ const ProfilePage = () => {
       console.log("After formatting - Data being sent:", formattedData);
 
       // Sử dụng chỉ một endpoint chính xác đã xác định
-      const response = await axios.put(
-        `${BASE_URL}/UserProfile/${profileId}`,
-        formattedData,
-        {
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.put(`/UserProfile/${profileId}`, formattedData, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       console.log("Update response:", response.data);
 

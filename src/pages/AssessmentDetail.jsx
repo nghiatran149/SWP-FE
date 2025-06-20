@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 function getUserId() {
   const userInfo = localStorage.getItem('userInfo');
@@ -35,7 +33,7 @@ const AssessmentDetail = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(`${BASE_URL}/Survey/${surveyId}/questions-with-options`);
+        const res = await api.get(`/Survey/${surveyId}/questions-with-options`);
         if (res.data && res.data.data) {
           setQuestions(res.data.data);
           setAnswers(Array(res.data.data.length).fill(null));
@@ -63,7 +61,7 @@ const AssessmentDetail = () => {
     try {
       const payload = { userId, surveyId };
       console.log('Gửi start-session:', payload);
-      const res = await axios.post(`${BASE_URL}/UserSurveyResponse/start-session`, payload);
+      const res = await api.post('/UserSurveyResponse/start-session', payload);
       console.log('Kết quả start-session:', res.data);
       if (res.data && res.data.data && res.data.data.responseId) {
         setResponseId(res.data.data.responseId);
@@ -98,7 +96,7 @@ const AssessmentDetail = () => {
       };
       console.log('Gửi save-answer:', answerPayload);
       try {
-        const res = await axios.post(`${BASE_URL}/UserSurveyResponse/save-answer`, answerPayload);
+        const res = await api.post('/UserSurveyResponse/save-answer', answerPayload);
         console.log('Kết quả save-answer:', res.data);
       } catch (err) {
         console.log('Lỗi save-answer:', err);
@@ -109,7 +107,7 @@ const AssessmentDetail = () => {
     } else {
       // Hoàn thành: gọi API lấy kết quả và chuyển trang
       try {
-        const res = await axios.post(`${BASE_URL}/UserSurveyResponse/complete/${responseId}`);
+        const res = await api.post(`/UserSurveyResponse/complete/${responseId}`);
         console.log('Kết quả complete:', res.data);
         if (res.data && res.data.data) {
           navigate(`/assessment-result/${responseId}`);

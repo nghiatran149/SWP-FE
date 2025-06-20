@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import axios from 'axios';
-
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 const AssessmentResult = () => {
   const { responseId } = useParams();
@@ -15,7 +13,7 @@ const AssessmentResult = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.post(`${BASE_URL}/UserSurveyResponse/complete/${responseId}`);
+        const res = await api.post(`/UserSurveyResponse/complete/${responseId}`);
         if (res.data && res.data.data) {
           setResult(res.data.data);
         } else {

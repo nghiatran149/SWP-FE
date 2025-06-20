@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/api';
 import { Users, Clock, ArrowRight, GraduationCap, Heart, Shield, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -33,7 +33,7 @@ const Course = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get('http://drugpreventionsystem.somee.com/api/Course');
+        const res = await api.get('/Course');
         if (res.data && res.data.data) {
           setCourses(res.data.data);
         } else {

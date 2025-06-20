@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-import axios from 'axios';
-
-// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 const ConsultantManagement = () => {
   const [consultants, setConsultants] = useState([]);
@@ -125,7 +122,7 @@ const ConsultantManagement = () => {
         return;
       }
 
-      const response = await axios.get(`${BASE_URL}/Consultant/${consultantId}`, { headers: headers });
+      const response = await api.get(`Consultant/${consultantId}`, { headers: headers });
       if (response.data && response.data.data) {
         setViewingConsultant(response.data.data);
       } else {
@@ -196,15 +193,15 @@ const ConsultantManagement = () => {
           userId: editingConsultant.userId
         };
         
-        response = await axios.post(
-          `${BASE_URL}/Consultant`,
+        response = await api.post(
+          'Consultant',
           newConsultantData,
           { headers: headers }
         );
       } else {
         // Update existing consultant record
-        response = await axios.put(
-          `${BASE_URL}/Consultant/${editingConsultant.consultantId}`,
+        response = await api.put(
+          `Consultant/${editingConsultant.consultantId}`,
           editForm,
           { headers: headers }
         );
@@ -260,7 +257,7 @@ const ConsultantManagement = () => {
         return;
       }
 
-      await axios.delete(`${BASE_URL}/Consultant/${consultantId}`, { headers: headers });
+      await api.delete(`Consultant/${consultantId}`, { headers: headers });
       
       // Update the consultants list by removing the deleted consultant
       setConsultants(prev => prev.filter(c => c.consultantId !== consultantId));

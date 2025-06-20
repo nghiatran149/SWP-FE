@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, Plus } from 'lucide-react';
-import axios from 'axios';
-
-// const BASE_URL = 'https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api';
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
+import api from '../api/api';
 
 const SurveyManagement = () => {
   const [surveys, setSurveys] = useState([]);
@@ -41,7 +38,7 @@ const SurveyManagement = () => {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await axios.get(`${BASE_URL}/Survey`, { headers });
+        const response = await api.get('/Survey', { headers });
         if (response.data && response.data.data) {
           setSurveys(response.data.data);
         } else {
@@ -122,11 +119,11 @@ const SurveyManagement = () => {
         updatedAt: currentDate
       };
 
-      const response = await axios.post(`${BASE_URL}/Survey`, requestBody, { headers });
+      const response = await api.post('/Survey', requestBody, { headers });
       
       if (response.data && response.data.data) {
         // Refresh the survey list
-        const updatedResponse = await axios.get(`${BASE_URL}/Survey`, { headers });
+        const updatedResponse = await api.get('/Survey', { headers });
         if (updatedResponse.data && updatedResponse.data.data) {
           setSurveys(updatedResponse.data.data);
         }
@@ -194,15 +191,15 @@ const SurveyManagement = () => {
         updatedAt: currentDate // Update the updatedAt
       };
 
-      const response = await axios.put(
-        `${BASE_URL}/Survey/${editingSurvey.surveyId}`,
+      const response = await api.put(
+        `/Survey/${editingSurvey.surveyId}`,
         requestBody,
         { headers }
       );
 
       if (response.data && response.data.data) {
         // Refresh the survey list
-        const updatedResponse = await axios.get(`${BASE_URL}/Survey`, { headers });
+        const updatedResponse = await api.get('/Survey', { headers });
         if (updatedResponse.data && updatedResponse.data.data) {
           setSurveys(updatedResponse.data.data);
         }
@@ -243,10 +240,10 @@ const SurveyManagement = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      await axios.delete(`${BASE_URL}/Survey/${surveyId}`, { headers });
+      await api.delete(`/Survey/${surveyId}`, { headers });
       
       // Refresh the survey list after successful deletion
-      const updatedResponse = await axios.get(`${BASE_URL}/Survey`, { headers });
+      const updatedResponse = await api.get('/Survey', { headers });
       if (updatedResponse.data && updatedResponse.data.data) {
         setSurveys(updatedResponse.data.data);
       }
@@ -259,7 +256,7 @@ const SurveyManagement = () => {
   };
 
   const handleViewClick = (surveyId) => {
-    navigate(`/surveydetail/${surveyId}`);
+    navigate(`/surveydetailmanagement/${surveyId}`);
   };
 
   return (

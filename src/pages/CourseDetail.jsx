@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/api';
 import { Users, Clock, CheckCircle, BookOpen, BookmarkPlus } from 'lucide-react';
-
-const BASE_URL = 'http://drugpreventionsystem.somee.com/api';
 
 const TABS = [
   { id: 'content', label: 'Nội dung khóa học' },
@@ -33,7 +31,7 @@ const CourseDetail = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(`${BASE_URL}/Course/${courseId}`);
+        const res = await api.getCourse(courseId);
         if (res.data && res.data.data) {
           const data = res.data.data;
           setCourse({
@@ -58,7 +56,7 @@ const CourseDetail = () => {
     setWeeksLoading(true);
     setWeeksError(null);
     setWeeks([]);
-    axios.get(`${BASE_URL}/Course/${courseId}/weeks-with-lessons`)
+    api.getCourseWeeks(courseId)
       .then(res => {
         if (res.data && res.data.data && Array.isArray(res.data.data.courseWeeks)) {
           setWeeks(res.data.data.courseWeeks);
@@ -76,7 +74,7 @@ const CourseDetail = () => {
     setRequirementsLoading(true);
     setRequirementsError(null);
     setRequirements([]);
-    axios.get(`${BASE_URL}/Course/${courseId}/requirements`)
+    api.getCourseRequirements(courseId)
       .then(res => {
         if (res.data && Array.isArray(res.data.data)) {
           setRequirements(res.data.data);

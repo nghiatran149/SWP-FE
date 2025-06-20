@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../contexts/AuthContext";
+import api from '../api/api';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -24,20 +25,18 @@ const Login = () => {
 
     try {
       setIsLoading(true);
-      const response = await fetch(
-        // "https://drugpreventionsystem-hwgecaa9ekasgngf.southeastasia-01.azurewebsites.net/api/User/login",
-        "http://drugpreventionsystem.somee.com/api/User/login",
+      const response = await api.post(
+        '/User/login',
+        { email, password },
         {
-          method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
           },
-          body: JSON.stringify({ email, password }),
         }
       );
-      const result = await response.json();
-      console.log("API login result:", result);
+      const result = response.data;
+      console.log('API login result:', result);
 
       if (result.resultStatus === "Success" && result.data) {
         const userInfo = {
