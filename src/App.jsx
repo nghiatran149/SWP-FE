@@ -15,6 +15,7 @@ import Course from "./pages/Course";
 import Assessment from "./pages/Assessment";
 import Booking from "./pages/Booking";
 import Blog from "./pages/Blog";
+import Campaign from "./pages/Campaign";
 
 //Admin Dashboard
 import UserManagement from "./pages/UserManagement";
@@ -125,6 +126,14 @@ function App() {
             element={
               <Layout>
                 <Blog />
+              </Layout>
+            }
+          />
+          <Route
+            path="/campaigns"
+            element={
+              <Layout>
+                <Campaign />
               </Layout>
             }
           />
