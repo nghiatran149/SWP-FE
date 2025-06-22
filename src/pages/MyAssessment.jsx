@@ -145,9 +145,12 @@ const MyAssessment = () => {
         )}
 
         <div className="flex justify-between mt-4">
-          <button className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-md hover:bg-gray-50 font-medium">
+          <Link 
+            to={`/my-assessment-result/${assessment.responseId}`}
+            className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-md hover:bg-gray-50 font-medium"
+          >
             <FileText className="h-4 w-4 mr-1" /> Xem kết quả chi tiết
-          </button>
+          </Link>
           <button 
             onClick={() => handleRetakeAssessment(assessment.surveyId)}
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"

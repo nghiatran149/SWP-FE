@@ -40,6 +40,7 @@ import Profile from "./pages/Profile";
 import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
+import MyAssessmentResult from "./pages/MyAssessmentResult";
 
 
 
@@ -192,6 +193,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="myassessment">
                 <MyAssessment />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/my-assessment-result/:responseId"
+            element={
+              <LayoutDashboard activeMenuItem="myassessment">
+                <MyAssessmentResult />
               </LayoutDashboard>
             }
           />

@@ -221,390 +221,401 @@ const MyCampaignDetail = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      {/* Header với nút quay lại và tiêu đề */}
-      <div className="bg-white border-b border-gray-200 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <Link to="/mycampaign" className="text-gray-500 hover:text-gray-700 mr-3">
-              <ArrowLeft size={20} />
-            </Link>
-            <h1 className="text-xl font-bold text-gray-900">{campaign.title}</h1>
-            
-            <div className="ml-auto">
-              <button className="bg-black text-white px-3 py-1 rounded-full text-sm font-medium">
-                {campaign.status === "Đang tiến hành" ? "Đang tiến hành" : campaign.status}
-              </button>
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-8 py-4">
+        <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+          <span>Chương trình của tôi</span>
+          <span>/</span>
+          <span className="text-gray-900 font-semibold">{campaign.title}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-x-3">
+              <h1 className="text-2xl font-bold text-gray-900">{campaign.title}</h1>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                campaign.status === "Đang tiến hành" ? "bg-blue-100 text-blue-800" :
+                campaign.status === "Hoàn thành" ? "bg-green-100 text-green-800" :
+                "bg-yellow-100 text-yellow-800"
+              }`}>
+                {campaign.status}
+              </span>
             </div>
+            <p className="text-gray-600 mt-1 max-w-4xl">{campaign.description}</p>
           </div>
+          <Link to="/mycampaign" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors flex-shrink-0 ml-4">
+            <ArrowLeft className="w-5 h-5" />
+            <span>Quay lại chương trình</span>
+          </Link>
         </div>
       </div>
       
       {/* Khung chương trình*/}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Khung chính với border */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden mb-6">
-          {/* Khoảng trống cho hình ảnh */}
-          <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
-            <img 
-              src={campaign.image || "https://via.placeholder.com/800x400?text=Campaign+Image"} 
-              alt={campaign.title} 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          
-          {/* Nội dung bên trong khung */}
-          <div className="p-6">
-            {/* Tiêu đề và mô tả */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">{campaign.title}</h2>
-              <p className="text-gray-600 text-sm">{campaign.description}</p>
-            </div>
-            
-            {/* Tiến độ */}
-            <div className="mb-6">
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-700">Tiến độ chung</span>
-                <span className="font-medium">{campaign.progress} %</span>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Khung chính với border */}
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              {/* Khoảng trống cho hình ảnh */}
+              <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+                <img 
+                  src={campaign.image || "https://via.placeholder.com/800x400?text=Campaign+Image"} 
+                  alt={campaign.title} 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <ProgressBar value={campaign.progress} />
-            </div>
-            
-            {/* Thông tin người giảng dạy và ngày tháng */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center">
-                <User className="h-5 w-5 text-gray-400 mr-2" />
-                <div>
-                  <p className="text-xs text-gray-500">Giảng viên:</p>
-                  <p className="text-sm">{campaign.instructor}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                <div>
-                  <p className="text-xs text-gray-500">Bắt đầu:</p>
-                  <p className="text-sm">{campaign.startDate}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                <div>
-                  <p className="text-xs text-gray-500">Kết thúc:</p>
-                  <p className="text-sm">{campaign.endDate}</p>
-                </div>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                <div>
-                  <p className="text-xs text-gray-500">Phiên:</p>
-                  <p className="text-sm">{campaign.completedSessions || 0} / {campaign.totalSessions} Phiên</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Layout hai cột cho phần bên dưới */}
-        <div className="flex flex-col md:flex-row md:space-x-6">
-          {/* Cột trái - Thông tin chính */}
-          <div className="md:w-2/3">
-            {/* Tab navigation cho chương trình đang diễn ra - ĐÃ CẬP NHẬT */}
-            {campaign.status === "Đang tiến hành" && (
-              <>
+              
+              {/* Nội dung bên trong khung */}
+              <div className="p-6">
+                {/* Tiêu đề và mô tả */}
                 <div className="mb-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-                      {[
-                        { id: 'upcoming', label: 'Sắp tới' },
-                        { id: 'completed', label: 'Hoàn thành' },
-                        { id: 'all', label: 'Tất cả các phiên' },
-                      ].map((tab) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => setActiveTab(tab.id)}
-                          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                            activeTab === tab.id
-                              ? 'bg-white text-gray-900 shadow-sm'
-                              : 'text-gray-600 hover:text-gray-900'
-                          }`}
-                        >
-                          {tab.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <h2 className="text-2xl font-bold mb-2">{campaign.title}</h2>
+                  <p className="text-gray-600 text-sm">{campaign.description}</p>
                 </div>
                 
-                {/* Tab Sắp tới */}
-                {activeTab === 'upcoming' && (
-                  <div className="bg-white p-6 rounded-md shadow-sm mb-6">
-                    {campaign.nextSession && (
-                      <>
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold">{campaign.nextSession.title}</h3>
-                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Sắp tới</span>
-                        </div>
-                        
-                        <p className="text-gray-700 mb-4">
-                          {campaign.nextSession.description}
-                        </p>
-                        
-                        <div className="flex items-center mb-3">
-                          <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{campaign.nextSession.date}</span>
-                        </div>
-                        
-                        <div className="flex items-center mb-5">
-                          <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{campaign.nextSession.duration}</span>
-                        </div>
-                        
-                        {campaign.nextSession.materials && (
-                          <div className="mb-5">
-                            <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
-                            <ul className="list-disc pl-5 text-gray-700 space-y-1">
-                              {campaign.nextSession.materials.map((material, index) => (
-                                <li key={index}>{material}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        <button className="w-full bg-black text-white rounded-md py-3 font-medium">
-                          Chuẩn bị cho Phiên họp
-                        </button>
-                      </>
-                    )}
+                {/* Tiến độ */}
+                <div className="mb-6">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-gray-700">Tiến độ chung</span>
+                    <span className="font-medium">{campaign.progress} %</span>
                   </div>
-                )}
+                  <ProgressBar value={campaign.progress} />
+                </div>
                 
-                {/* Tab Hoàn thành - ĐÃ CẬP NHẬT FORM VỚI THANH TIẾN ĐỘ */}
-                {activeTab === 'completed' && campaign.completedSessionsDetails && campaign.completedSessionsDetails.length > 0 && (
-                  <div className="bg-white p-6 rounded-md shadow-sm mb-6">
-                    {campaign.completedSessionsDetails[0] && (
-                      <>
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold">{campaign.completedSessionsDetails[0].title}</h3>
-                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Hoàn thành</span>
-                        </div>
-                        
-                        {campaign.completedSessionsDetails[0].description && (
-                          <p className="text-gray-700 mb-4">
-                            {campaign.completedSessionsDetails[0].description}
-                          </p>
-                        )}
-                        
-                        {/* GIỮ LẠI THANH TIẾN ĐỘ */}
-                        <div className="mb-5">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-gray-700">Tiến độ chung</span>
-                            <span className="font-medium text-green-600">Hoàn thành</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center mb-3">
-                          <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{campaign.completedSessionsDetails[0].date}</span>
-                        </div>
-                        
-                        <div className="flex items-center mb-5">
-                          <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{campaign.completedSessionsDetails[0].duration}</span>
-                        </div>
-                        
-                        {campaign.completedSessionsDetails[0].materials && (
-                          <div className="mb-5">
-                            <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
-                            <ul className="list-disc pl-5 text-gray-700 space-y-1">
-                              {campaign.completedSessionsDetails[0].materials.map((material, index) => (
-                                <li key={index}>{material}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        <button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-md py-3 font-medium">
-                          Hoàn thành
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {/* Tab Tất cả các phiên */}
-                {activeTab === 'all' && (
-                  <>
-                    {/* Phiên sắp tới - ĐÃ CẬP NHẬT FORM */}
-                    {campaign.nextSession && (
-                      <div className="bg-white p-6 rounded-md shadow-sm mb-6">
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold">{campaign.nextSession.title}</h3>
-                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Sắp tới</span>
-                        </div>
-                        
-                        <p className="text-gray-700 mb-4">
-                          {campaign.nextSession.description}
-                        </p>
-                        
-                        <div className="flex items-center mb-3">
-                          <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{campaign.nextSession.date}</span>
-                        </div>
-                        
-                        <div className="flex items-center mb-5">
-                          <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{campaign.nextSession.duration}</span>
-                        </div>
-                        
-                        {campaign.nextSession.materials && (
-                          <div className="mb-5">
-                            <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
-                            <ul className="list-disc pl-5 text-gray-700 space-y-1">
-                              {campaign.nextSession.materials.map((material, index) => (
-                                <li key={index}>{material}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        <button className="w-full bg-black text-white rounded-md py-3 font-medium">
-                          Chuẩn bị cho Phiên họp
-                        </button>
-                      </div>
-                    )}
-                    
-                    {/* Phiên đã hoàn thành - ĐÃ CẬP NHẬT FORM VỚI THANH TIẾN ĐỘ */}
-                    {campaign.completedSessionsDetails && campaign.completedSessionsDetails.map((session) => (
-                      <div key={session.id} className="bg-white p-6 rounded-md shadow-sm mb-6">
-                        <div className="flex justify-between items-center mb-3">
-                          <h3 className="text-lg font-bold">{session.title}</h3>
-                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Hoàn thành</span>
-                        </div>
-                        
-                        {session.description && (
-                          <p className="text-gray-700 mb-4">
-                            {session.description}
-                          </p>
-                        )}
-                        
-                        {/* GIỮ LẠI THANH TIẾN ĐỘ */}
-                        <div className="mb-5">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-gray-700">Tiến độ chung</span>
-                            <span className="font-medium text-green-600">Hoàn thành</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center mb-3">
-                          <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{session.date}</span>
-                        </div>
-                        
-                        <div className="flex items-center mb-5">
-                          <Clock className="h-5 w-5 text-gray-400 mr-2" />
-                          <span>{session.duration}</span>
-                        </div>
-                        
-                        {session.materials && (
-                          <div className="mb-5">
-                            <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
-                            <ul className="list-disc pl-5 text-gray-700 space-y-1">
-                              {session.materials.map((material, index) => (
-                                <li key={index}>{material}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        <button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-md py-3 font-medium">
-                          Hoàn thành
-                        </button>
-                      </div>
-                    ))}
-                  </>
-                )}
-              </>
-            )}
-            
-            {/* Hiển thị thông tin chứng chỉ nếu đã hoàn thành */}
-            {campaign.status === "Hoàn thành" && (
-              <div className="bg-white p-6 rounded-md shadow-sm mb-6">
-                <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-6">
+                {/* Thông tin người giảng dạy và ngày tháng */}
+                <div className="grid grid-cols-2 gap-4">
                   <div className="flex items-center">
-                    <div className="bg-green-500 rounded-full p-2 mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
+                    <User className="h-5 w-5 text-gray-400 mr-2" />
                     <div>
-                      <h3 className="font-medium text-green-800">Chương trình đã hoàn thành</h3>
-                      <p className="text-green-700 text-sm">Bạn đã hoàn thành thành công tất cả các phiên học.</p>
+                      <p className="text-xs text-gray-500">Giảng viên:</p>
+                      <p className="text-sm">{campaign.instructor}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                    <div>
+                      <p className="text-xs text-gray-500">Bắt đầu:</p>
+                      <p className="text-sm">{campaign.startDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                    <div>
+                      <p className="text-xs text-gray-500">Kết thúc:</p>
+                      <p className="text-sm">{campaign.endDate}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                    <div>
+                      <p className="text-xs text-gray-500">Phiên:</p>
+                      <p className="text-sm">{campaign.completedSessions || 0} / {campaign.totalSessions} Phiên</p>
                     </div>
                   </div>
                 </div>
-                
-                <div className="border border-gray-200 rounded-lg p-6">
-                  <h3 className="text-lg font-medium mb-4">Thông tin chứng chỉ</h3>
-                  
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Mã chứng chỉ:</p>
-                      <p className="font-medium">{campaign.certificateId}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-gray-500">Ngày hoàn thành:</p>
-                      <p className="font-medium">{campaign.completionDate}</p>
+              </div>
+            </div>
+
+            {/* Cột trái - Thông tin chính */}
+            <div>
+              {/* Tab navigation cho chương trình đang diễn ra - ĐÃ CẬP NHẬT */}
+              {campaign.status === "Đang tiến hành" && (
+                <>
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+                        {[
+                          { id: 'upcoming', label: 'Sắp tới' },
+                          { id: 'completed', label: 'Hoàn thành' },
+                          { id: 'all', label: 'Tất cả các phiên' },
+                        ].map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                              activeTab === tab.id
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                          >
+                            {tab.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   
-                  <button className="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md font-medium">
-                    <Download className="h-5 w-5 mr-2" />
-                    Tải chứng chỉ
+                  {/* Tab Sắp tới */}
+                  {activeTab === 'upcoming' && (
+                    <div className="bg-white p-6 rounded-md shadow-sm mb-6">
+                      {campaign.nextSession && (
+                        <>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg font-bold">{campaign.nextSession.title}</h3>
+                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Sắp tới</span>
+                          </div>
+                          
+                          <p className="text-gray-700 mb-4">
+                            {campaign.nextSession.description}
+                          </p>
+                          
+                          <div className="flex items-center mb-3">
+                            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{campaign.nextSession.date}</span>
+                          </div>
+                          
+                          <div className="flex items-center mb-5">
+                            <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{campaign.nextSession.duration}</span>
+                          </div>
+                          
+                          {campaign.nextSession.materials && (
+                            <div className="mb-5">
+                              <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
+                              <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                                {campaign.nextSession.materials.map((material, index) => (
+                                  <li key={index}>{material}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          <button className="w-full bg-black text-white rounded-md py-3 font-medium">
+                            Chuẩn bị cho Phiên họp
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Tab Hoàn thành - ĐÃ CẬP NHẬT FORM VỚI THANH TIẾN ĐỘ */}
+                  {activeTab === 'completed' && campaign.completedSessionsDetails && campaign.completedSessionsDetails.length > 0 && (
+                    <div className="bg-white p-6 rounded-md shadow-sm mb-6">
+                      {campaign.completedSessionsDetails[0] && (
+                        <>
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg font-bold">{campaign.completedSessionsDetails[0].title}</h3>
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Hoàn thành</span>
+                          </div>
+                          
+                          {campaign.completedSessionsDetails[0].description && (
+                            <p className="text-gray-700 mb-4">
+                              {campaign.completedSessionsDetails[0].description}
+                            </p>
+                          )}
+                          
+                          {/* GIỮ LẠI THANH TIẾN ĐỘ */}
+                          <div className="mb-5">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-gray-700">Tiến độ chung</span>
+                              <span className="font-medium text-green-600">Hoàn thành</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center mb-3">
+                            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{campaign.completedSessionsDetails[0].date}</span>
+                          </div>
+                          
+                          <div className="flex items-center mb-5">
+                            <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{campaign.completedSessionsDetails[0].duration}</span>
+                          </div>
+                          
+                          {campaign.completedSessionsDetails[0].materials && (
+                            <div className="mb-5">
+                              <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
+                              <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                                {campaign.completedSessionsDetails[0].materials.map((material, index) => (
+                                  <li key={index}>{material}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          <button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-md py-3 font-medium">
+                            Hoàn thành
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Tab Tất cả các phiên */}
+                  {activeTab === 'all' && (
+                    <>
+                      {/* Phiên sắp tới - ĐÃ CẬP NHẬT FORM */}
+                      {campaign.nextSession && (
+                        <div className="bg-white p-6 rounded-md shadow-sm mb-6">
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg font-bold">{campaign.nextSession.title}</h3>
+                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Sắp tới</span>
+                          </div>
+                          
+                          <p className="text-gray-700 mb-4">
+                            {campaign.nextSession.description}
+                          </p>
+                          
+                          <div className="flex items-center mb-3">
+                            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{campaign.nextSession.date}</span>
+                          </div>
+                          
+                          <div className="flex items-center mb-5">
+                            <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{campaign.nextSession.duration}</span>
+                          </div>
+                          
+                          {campaign.nextSession.materials && (
+                            <div className="mb-5">
+                              <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
+                              <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                                {campaign.nextSession.materials.map((material, index) => (
+                                  <li key={index}>{material}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          <button className="w-full bg-black text-white rounded-md py-3 font-medium">
+                            Chuẩn bị cho Phiên họp
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Phiên đã hoàn thành - ĐÃ CẬP NHẬT FORM VỚI THANH TIẾN ĐỘ */}
+                      {campaign.completedSessionsDetails && campaign.completedSessionsDetails.map((session) => (
+                        <div key={session.id} className="bg-white p-6 rounded-md shadow-sm mb-6">
+                          <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-lg font-bold">{session.title}</h3>
+                            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Hoàn thành</span>
+                          </div>
+                          
+                          {session.description && (
+                            <p className="text-gray-700 mb-4">
+                              {session.description}
+                            </p>
+                          )}
+                          
+                          {/* GIỮ LẠI THANH TIẾN ĐỘ */}
+                          <div className="mb-5">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-gray-700">Tiến độ chung</span>
+                              <span className="font-medium text-green-600">Hoàn thành</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div className="bg-green-500 h-2 rounded-full" style={{ width: '100%' }}></div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center mb-3">
+                            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{session.date}</span>
+                          </div>
+                          
+                          <div className="flex items-center mb-5">
+                            <Clock className="h-5 w-5 text-gray-400 mr-2" />
+                            <span>{session.duration}</span>
+                          </div>
+                          
+                          {session.materials && (
+                            <div className="mb-5">
+                              <h4 className="font-medium mb-2">Nguyên vật liệu:</h4>
+                              <ul className="list-disc pl-5 text-gray-700 space-y-1">
+                                {session.materials.map((material, index) => (
+                                  <li key={index}>{material}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          <button className="w-full bg-green-600 hover:bg-green-700 text-white rounded-md py-3 font-medium">
+                            Hoàn thành
+                          </button>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </>
+              )}
+              
+              {/* Hiển thị thông tin chứng chỉ nếu đã hoàn thành */}
+              {campaign.status === "Hoàn thành" && (
+                <div className="bg-white p-6 rounded-md shadow-sm mb-6">
+                  <div className="bg-green-50 border border-green-100 rounded-lg p-4 mb-6">
+                    <div className="flex items-center">
+                      <div className="bg-green-500 rounded-full p-2 mr-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-green-800">Chương trình đã hoàn thành</h3>
+                        <p className="text-green-700 text-sm">Bạn đã hoàn thành thành công tất cả các phiên học.</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="border border-gray-200 rounded-lg p-6">
+                    <h3 className="text-lg font-medium mb-4">Thông tin chứng chỉ</h3>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-500">Mã chứng chỉ:</p>
+                        <p className="font-medium">{campaign.certificateId}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-500">Ngày hoàn thành:</p>
+                        <p className="font-medium">{campaign.completionDate}</p>
+                      </div>
+                    </div>
+                    
+                    <button className="flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md font-medium">
+                      <Download className="h-5 w-5 mr-2" />
+                      Tải chứng chỉ
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {/* Hiển thị thông tin lịch trình nếu chương trình sắp tới */}
+              {campaign.status === "Sắp tới" && (
+                <div className="bg-white p-6 rounded-md shadow-sm mb-6">
+                  <h3 className="font-medium mb-4">Thông tin lịch trình</h3>
+                  <div className="space-y-4 mb-6">
+                    {campaign.schedule && (
+                      <div className="flex items-center">
+                        <Clock className="h-5 w-5 text-gray-400 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-500">Lịch học:</p>
+                          <p>{campaign.schedule}</p>
+                        </div>
+                      </div>
+                    )}
+                    {campaign.duration && (
+                      <div className="flex items-center">
+                        <Clock className="h-5 w-5 text-gray-400 mr-3" />
+                        <div>
+                          <p className="text-sm text-gray-500">Thời gian:</p>
+                          <p>{campaign.duration}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <button className="w-full bg-blue-600 text-white py-3 rounded-md font-medium">
+                    Đăng ký ngay
                   </button>
                 </div>
-              </div>
-            )}
-            
-            {/* Hiển thị thông tin lịch trình nếu chương trình sắp tới */}
-            {campaign.status === "Sắp tới" && (
-              <div className="bg-white p-6 rounded-md shadow-sm mb-6">
-                <h3 className="font-medium mb-4">Thông tin lịch trình</h3>
-                <div className="space-y-4 mb-6">
-                  {campaign.schedule && (
-                    <div className="flex items-center">
-                      <Clock className="h-5 w-5 text-gray-400 mr-3" />
-                      <div>
-                        <p className="text-sm text-gray-500">Lịch học:</p>
-                        <p>{campaign.schedule}</p>
-                      </div>
-                    </div>
-                  )}
-                  {campaign.duration && (
-                    <div className="flex items-center">
-                      <Clock className="h-5 w-5 text-gray-400 mr-3" />
-                      <div>
-                        <p className="text-sm text-gray-500">Thời gian:</p>
-                        <p>{campaign.duration}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <button className="w-full bg-blue-600 text-white py-3 rounded-md font-medium">
-                  Đăng ký ngay
-                </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           
           {/* Cột phải - Chi tiết chương trình */}
-          <div className="md:w-1/3 mt-6 md:mt-0">
+          <div className="space-y-6">
             {/* Chi tiết chương trình */}
             <div className="bg-white p-6 rounded-md shadow-sm">
               <h3 className="text-lg font-bold mb-4">Chi tiết chương trình</h3>

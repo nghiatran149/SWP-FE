@@ -8,6 +8,24 @@ const AssessmentResult = () => {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
+  const renderRiskBadge = (risk) => {
+    let colorClass = '';
+    if (risk === 'Nguy cơ cao' || risk === 'High Risk') {
+      colorClass = 'bg-red-100 text-red-800';
+    } else if (risk === 'Nguy cơ trung bình' || risk === 'Moderate Risk') {
+      colorClass = 'bg-orange-100 text-orange-800';
+    } else if (risk === 'Nguy cơ thấp' || risk === 'Low Risk') {
+      colorClass = 'bg-green-100 text-green-800';
+    } else {
+      colorClass = 'bg-gray-100 text-gray-800';
+    }
+    return (
+      <span className={`px-3 py-1 rounded-lg text-xl font-medium ${colorClass}`}>
+        {risk}
+      </span>
+    );
+  };
+
   useEffect(() => {
     const fetchResult = async () => {
       setLoading(true);
@@ -49,11 +67,13 @@ const AssessmentResult = () => {
         ) : result ? (
           <>
             {/* Mức độ nguy cơ */}
-            <div className="bg-white rounded-xl shadow p-5 mb-8 flex items-center gap-4">
-              <span className="text-xl"><i className="fa-regular fa-circle-info text-gray-400"></i></span>
-              <div>
-                <span className="font-semibold">Mức độ nguy cơ:</span> <span className="font-medium">{result.riskLevel}</span>
-                <div className="text-gray-500 text-sm">Bạn có nguy cơ {result.riskLevel?.toLowerCase()} liên quan đến việc sử dụng chất gây nghiện.</div>
+            <div className="bg-white rounded-xl shadow p-6 mb-8">
+              <h2 className="text-2xl font-bold mb-2 flex items-center gap-x-3">
+                <span>Mức độ nguy cơ:</span>
+                {result.riskLevel && renderRiskBadge(result.riskLevel)}
+              </h2>
+              <div className="text-gray-500 text-sm">
+                Bạn có nguy cơ {result.riskLevel?.toLowerCase()} liên quan đến việc sử dụng chất gây nghiện.
               </div>
             </div>
             {/* Điểm số */}
