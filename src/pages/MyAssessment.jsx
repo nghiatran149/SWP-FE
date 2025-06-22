@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   TrendingUp,
@@ -13,59 +13,75 @@ import {
   Plus,
   AlertTriangle
 } from 'lucide-react';
+import api from '../api/api';
 
 const MyAssessment = () => {
-  const [activeTab, setActiveTab] = useState('history');
+  const [surveyResponses, setSurveyResponses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Mock data for assessments
-  const assessments = {
-    upcoming: [
-      {
-        id: 1,
-        type: 'AUDIT',
-        scheduledDate: '20/11/2023',
-        description: 'Đánh giá theo dõi việc sử dụng rượu'
-      },
-    ],
-    history: [
-      {
-        id: 2,
-        type: 'ASSIST',
-        date: '15/10/2023',
-        score: 18,
-        risk: 'Nguy cơ trung bình',
-        substances: ['Rượu', 'Cần sa'],
-        recommendation: 'Xem xét can thiệp ngắn hạn và theo dõi'
-      },
-      {
-        id: 3,
-        type: 'CRAFFT',
-        date: '01/09/2023',
-        score: 3,
-        risk: 'Nguy cơ cao',
-        substances: ['Rượu'],
-        recommendation: 'Khuyến nghị chuyển sang đánh giá chuyên sâu'
-      },
-      {
-        id: 4,
-        type: 'DAST',
-        date: '10/08/2023',
-        score: 4,
-        risk: 'Nguy cơ trung bình',
-        substances: ['Chất kích thích'],
-        recommendation: 'Khuyến nghị can thiệp ngắn hạn'
+  // Fetch survey responses from API
+  useEffect(() => {
+    const fetchSurveyResponses = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get user ID from localStorage
+        const userInfo = localStorage.getItem('userInfo');
+        if (!userInfo) {
+          setError('Không tìm thấy thông tin người dùng');
+          setLoading(false);
+          return;
+        }
+
+        const user = JSON.parse(userInfo);
+        const userId = user.userId;
+
+        if (!userId) {
+          setError('Không tìm thấy ID người dùng');
+          setLoading(false);
+          return;
+        }
+
+        // Call API to get survey responses
+        const response = await api.get(`/UserSurveyResponse/user/${userId}`);
+        
+        if (response.data.resultStatus === 'Success') {
+          setSurveyResponses(response.data.data || []);
+        } else {
+          setError(response.data.messages?.[0] || 'Không thể tải dữ liệu đánh giá');
+        }
+      } catch (err) {
+        console.error('Error fetching survey responses:', err);
+        setError('Lỗi kết nối đến server');
+      } finally {
+        setLoading(false);
       }
-    ]
-  };
-  
+    };
 
-  // Function to render assessment trend chart placeholder
-  const renderTrendChart = () => {
-    return (
-      <div className="flex items-center justify-center h-60 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-        <p className="text-gray-500">Biểu đồ xu hướng đánh giá sẽ hiển thị ở đây</p>
-      </div>
-    );
+    fetchSurveyResponses();
+  }, []);
+
+  // Function to format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+  };
+
+  // Function to extract survey type from survey name
+  const extractSurveyType = (surveyName) => {
+    if (surveyName.includes('ASSIST')) return 'ASSIST';
+    if (surveyName.includes('AUDIT')) return 'AUDIT';
+    if (surveyName.includes('CRAFFT')) return 'CRAFFT';
+    if (surveyName.includes('DAST')) return 'DAST';
+    return surveyName.replace('Bài đánh giá ', '');
+  };
+
+  // Function to handle retake assessment
+  const handleRetakeAssessment = (surveyId) => {
+    navigate(`/assessmentdetail/${surveyId}`);
   };
 
   // Function to render risk badge
@@ -87,11 +103,11 @@ const MyAssessment = () => {
     );
   };
 
-  // Function to render substance pill
-  const renderSubstancePill = (substance) => {
+  // Function to render recommended action pill
+  const renderRecommendedActionPill = (action) => {
     return (
-      <span key={substance} className="px-3 py-1 bg-gray-100 text-gray-800 text-sm rounded-full mr-2">
-        {substance}
+      <span key={action} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full mr-2 mb-2">
+        {action}
       </span>
     );
   };
@@ -99,75 +115,49 @@ const MyAssessment = () => {
   // Function to render assessment history cards
   const renderAssessmentHistoryCard = (assessment) => {
     return (
-      <div key={assessment.id} className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
+      <div key={assessment.responseId} className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="text-lg font-bold">Bài đánh giá {assessment.type}</h3>
-            <p className="text-sm text-gray-500">Làm vào ngày {assessment.date}</p>
+            <h3 className="text-lg font-bold">{assessment.surveyName}</h3>
+            <p className="text-sm text-gray-500">Làm vào ngày {formatDate(assessment.takenAt)}</p>
           </div>
-          {assessment.risk && renderRiskBadge(assessment.risk)}
+          {assessment.riskLevel && renderRiskBadge(assessment.riskLevel)}
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <p className="text-sm text-gray-500">Điểm</p>
-            <p className="text-2xl font-bold">{assessment.score}</p>
+            <p className="text-2xl font-bold">{assessment.totalScore}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-500">Chất sử dụng</p>
-            <div className="flex flex-wrap mt-1">
-              {assessment.substances.map(substance => renderSubstancePill(substance))}
-            </div>
+            <p className="text-sm text-gray-500">Loại đánh giá</p>
+            <p className="text-gray-800 font-medium">{extractSurveyType(assessment.surveyName)}</p>
           </div>
         </div>
 
-        <div className="mb-4">
-          <p className="text-sm text-gray-500">Khuyến nghị</p>
-          <p className="text-gray-800">{assessment.recommendation}</p>
-        </div>
+        {assessment.recommendedActions && assessment.recommendedActions.length > 0 && (
+          <div className="mb-4">
+            <p className="text-sm text-gray-500 mb-2">Khuyến nghị hành động</p>
+            <div className="flex flex-wrap">
+              {assessment.recommendedActions.map(action => renderRecommendedActionPill(action))}
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-between mt-4">
-          <button className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-md hover:bg-gray-50 font-medium">
+          <Link 
+            to={`/my-assessment-result/${assessment.responseId}`}
+            className="flex items-center px-4 py-2 bg-white border border-gray-300 text-gray-900 rounded-md hover:bg-gray-50 font-medium"
+          >
             <FileText className="h-4 w-4 mr-1" /> Xem kết quả chi tiết
-          </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+          </Link>
+          <button 
+            onClick={() => handleRetakeAssessment(assessment.surveyId)}
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium"
+          >
             Làm lại <ArrowRight className="h-4 w-4 ml-1" />
           </button>
         </div>
-      </div>
-    );
-  };
-
-  // Function to render upcoming assessment card
-  const renderUpcomingAssessment = (assessment) => {
-    return (
-      <div key={assessment.id} className="bg-white border border-gray-200 rounded-lg p-5 mb-4">
-        <div className="mb-3">
-          <h3 className="text-lg font-bold">Bài đánh giá {assessment.type}</h3>
-          <p className="text-sm text-gray-500">Đã lên lịch vào {assessment.scheduledDate}</p>
-        </div>
-
-        <p className="text-gray-700 mb-4">{assessment.description}</p>
-
-        <div className="flex justify-between mt-4">
-          <button className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-            Lên lịch lại
-          </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Làm ngay <ArrowRight className="h-4 w-4 ml-1" />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // Function to render assessment trends
-  const renderAssessmentTrends = () => {
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg p-5">
-        <h3 className="text-lg font-bold mb-1">Assessment Trends</h3>
-        <p className="text-sm text-gray-600 mb-6">Track your progress over time. More data will be available as you complete additional assessments.</p>
-        {renderTrendChart()}
       </div>
     );
   };
@@ -187,6 +177,36 @@ const MyAssessment = () => {
     );
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải dữ liệu đánh giá...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -205,52 +225,28 @@ const MyAssessment = () => {
         {renderRecommendation()}
 
         <div className="mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-              {[
-                { id: 'history', label: 'Lịch sử đánh giá', count: assessments.history.length },
-                { id: 'upcoming', label: 'Sắp tới', count: assessments.upcoming.length },
-                { id: 'insights', label: 'Thống kê', count: null },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    activeTab === tab.id
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  {tab.label}{tab.count !== null ? ` (${tab.count})` : ''}
-                </button>
-              ))}
-            </div>
-            <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-4">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">Lịch sử đánh giá ({surveyResponses.length})</h2>
+            <Link to="/assessments" className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
               Làm bài đánh giá mới
               <Plus className="h-4 w-4 ml-2" />
-            </button>
+            </Link>
           </div>
 
-          <div className="mt-6">
-            {activeTab === 'history' && (
+          <div>
+            {surveyResponses.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {assessments.history.map(assessment => renderAssessmentHistoryCard(assessment))}
+                {surveyResponses.map(assessment => renderAssessmentHistoryCard(assessment))}
+              </div>
+            ) : (
+              <div className="text-center py-10 text-gray-500">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>Bạn chưa có bài đánh giá nào</p>
+                <Link to="/assessments" className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                  Làm bài đánh giá đầu tiên
+                </Link>
               </div>
             )}
-
-            {activeTab === 'upcoming' && (
-              <div>
-                {assessments.upcoming.length > 0 ? (
-                  assessments.upcoming.map(assessment => renderUpcomingAssessment(assessment))
-                ) : (
-                  <div className="text-center py-10 text-gray-500">
-                    Không có đánh giá sắp tới nào được lên lịch
-                  </div>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'insights' && renderAssessmentTrends()}
           </div>
         </div>
       </div>

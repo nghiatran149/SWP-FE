@@ -41,7 +41,7 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-blue-900 to-teal-900 text-white">
       {/* Emergency Banner */}
-      <div className="bg-red-600 py-3">
+      <div className="bg-red-800 py-3">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-white font-semibold">
             🚨 Cần hỗ trợ khẩn cấp? Gọi ngay đường dây nóng: 

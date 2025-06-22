@@ -155,9 +155,13 @@ const MyCampaign = () => {
         </div>
 
         <div className="flex justify-between mt-5">
-          <button className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium">
+          {/* Thay thế button thành Link */}
+          <Link 
+            to={`/my-campaigns/${campaign.id}`} 
+            className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium"
+          >
             Xem chi tiết
-          </button>
+          </Link>
           <button className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 text-md font-medium flex items-center">
             <Download className="w-4 h-4 mr-1" /> Tải xuống chứng chỉ
           </button>
@@ -235,9 +239,13 @@ const MyCampaign = () => {
         </div>
 
         <div className="flex justify-between mt-5">
-          <button className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium">
+          {/* Thay thế button thành Link */}
+          <Link 
+            to={`/my-campaigns/${campaign.id}`} 
+            className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium"
+          >
             Xem chi tiết
-          </button>
+          </Link>
           <button className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-md font-medium">
             Tiếp tục chương trình
           </button>
@@ -302,9 +310,13 @@ const MyCampaign = () => {
         </div>
 
         <div className="flex justify-between mt-5">
-          <button className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium">
+          {/* Thay thế button thành Link */}
+          <Link 
+            to={`/my-campaigns/${campaign.id}`} 
+            className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium"
+          >
             Tìm hiểu thêm
-          </button>
+          </Link>
           <button className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-md font-medium">
             Đăng ký ngay
           </button>

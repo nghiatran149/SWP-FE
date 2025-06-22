@@ -15,6 +15,7 @@ import Course from "./pages/Course";
 import Assessment from "./pages/Assessment";
 import Booking from "./pages/Booking";
 import Blog from "./pages/Blog";
+import Campaign from "./pages/Campaign";
 
 //Admin Dashboard
 import UserManagement from "./pages/UserManagement";
@@ -22,6 +23,7 @@ import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import MyCampaign from "./pages/MyCampaign";
+import MyCampaignDetail from "./pages/MyCampaignDetail"; // Thêm import cho MyCampaignDetail
 
 //Detail
 import QuestionDetail from "./pages/QuestionDetail";
@@ -38,6 +40,7 @@ import Profile from "./pages/Profile";
 import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
+import MyAssessmentResult from "./pages/MyAssessmentResult";
 
 
 
@@ -129,6 +132,14 @@ function App() {
             }
           />
           <Route
+            path="/campaigns"
+            element={
+              <Layout>
+                <Campaign />
+              </Layout>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <LayoutDashboard activeMenuItem="overview">
@@ -141,6 +152,15 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="mycampaign">
                 <MyCampaign />
+              </LayoutDashboard>
+            }
+          />
+          {/* Thêm route cho MyCampaignDetail */}
+          <Route
+            path="/my-campaigns/:id"
+            element={
+              <LayoutDashboard activeMenuItem="mycampaign">
+                <MyCampaignDetail />
               </LayoutDashboard>
             }
           />
@@ -173,6 +193,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="myassessment">
                 <MyAssessment />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/my-assessment-result/:responseId"
+            element={
+              <LayoutDashboard activeMenuItem="myassessment">
+                <MyAssessmentResult />
               </LayoutDashboard>
             }
           />

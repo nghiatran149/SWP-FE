@@ -31,7 +31,7 @@ const CourseDetail = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await api.getCourse(courseId);
+        const res = await api.get(`/Course/${courseId}`);
         if (res.data && res.data.data) {
           const data = res.data.data;
           setCourse({
@@ -56,7 +56,7 @@ const CourseDetail = () => {
     setWeeksLoading(true);
     setWeeksError(null);
     setWeeks([]);
-    api.getCourseWeeks(courseId)
+    api.get(`/Course/${courseId}/weeks-with-lessons`)
       .then(res => {
         if (res.data && res.data.data && Array.isArray(res.data.data.courseWeeks)) {
           setWeeks(res.data.data.courseWeeks);
@@ -74,7 +74,7 @@ const CourseDetail = () => {
     setRequirementsLoading(true);
     setRequirementsError(null);
     setRequirements([]);
-    api.getCourseRequirements(courseId)
+    api.get(`/Course/${courseId}/requirements`)
       .then(res => {
         if (res.data && Array.isArray(res.data.data)) {
           setRequirements(res.data.data);
@@ -167,7 +167,7 @@ const CourseDetail = () => {
                                 className="flex items-center justify-between py-3 px-2 hover:bg-gray-50 transition-colors"
                               >
                                 <div className="flex items-center gap-3">
-                                  <CheckCircle className="w-5 h-5 text-green-500" />
+                                  <CheckCircle className="w-5 h-5 text-gray-500" />
                                   <span className="text-gray-900">{lesson.title}</span>
                                 </div>
                                 <span className="text-sm text-gray-500">{lesson.durationMinutes} phút</span>

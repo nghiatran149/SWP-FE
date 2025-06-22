@@ -41,12 +41,12 @@ const ConsultantManagement = () => {
 
         // Fetch both consultants and users in parallel
         const [consultantsRes, usersRes] = await Promise.all([
-          fetch(`${BASE_URL}/Consultant`, { headers: headers }),
-          fetch(`${BASE_URL}/User`, { headers: headers })
+          api.get('/Consultant', { headers: headers }),
+          api.get('/User', { headers: headers })
         ]);
 
-        const consultantsData = await consultantsRes.json();
-        const usersData = await usersRes.json();
+        const consultantsData = consultantsRes.data;
+        const usersData = usersRes.data;
 
         if (consultantsData.resultStatus === 'Success' && usersData.resultStatus === 'Success') {
           // Filter users to only get consultants by roleId 4
