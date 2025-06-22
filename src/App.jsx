@@ -23,6 +23,7 @@ import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import MyCampaign from "./pages/MyCampaign";
+import MyCampaignDetail from "./pages/MyCampaignDetail"; // Thêm import cho MyCampaignDetail
 
 //Detail
 import QuestionDetail from "./pages/QuestionDetail";
@@ -150,6 +151,15 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="mycampaign">
                 <MyCampaign />
+              </LayoutDashboard>
+            }
+          />
+          {/* Thêm route cho MyCampaignDetail */}
+          <Route
+            path="/my-campaigns/:id"
+            element={
+              <LayoutDashboard activeMenuItem="mycampaign">
+                <MyCampaignDetail />
               </LayoutDashboard>
             }
           />
