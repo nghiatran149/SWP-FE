@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Calendar, User, ArrowRight, Image } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState('Tất cả');
@@ -13,7 +14,7 @@ const Blog = () => {
     'Sức khỏe',
     'Kỹ năng sống'
   ];
-
+// mock dữ liệu
   const blogPosts = [
     {
       id: 1,
@@ -71,6 +72,7 @@ const Blog = () => {
       image: false
     }
   ];
+  //Lọc bài viết
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = activeCategory === 'Tất cả' || post.category === activeCategory;
@@ -79,9 +81,11 @@ const Blog = () => {
     return matchesCategory && matchesSearch;
   });
 
+  // Phân loại bài viết
   const featuredPost = blogPosts.find(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
 
+  // Phần giao diện
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
@@ -153,9 +157,12 @@ const Blog = () => {
                     <span>•</span>
                     <span>{featuredPost.author}</span>
                   </div>
-                  <button className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200">
-                    Đọc thêm
-                  </button>
+                  <Link
+                  to={`/blog/${featuredPost.id}`}
+                  className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 inline-block"
+                    >
+                      Đọc thêm
+                  </Link>
                 </div>
               </div>
             </div>
@@ -197,9 +204,11 @@ const Blog = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                  {post.title}
-                </h3>
+                <Link to={`/blog/${post.id}`}>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 hover:text-emerald-600 transition-colors">
+                    {post.title}
+                  </h3>
+                </Link>
 
                 {/* Excerpt */}
                 <p className="text-gray-600 mb-4 line-clamp-3">
@@ -207,10 +216,13 @@ const Blog = () => {
                 </p>
 
                 {/* Read More Link */}
-                <button className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200">
+                <Link 
+                  to={`/blog/${post.id}`}
+                  className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200"
+                >
                   <span>Đọc thêm</span>
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </Link>
               </div>
             </article>
           ))}

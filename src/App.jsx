@@ -33,6 +33,7 @@ import CertificateDetail from "./pages/CertificateDetail";
 import AppointmentDetail from "./pages/AppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
 import AssessmentResult from "./pages/AssessmentResult";
+import BlogDetail from "./pages/BlogDetail";
 
 //User Dashboard
 import Dashboard from "./pages/Dashboard";
@@ -128,6 +129,14 @@ function App() {
             element={
               <Layout>
                 <Blog />
+              </Layout>
+            }
+          />
+          <Route
+            path="/blog/:id"
+            element={
+              <Layout>
+                <BlogDetail />
               </Layout>
             }
           />
