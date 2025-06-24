@@ -27,9 +27,9 @@ const Sidebar = ({ activeItem = 'overview' }) => {
     ];
 
     const memberItems = [
+      { id: 'myassessment', label: 'Đánh giá của tôi', icon: FileText },
       { id: 'mycourse', label: 'Khóa học của tôi', icon: BookOpen },
       { id: 'myappointment', label: 'Lịch hẹn của tôi', icon: Calendar },
-      { id: 'myassessment', label: 'Đánh giá của tôi', icon: FileText },
       { id: 'mycampaign', label: 'Chương trình của tôi', icon: AppWindow },
     ];
 
@@ -77,9 +77,9 @@ const Sidebar = ({ activeItem = 'overview' }) => {
             switch (item.id) {
               case 'overview': to = '/dashboard'; break;
 
+              case 'myassessment': to = '/myassessment'; break;
               case 'mycourse': to = '/mycourse'; break;
               case 'myappointment': to = '/myappointment'; break;
-              case 'myassessment': to = '/myassessment'; break;
               case 'mycampaign': to = '/mycampaign'; break;
               
               case 'usermanagement': to = '/usermanagement'; break;

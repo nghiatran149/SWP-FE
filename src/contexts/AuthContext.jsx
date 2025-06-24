@@ -4,6 +4,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
     // Lấy user từ localStorage khi load app
@@ -11,6 +12,7 @@ export const AuthProvider = ({ children }) => {
     if (userInfo) {
       setUser(JSON.parse(userInfo));
     }
+    setIsAuthLoading(false);
   }, []);
 
   const login = (userInfo) => {
@@ -24,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthLoading }}>
       {children}
     </AuthContext.Provider>
   );

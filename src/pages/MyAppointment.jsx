@@ -75,7 +75,7 @@ const MyAppointment = () => {
         </div>
       </div>
       <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0 md:ml-6">
-      <Link to="/appointmentdetail" className={`px-4 py-2 rounded-md ${isCompleted ? 'border border-gray-300 bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>Xem chi tiết</Link>
+      <Link to="/myappointmentdetail" className={`px-4 py-2 rounded-md ${isCompleted ? 'border border-gray-300 bg-blue-600 text-white hover:bg-blue-700' : 'bg-blue-600 text-white hover:bg-blue-700'}`}>Xem chi tiết</Link>
         {!isCompleted && (
           <button className="px-4 py-2 border border-gray-300 rounded-md bg-red-600 text-white hover:bg-red-700">Hủy lịch</button>
         )} 

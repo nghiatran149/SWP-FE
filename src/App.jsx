@@ -23,14 +23,14 @@ import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import MyCampaign from "./pages/MyCampaign";
-import MyCampaignDetail from "./pages/MyCampaignDetail"; // Thêm import cho MyCampaignDetail
+import MyCampaignDetail from "./pages/MyCampaignDetail";
 
 //Detail
 import QuestionDetail from "./pages/QuestionDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import CertificateDetail from "./pages/CertificateDetail";
-import AppointmentDetail from "./pages/AppointmentDetail";
+import MyAppointmentDetail from "./pages/MyAppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
 import AssessmentResult from "./pages/AssessmentResult";
 import BlogDetail from "./pages/BlogDetail";
@@ -190,10 +190,10 @@ function App() {
             }
           />
           <Route
-            path="/appointmentdetail"
+            path="/myappointmentdetail"
             element={
               <LayoutDashboard activeMenuItem="myappointment">
-                <AppointmentDetail />
+                <MyAppointmentDetail />
               </LayoutDashboard>
             }
           />
