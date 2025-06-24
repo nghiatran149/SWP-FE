@@ -15,7 +15,9 @@ import {
   MessageCircle,
   HelpCircle,
   AlertTriangle,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  Award,
 } from 'lucide-react';
 
 const modules = [
@@ -186,10 +188,10 @@ const MyCourseDetail = () => {
                     <Users className="w-4 h-4" />
                     <span>Giảng viên: {course.instructorName}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  {/* <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
                     <span>Chưa có đánh giá</span>
-                  </div>
+                  </div> */}
                 </div>
                 {/* Progress Bar */}
                 <div className="mb-4">
@@ -204,11 +206,15 @@ const MyCourseDetail = () => {
                     ></div>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <button className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                <div className="flex justify-between">
+                  <button className="flex items-center gap-2 bg-green-600 text-white px-10 py-2 rounded-lg hover:bg-green-700 transition-colors">
                     <Play className="w-4 h-4" />
                     <span>Tiếp tục học</span>
                   </button>
+                  <Link to="/certificate" className="flex items-center gap-2 border border-gray-600 text-gray-600 px-10 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <Award className="w-4 h-4" />
+                    <span>Xem chứng chỉ</span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -262,18 +268,17 @@ const MyCourseDetail = () => {
                               week.lessons.map((lesson, idx) => (
                                 <div
                                   key={lesson.lessonId || idx}
-                                  className="flex items-center justify-between py-3 px-2 hover:bg-gray-50 transition-colors"
+                                  className="flex items-center gap-4 py-3 px-2 hover:bg-gray-50 transition-colors"
                                 >
-                                  <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-3 min-w-0 flex-1">
                                     <CheckCircle className={`w-5 h-5 ${lesson.isCompleted ? 'text-green-500' : 'text-gray-300'}`} />
-                                    <span className="text-gray-900">{lesson.title}</span>
+                                    <span className="text-gray-900 truncate">{lesson.title}</span>
                                   </div>
-                                  <div className="flex items-center gap-4">
-                                    <span className="text-sm text-gray-500">{lesson.durationMinutes} phút</span>
-                                    <button className={lesson.isCompleted ? 'text-blue-600 hover:text-blue-800 text-sm' : 'text-green-600 hover:text-green-800 text-sm'}>
-                                      {lesson.isCompleted ? 'Xem lại' : 'Học ngay'}
-                                    </button>
-                                  </div>
+                                  <span className="text-sm text-gray-500 w-20 text-left block">{lesson.durationMinutes} phút</span>
+                                  <button
+                                    className={lesson.isCompleted ? 'text-blue-600 hover:text-blue-800 text-sm w-20 text-left' : 'text-green-600 hover:text-green-800 text-sm w-20 text-left'}>
+                                    {lesson.isCompleted ? 'Xem lại' : 'Học ngay'}
+                                  </button>
                                 </div>
                               ))
                             ) : (

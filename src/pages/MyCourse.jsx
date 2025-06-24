@@ -11,6 +11,17 @@ const MyCourse = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const formatLastAccessed = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
   useEffect(() => {
     const fetchMyCourses = async () => {
       if (!user) {
@@ -161,7 +172,7 @@ const MyCourse = () => {
                     {course.lastAccessed && (
                       <div className="flex items-center text-sm text-gray-600">
                         <Calendar className="w-4 h-4 mr-2" />
-                        <span>Truy cập gần nhất: {course.lastAccessed}</span>
+                        <span>Truy cập gần nhất: {formatLastAccessed(course.lastAccessed)}</span>
                       </div>
                     )}
                   </div>

@@ -40,18 +40,15 @@ const CourseDetail = () => {
       }
       setEnrollmentCheckLoading(true);
       try {
-        const response = await api.get(`/UserCourseEnrollment`);
+        const response = await api.get(`/UserCourseEnrollment/${courseId}/enrollment-status?userId=${user.userId}`);
         if (response.data && response.data.data) {
-          const enrollments = response.data.data;
-          const userEnrollment = enrollments.find(
-            (enrollment) => enrollment.userId === user.userId && enrollment.courseId === courseId
-          );
-          if (userEnrollment) {
-            setIsEnrolled(true);
-          }
+          setIsEnrolled(!!response.data.data.isEnrolled);
+        } else {
+          setIsEnrolled(false);
         }
       } catch (err) {
         console.error('Failed to check enrollment status', err);
+        setIsEnrolled(false);
       } finally {
         setEnrollmentCheckLoading(false);
       }
