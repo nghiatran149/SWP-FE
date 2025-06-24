@@ -29,6 +29,7 @@ import MyCampaignDetail from "./pages/MyCampaignDetail";
 import QuestionDetail from "./pages/QuestionDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
+import LessonDetail from "./pages/LessonDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import MyAppointmentDetail from "./pages/MyAppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
@@ -42,7 +43,6 @@ import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
 import MyAssessmentResult from "./pages/MyAssessmentResult";
-
 
 
 function App() {
@@ -266,6 +266,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="mycourse">
                 <MyCourseDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/lessondetail"
+            element={
+              <LayoutDashboard activeMenuItem="mycourse">
+                <LessonDetail />
               </LayoutDashboard>
             }
           />

@@ -140,7 +140,7 @@ const MyCourseDetail = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-8 py-4">
         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-          <span>Khóa học</span>
+          <Link to="/mycourse" className="hover:underline">Khóa học</Link>
           <span>/</span>
           <span className="text-gray-900 font-semibold">{course.title}</span>
         </div>
@@ -225,8 +225,8 @@ const MyCourseDetail = () => {
                   <button
                     onClick={() => setActiveTab('content')}
                     className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === 'content'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
                       }`}
                   >
                     Nội dung khóa học
@@ -234,8 +234,8 @@ const MyCourseDetail = () => {
                   <button
                     onClick={() => setActiveTab('materials')}
                     className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === 'materials'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
                       }`}
                   >
                     Tài liệu
@@ -243,8 +243,8 @@ const MyCourseDetail = () => {
                   <button
                     onClick={() => setActiveTab('objectives')}
                     className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === 'objectives'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
                       }`}
                   >
                     Mục tiêu
@@ -275,10 +275,21 @@ const MyCourseDetail = () => {
                                     <span className="text-gray-900 truncate">{lesson.title}</span>
                                   </div>
                                   <span className="text-sm text-gray-500 w-20 text-left block">{lesson.durationMinutes} phút</span>
-                                  <button
-                                    className={lesson.isCompleted ? 'text-blue-600 hover:text-blue-800 text-sm w-20 text-left' : 'text-green-600 hover:text-green-800 text-sm w-20 text-left'}>
-                                    {lesson.isCompleted ? 'Xem lại' : 'Học ngay'}
-                                  </button>
+                                  {lesson.isCompleted ? (
+                                    <Link
+                                      to={`/lessondetail?lessonId=${lesson.lessonId}&courseId=${courseId}`}
+                                      className="text-blue-600 hover:text-blue-800 text-sm w-20 text-left"
+                                    >
+                                      Xem lại
+                                    </Link>
+                                  ) : (
+                                    <Link
+                                      to={`/lessondetail?lessonId=${lesson.lessonId}&courseId=${courseId}`}
+                                      className="text-green-600 hover:text-green-800 text-sm w-20 text-left"
+                                    >
+                                      Học ngay
+                                    </Link>
+                                  )}
                                 </div>
                               ))
                             ) : (
