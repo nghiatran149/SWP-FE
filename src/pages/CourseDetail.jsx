@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/api';
-import { Users, Clock, CheckCircle, BookOpen, BookmarkPlus } from 'lucide-react';
+import { Users, Clock, CheckCircle, BookOpen, BookmarkPlus, SquareCheckBig } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const TABS = [
   { id: 'content', label: 'Nội dung khóa học' },
@@ -11,10 +12,15 @@ const TABS = [
 
 const CourseDetail = () => {
   const { courseId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('content');
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollmentCheckLoading, setEnrollmentCheckLoading] = useState(true);
 
   // State cho nội dung tuần/bài học
   const [weeks, setWeeks] = useState([]);
@@ -25,6 +31,62 @@ const CourseDetail = () => {
   const [requirements, setRequirements] = useState([]);
   const [requirementsLoading, setRequirementsLoading] = useState(false);
   const [requirementsError, setRequirementsError] = useState(null);
+
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (!user) {
+        setEnrollmentCheckLoading(false);
+        return;
+      }
+      setEnrollmentCheckLoading(true);
+      try {
+        const response = await api.get(`/UserCourseEnrollment/${courseId}/enrollment-status?userId=${user.userId}`);
+        if (response.data && response.data.data) {
+          setIsEnrolled(!!response.data.data.isEnrolled);
+        } else {
+          setIsEnrolled(false);
+        }
+      } catch (err) {
+        console.error('Failed to check enrollment status', err);
+        setIsEnrolled(false);
+      } finally {
+        setEnrollmentCheckLoading(false);
+      }
+    };
+
+    checkEnrollment();
+  }, [user, courseId]);
+
+  const handleEnroll = async () => {
+    if (!user) {
+      alert('Bạn cần đăng nhập để đăng ký khóa học.');
+      navigate('/login');
+      return;
+    }
+
+    setIsEnrolling(true);
+    try {
+      const response = await api.post('/UserCourseEnrollment', {
+        userId: user.userId,
+        courseId: courseId,
+      });
+
+      if (response.data && response.data.resultStatus === 'Success') {
+        alert('Đăng ký khóa học thành công!');
+        setIsEnrolled(true);
+        // Optionally, disable the button or change its text
+      } else {
+        throw new Error(response.data.messages?.join(', ') || 'Đăng ký thất bại.');
+      }
+    } catch (err) {
+      console.error('Enrollment error:', err);
+      const errorMessage =
+        err.response?.data?.messages?.join(', ') || err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.';
+      alert(`Đăng ký không thành công: ${errorMessage}`);
+    } finally {
+      setIsEnrolling(false);
+    }
+  };
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -227,13 +289,34 @@ const CourseDetail = () => {
             <h3 className="text-lg font-semibold mb-2">Đăng ký khóa học</h3>
             <div className="text-2xl font-bold text-green-600 mb-1">Miễn phí</div>
             <div className="text-gray-600 mb-4 text-sm">Khóa học hoàn toàn miễn phí cho tất cả học sinh</div>
-            <button className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mb-3">
-              Đăng ký ngay
-            </button>
-            <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mb-4">
+            {enrollmentCheckLoading ? (
+              <button
+                disabled
+                className="w-full bg-gray-400 text-white py-3 rounded-lg font-medium cursor-not-allowed"
+              >
+                Đang tải...
+              </button>
+            ) : isEnrolled ? (
+              <button
+                disabled
+                className="w-full bg-green-800 text-white py-3 rounded-lg font-medium cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <SquareCheckBig className="w-5 h-5" />
+                <span>Đã đăng ký</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleEnroll}
+                disabled={isEnrolling}
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mb-3 disabled:bg-green-400 disabled:cursor-not-allowed"
+              >
+                {isEnrolling ? 'Đang xử lý...' : 'Đăng ký ngay'}
+              </button>
+            )}
+            {/* <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mb-4">
               <BookmarkPlus className="w-5 h-5 mr-1" />
               <span> Thêm vào danh sách quan tâm</span>
-            </button>
+            </button> */}
             <div className="border-t pt-4 mt-4">
               <h4 className="font-semibold mb-2 text-gray-900 text-sm">Khóa học này bao gồm:</h4>
               <ul className="space-y-2 text-gray-700 text-sm">

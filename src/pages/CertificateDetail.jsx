@@ -31,7 +31,7 @@ const CertificateDetail = () => {
             <h1 className="text-2xl font-bold text-gray-900">{certificateData.title}</h1>
             <p className="text-gray-600 mt-1">{certificateData.description}</p>
           </div>
-          <Link to="/mycourses" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
+          <Link to="/mycourse" className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" />
             <span>Quay lại khóa học</span>
           </Link>
@@ -178,7 +178,7 @@ const CertificateDetail = () => {
 
         {/* Back Button */}
         <div className="mt-8 text-center">
-          <Link to="/mycourses" className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+          <Link to="/mycourse" className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors">
             Quay lại khóa học
           </Link>
         </div>

@@ -23,16 +23,18 @@ import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import MyCampaign from "./pages/MyCampaign";
-import MyCampaignDetail from "./pages/MyCampaignDetail"; // Thêm import cho MyCampaignDetail
+import MyCampaignDetail from "./pages/MyCampaignDetail";
 
 //Detail
 import QuestionDetail from "./pages/QuestionDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
+import LessonDetail from "./pages/LessonDetail";
 import CertificateDetail from "./pages/CertificateDetail";
-import AppointmentDetail from "./pages/AppointmentDetail";
+import MyAppointmentDetail from "./pages/MyAppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
 import AssessmentResult from "./pages/AssessmentResult";
+import BlogDetail from "./pages/BlogDetail";
 
 //User Dashboard
 import Dashboard from "./pages/Dashboard";
@@ -41,7 +43,6 @@ import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
 import MyAssessmentResult from "./pages/MyAssessmentResult";
-
 
 
 function App() {
@@ -132,6 +133,14 @@ function App() {
             }
           />
           <Route
+            path="/blog/:id"
+            element={
+              <Layout>
+                <BlogDetail />
+              </Layout>
+            }
+          />
+          <Route
             path="/campaigns"
             element={
               <Layout>
@@ -181,10 +190,10 @@ function App() {
             }
           />
           <Route
-            path="/appointmentdetail"
+            path="/myappointmentdetail"
             element={
               <LayoutDashboard activeMenuItem="myappointment">
-                <AppointmentDetail />
+                <MyAppointmentDetail />
               </LayoutDashboard>
             }
           />
@@ -257,6 +266,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="mycourse">
                 <MyCourseDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/lessondetail"
+            element={
+              <LayoutDashboard activeMenuItem="mycourse">
+                <LessonDetail />
               </LayoutDashboard>
             }
           />
