@@ -3,6 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Play, Download, FileText, FileImage, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/api';
+import axios from 'axios';
 
 const TABS = [
     { id: 'content', label: 'Nội dung' },
@@ -27,6 +28,9 @@ const LessonDetail = () => {
     const [lesson, setLesson] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [quizState, setQuizState] = useState({ loading: false, error: null, data: null });
+    const [selectedAnswers, setSelectedAnswers] = useState({});
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         if (!lessonId || !userId) return;
@@ -43,6 +47,53 @@ const LessonDetail = () => {
             .catch(() => setError('Lỗi khi tải chi tiết bài học.'))
             .finally(() => setLoading(false));
     }, [lessonId, userId]);
+
+    // Fetch quiz data when tab changes to 'exercise'
+    useEffect(() => {
+        if (activeTab === 'exercise' && lessonId && userId) {
+            setQuizState({ loading: true, error: null, data: null });
+            axios.get(`http://drugpreventionsystem.somee.com/api/Lesson/${lessonId}/initial-state?userId=${userId}`)
+                .then(res => {
+                    setQuizState({ loading: false, error: null, data: res.data.data });
+                })
+                .catch(() => setQuizState({ loading: false, error: 'Lỗi khi tải bài kiểm tra.', data: null }));
+        }
+    }, [activeTab, lessonId, userId]);
+
+    // Handle answer selection
+    const handleSelectOption = (questionId, optionId) => {
+        setSelectedAnswers(prev => ({ ...prev, [questionId]: optionId }));
+    };
+
+    // Handle quiz submit (call API submit)
+    const handleSubmitQuiz = async () => {
+        if (!quizState.data?.quizAttemptData || !userId) return;
+        const quizId = quizState.data.quizAttemptData.quizId;
+        const answers = Object.entries(selectedAnswers).map(([questionId, selectedOptionId]) => ({ questionId, selectedOptionId }));
+        if (answers.length !== quizState.data.quizAttemptData.questions.length) {
+            alert('Bạn cần trả lời tất cả các câu hỏi!');
+            return;
+        }
+        setSubmitting(true);
+        try {
+            await axios.post('http://drugpreventionsystem.somee.com/api/Lesson/submit', {
+                quizId,
+                userId,
+                answers
+            });
+            // Sau khi submit, reload lại quizState để hiển thị kết quả
+            setQuizState({ loading: true, error: null, data: null });
+            axios.get(`http://drugpreventionsystem.somee.com/api/Lesson/${lessonId}/initial-state?userId=${userId}`)
+                .then(res => {
+                    setQuizState({ loading: false, error: null, data: res.data.data });
+                })
+                .catch(() => setQuizState({ loading: false, error: 'Lỗi khi tải bài kiểm tra.', data: null }));
+        } catch (err) {
+            alert('Có lỗi khi nộp bài.');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     if (loading) return <div className="text-center py-12 text-gray-500">Đang tải chi tiết bài học...</div>;
     if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
@@ -65,7 +116,12 @@ const LessonDetail = () => {
                 </div>
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
+                        <div className="flex items-center gap-4">
+                            <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
+                            {lesson.durationMinutes && (
+                                <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">⏱ {lesson.durationMinutes} phút</span>
+                            )}
+                        </div>
                         <p className="text-gray-600 mt-1">{lesson.description}</p>
                     </div>
                     <Link to={`/mycoursedetail?courseId=${lesson.courseId || courseId}`} className="flex min-w-max ml-10 items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
@@ -134,25 +190,124 @@ const LessonDetail = () => {
                         <div className="p-6">
                             {activeTab === 'content' && (
                                 <div className="prose max-w-none text-gray-800 whitespace-pre-line">
-                                    <h3 className="text-lg font-semibold mb-4">Nội dung bài học</h3>
-                                    {/* lesson.content hoặc nội dung khác nếu có */}
-                                    <p>Chưa có nội dung chi tiết cho bài học này.</p>
+                                    <h3 className="text-lg text-blue-600 font-bold  mb-4">Nội dung bài học</h3>
+                                    {lesson.content ? (
+                                        <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
+                                    ) : (
+                                        <p>Chưa có nội dung chi tiết cho bài học này.</p>
+                                    )}
                                 </div>
                             )}
                             {activeTab === 'exercise' && (
                                 <div>
-                                    <h3 className="text-lg font-semibold mb-4">Bài tập kiểm tra</h3>
-                                    <p className="text-gray-600 mb-6">Hãy hoàn thành bài tập sau để kiểm tra kiến thức của bạn</p>
-                                    {/* Hiện tại chưa có bài tập từ API, có thể mock nếu cần */}
-                                    <p>Chưa có bài tập cho bài học này.</p>
+                                    <h3 className="text-lg text-blue-600 font-bold mb-4">Bài tập kiểm tra</h3>
+                                    {quizState.loading ? (
+                                        <div className="text-gray-500">Đang tải bài kiểm tra...</div>
+                                    ) : quizState.error ? (
+                                        <div className="text-red-500">{quizState.error}</div>
+                                    ) : quizState.data ? (
+                                        quizState.data.displayMode === 'AttemptQuiz' && quizState.data.quizAttemptData ? (
+                                            <div>
+                                                <div className="mb-4">
+                                                    <div className="font-semibold text-lg mb-1">{quizState.data.quizAttemptData.title}</div>
+                                                    <div className="text-gray-600 mb-2">{quizState.data.quizAttemptData.description}</div>
+                                                    <div className="font-semibold text-gray-500">Tổng số câu hỏi: {quizState.data.quizAttemptData.totalQuestions} | Điểm cần để đạt: {quizState.data.quizAttemptData.passingScore}</div>
+                                                </div>
+                                                <form onSubmit={e => { e.preventDefault(); handleSubmitQuiz(); }}>
+                                                    {quizState.data.quizAttemptData.questions.map(q => (
+                                                        <div key={q.questionId} className="mb-6">
+                                                            <div className="font-medium mb-2">Câu {q.sequence}: {q.questionText}</div>
+                                                            <div className="space-y-2">
+                                                                {q.options.map(opt => (
+                                                                    <label key={opt.optionId} className={`flex items-center gap-2 p-2 rounded cursor-pointer border ${selectedAnswers[q.questionId] === opt.optionId ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+                                                                        <input
+                                                                            type="radio"
+                                                                            name={`question_${q.questionId}`}
+                                                                            value={opt.optionId}
+                                                                            checked={selectedAnswers[q.questionId] === opt.optionId}
+                                                                            onChange={() => handleSelectOption(q.questionId, opt.optionId)}
+                                                                            className="accent-blue-600"
+                                                                        />
+                                                                        <span>{opt.optionText}</span>
+                                                                    </label>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    <button type="submit" className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors" disabled={submitting}>
+                                                        {submitting ? 'Đang nộp bài...' : 'Nộp bài'}
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        ) : quizState.data.displayMode === 'ViewResult' && quizState.data.latestQuizResultData ? (
+                                            <div>
+                                                <div className="mb-4">
+                                                    <div className="font-semibold text-lg mb-1">{quizState.data.latestQuizResultData.quizTitle}</div>
+                                                    <div className="text-gray-600 mb-2">Kết quả làm bài ngày: {new Date(quizState.data.latestQuizResultData.takenAt).toLocaleString()}</div>
+                                                    <div className="font-semibold text-gray-500">Tổng số câu hỏi: {quizState.data.latestQuizResultData.totalQuestions} | Số câu đúng: {quizState.data.latestQuizResultData.correctCount} | Điểm: {quizState.data.latestQuizResultData.totalScore}</div>
+                                                    <div className={`text-xl mt-2 font-bold ${quizState.data.latestQuizResultData.status === 'passed' ? 'text-green-600' : 'text-red-600'}`}>{quizState.data.latestQuizResultData.status === 'passed' ? 'ĐẠT' : 'CHƯA ĐẠT'}</div>
+                                                </div>
+
+                                                <div className="space-y-4 mb-10">
+                                                    {quizState.data.latestQuizResultData.questionsAttempted.map((q, idx) => (
+                                                        <div key={q.questionId} className="p-4 rounded border bg-gray-50">
+                                                            <div className="font-medium mb-1">Câu {idx + 1}: {q.questionText}</div>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`px-2 py-1 rounded text-xs font-semibold ${q.isUserAnswerCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{q.isUserAnswerCorrect ? 'Đúng' : 'Sai'}</span>
+                                                                <span className="text-gray-700">Trả lời: {q.userSelectedOptionText}</span>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                {quizState.data.latestQuizResultData.status !== 'passed' && (
+                                                    <button
+                                                        className="mb-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                                        onClick={() => {
+                                                            setQuizState({ loading: true, error: null, data: null });
+                                                            setSelectedAnswers({});
+                                                            axios.get(`http://drugpreventionsystem.somee.com/api/Lesson/${lessonId}/initial-state?userId=${userId}`)
+                                                                .then(res => {
+                                                                    setQuizState({ loading: false, error: null, data: res.data.data });
+                                                                })
+                                                                .catch(() => setQuizState({ loading: false, error: 'Lỗi khi tải bài kiểm tra.', data: null }));
+                                                        }}
+                                                    >
+                                                        Làm lại bài
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div>Không có dữ liệu bài kiểm tra.</div>
+                                        )
+                                    ) : (
+                                        <div>Chưa có bài tập cho bài học này.</div>
+                                    )}
                                 </div>
                             )}
                             {activeTab === 'material' && (
                                 <div>
-                                    <h3 className="text-lg font-semibold mb-4">Tài liệu học tập</h3>
+                                    <h3 className="text-lg text-blue-600 font-bold mb-4">Tài liệu học tập</h3>
                                     <p className="text-gray-600 mb-6">Các tài liệu bổ sung cho bài học này</p>
-                                    {/* Hiện tại chưa có tài liệu từ API, có thể mock nếu cần */}
-                                    <p>Chưa có tài liệu cho bài học này.</p>
+                                    {lesson.resources && lesson.resources.length > 0 ? (
+                                        <ul className="space-y-4">
+                                            {lesson.resources.map(resource => (
+                                                <li key={resource.resourceId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                                    {resource.resourceType === 'pdf' && <FileText className="w-6 h-6 text-blue-500" />}
+                                                    {resource.resourceType === 'image' && <FileImage className="w-6 h-6 text-green-500" />}
+                                                    {resource.resourceType === 'video' && <Play className="w-6 h-6 text-red-500" />}
+                                                    <div className="flex-1">
+                                                        <div className="font-medium text-gray-800">{resource.description || resource.resourceType}</div>
+                                                        <a href={resource.resourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm hover:underline flex items-center gap-1 mt-1">
+                                                            <Download className="w-4 h-4" />
+                                                            <span>Tải về/Xem</span>
+                                                        </a>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>Chưa có tài liệu cho bài học này.</p>
+                                    )}
                                 </div>
                             )}
                         </div>

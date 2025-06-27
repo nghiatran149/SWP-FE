@@ -222,7 +222,7 @@ const MyAssessment = () => {
       </div>
       <div className="p-8 mx-auto">
 
-        {renderRecommendation()}
+        {/* {renderRecommendation()} */}
 
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">

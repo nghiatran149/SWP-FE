@@ -20,44 +20,44 @@ import {
   Award,
 } from 'lucide-react';
 
-const modules = [
-  {
-    id: 1,
-    title: "Giới thiệu về ma túy và các chất gây nghiện",
-    lessons: [
-      { title: "Định nghĩa và phân loại ma túy", duration: "45 phút", completed: true },
-      { title: "Lịch sử sử dụng ma túy trong xã hội", duration: "30 phút", completed: true },
-      { title: "Tình hình sử dụng ma túy hiện nay", duration: "40 phút", completed: true }
-    ]
-  },
-  {
-    id: 2,
-    title: "Tác động của ma túy đối với cơ thể",
-    lessons: [
-      { title: "Tác động đến hệ thần kinh trung ương", duration: "50 phút", completed: true },
-      { title: "Tác động đến các cơ quan nội tạng", duration: "45 phút", completed: true },
-      { title: "Tác động dài hạn và ngắn hạn", duration: "40 phút", completed: true }
-    ]
-  },
-  {
-    id: 3,
-    title: "Tác động tâm lý và xã hội",
-    lessons: [
-      { title: "Ảnh hưởng đến sức khỏe tâm thần", duration: "55 phút", completed: true },
-      { title: "Tác động đến môi quan hệ gia đình", duration: "50 phút", completed: true },
-      { title: "Hậu quả xã hội của việc sử dụng ma túy", duration: "45 phút", completed: true }
-    ]
-  },
-  {
-    id: 4,
-    title: "Phòng ngừa và can thiệp",
-    lessons: [
-      { title: "Chiến lược phòng ngừa hiệu quả", duration: "60 phút", completed: false },
-      { title: "Kỹ năng từ chối và đối phó với áp lực", duration: "50 phút", completed: false },
-      { title: "Nguồn lực hỗ trợ và can thiệp", duration: "45 phút", completed: false }
-    ]
-  }
-];
+// const modules = [
+//   {
+//     id: 1,
+//     title: "Giới thiệu về ma túy và các chất gây nghiện",
+//     lessons: [
+//       { title: "Định nghĩa và phân loại ma túy", duration: "45 phút", completed: true },
+//       { title: "Lịch sử sử dụng ma túy trong xã hội", duration: "30 phút", completed: true },
+//       { title: "Tình hình sử dụng ma túy hiện nay", duration: "40 phút", completed: true }
+//     ]
+//   },
+//   {
+//     id: 2,
+//     title: "Tác động của ma túy đối với cơ thể",
+//     lessons: [
+//       { title: "Tác động đến hệ thần kinh trung ương", duration: "50 phút", completed: true },
+//       { title: "Tác động đến các cơ quan nội tạng", duration: "45 phút", completed: true },
+//       { title: "Tác động dài hạn và ngắn hạn", duration: "40 phút", completed: true }
+//     ]
+//   },
+//   {
+//     id: 3,
+//     title: "Tác động tâm lý và xã hội",
+//     lessons: [
+//       { title: "Ảnh hưởng đến sức khỏe tâm thần", duration: "55 phút", completed: true },
+//       { title: "Tác động đến môi quan hệ gia đình", duration: "50 phút", completed: true },
+//       { title: "Hậu quả xã hội của việc sử dụng ma túy", duration: "45 phút", completed: true }
+//     ]
+//   },
+//   {
+//     id: 4,
+//     title: "Phòng ngừa và can thiệp",
+//     lessons: [
+//       { title: "Chiến lược phòng ngừa hiệu quả", duration: "60 phút", completed: false },
+//       { title: "Kỹ năng từ chối và đối phó với áp lực", duration: "50 phút", completed: false },
+//       { title: "Nguồn lực hỗ trợ và can thiệp", duration: "45 phút", completed: false }
+//     ]
+//   }
+// ];
 
 const materials = [
   { title: "Sổ tay phòng chống ma túy", type: "PDF", size: "2.4 MB" },
