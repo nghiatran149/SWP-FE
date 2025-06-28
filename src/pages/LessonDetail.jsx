@@ -52,7 +52,7 @@ const LessonDetail = () => {
     useEffect(() => {
         if (activeTab === 'exercise' && lessonId && userId) {
             setQuizState({ loading: true, error: null, data: null });
-            axios.get(`http://drugpreventionsystem.somee.com/api/Lesson/${lessonId}/initial-state?userId=${userId}`)
+            api.get(`/Lesson/${lessonId}/initial-state?userId=${userId}`)
                 .then(res => {
                     setQuizState({ loading: false, error: null, data: res.data.data });
                 })
@@ -76,14 +76,14 @@ const LessonDetail = () => {
         }
         setSubmitting(true);
         try {
-            await axios.post('http://drugpreventionsystem.somee.com/api/Lesson/submit', {
+            await api.post('/Lesson/submit', {
                 quizId,
                 userId,
                 answers
             });
             // Sau khi submit, reload lại quizState để hiển thị kết quả
             setQuizState({ loading: true, error: null, data: null });
-            axios.get(`http://drugpreventionsystem.somee.com/api/Lesson/${lessonId}/initial-state?userId=${userId}`)
+            api.get(`/Lesson/${lessonId}/initial-state?userId=${userId}`)
                 .then(res => {
                     setQuizState({ loading: false, error: null, data: res.data.data });
                 })
@@ -259,22 +259,20 @@ const LessonDetail = () => {
                                                         </div>
                                                     ))}
                                                 </div>
-                                                {quizState.data.latestQuizResultData.status !== 'passed' && (
-                                                    <button
-                                                        className="mb-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                                                        onClick={() => {
-                                                            setQuizState({ loading: true, error: null, data: null });
-                                                            setSelectedAnswers({});
-                                                            axios.get(`http://drugpreventionsystem.somee.com/api/Lesson/${lessonId}/initial-state?userId=${userId}`)
-                                                                .then(res => {
-                                                                    setQuizState({ loading: false, error: null, data: res.data.data });
-                                                                })
-                                                                .catch(() => setQuizState({ loading: false, error: 'Lỗi khi tải bài kiểm tra.', data: null }));
-                                                        }}
-                                                    >
-                                                        Làm lại bài
-                                                    </button>
-                                                )}
+                                                <button
+                                                    className="mb-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                                    onClick={() => {
+                                                        setQuizState({ loading: true, error: null, data: null });
+                                                        setSelectedAnswers({});
+                                                        api.get(`/Lesson/${lessonId}/initial-state?userId=${userId}&forceAttempt=true`)
+                                                            .then(res => {
+                                                                setQuizState({ loading: false, error: null, data: res.data.data });
+                                                            })
+                                                            .catch(() => setQuizState({ loading: false, error: 'Lỗi khi tải bài kiểm tra.', data: null }));
+                                                    }}
+                                                >
+                                                    Làm lại bài
+                                                </button>
                                             </div>
                                         ) : (
                                             <div>Không có dữ liệu bài kiểm tra.</div>
@@ -297,9 +295,9 @@ const LessonDetail = () => {
                                                     {resource.resourceType === 'video' && <Play className="w-6 h-6 text-red-500" />}
                                                     <div className="flex-1">
                                                         <div className="font-medium text-gray-800">{resource.description || resource.resourceType}</div>
-                                                        <a href={resource.resourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm hover:underline flex items-center gap-1 mt-1">
+                                                        <a href={resource.resourceUrl} target="_blank" rel="noopener noreferrer" className="text-green-600 text-sm hover:underline flex items-center gap-1 mt-1">
                                                             <Download className="w-4 h-4" />
-                                                            <span>Tải về/Xem</span>
+                                                            <span>Xem & Tải về</span>
                                                         </a>
                                                     </div>
                                                 </li>

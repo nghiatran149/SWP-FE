@@ -65,7 +65,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
     <div className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
 
       <div className="p-6 border-b border-gray-200">
-        <h1 className="text-xl font-bold text-gray-800">Drug Prevention</h1>
+        <Link to="/home" className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">Drug Prevention</Link>
       </div>
 
       {/* Main Menu */}
