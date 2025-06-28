@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Play, Download, FileText, FileImage, CheckCircle } from 'lucide-react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Play, Download, FileText, FileImage, CheckCircle, Target } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/api';
 import axios from 'axios';
@@ -22,6 +22,8 @@ const LessonDetail = () => {
     const courseId = query.get('courseId');
     const { user } = useAuth();
     const userId = user?.userId;
+    const navigate = useNavigate();
+    const [lessonList, setLessonList] = useState([]);
 
     const [activeTab, setActiveTab] = useState('content');
     const [note, setNote] = useState('');
@@ -31,6 +33,7 @@ const LessonDetail = () => {
     const [quizState, setQuizState] = useState({ loading: false, error: null, data: null });
     const [selectedAnswers, setSelectedAnswers] = useState({});
     const [submitting, setSubmitting] = useState(false);
+    const [markingComplete, setMarkingComplete] = useState(false);
 
     useEffect(() => {
         if (!lessonId || !userId) return;
@@ -48,9 +51,9 @@ const LessonDetail = () => {
             .finally(() => setLoading(false));
     }, [lessonId, userId]);
 
-    // Fetch quiz data when tab changes to 'exercise'
+    // Fetch quiz data ngay khi vào trang
     useEffect(() => {
-        if (activeTab === 'exercise' && lessonId && userId) {
+        if (lessonId && userId) {
             setQuizState({ loading: true, error: null, data: null });
             api.get(`/Lesson/${lessonId}/initial-state?userId=${userId}`)
                 .then(res => {
@@ -58,7 +61,23 @@ const LessonDetail = () => {
                 })
                 .catch(() => setQuizState({ loading: false, error: 'Lỗi khi tải bài kiểm tra.', data: null }));
         }
-    }, [activeTab, lessonId, userId]);
+    }, [lessonId, userId]);
+
+    useEffect(() => {
+        if (courseId && userId) {
+            api.get(`/Course/${courseId}/lesson-progress-details?userId=${userId}`)
+                .then(res => {
+                    // Flatten all lessons from all weeks
+                    const weeks = res.data?.data?.courseWeeks || [];
+                    const allLessons = weeks.flatMap(w => w.lessons || []);
+                    setLessonList(allLessons);
+                });
+        }
+    }, [courseId, userId]);
+
+    const currentIndex = lessonList.findIndex(l => l.lessonId === lessonId);
+    const prevLesson = currentIndex > 0 ? lessonList[currentIndex - 1] : null;
+    const nextLesson = currentIndex >= 0 && currentIndex < lessonList.length - 1 ? lessonList[currentIndex + 1] : null;
 
     // Handle answer selection
     const handleSelectOption = (questionId, optionId) => {
@@ -95,6 +114,29 @@ const LessonDetail = () => {
         }
     };
 
+    // Đánh dấu hoàn thành bài học
+    const handleMarkComplete = async () => {
+        if (!userId || !lessonId) return;
+        setMarkingComplete(true);
+        try {
+            await api.post('/Lesson/complete', {
+                userId,
+                lessonId
+            });
+            // Gọi lại API lấy chi tiết bài học để cập nhật trạng thái hoàn thành
+            const res = await api.get(`/Lesson/${lessonId}/details?userId=${userId}`);
+            if (res.data && res.data.data) {
+                setLesson(res.data.data);
+            }
+            // Có thể hiển thị thông báo thành công nếu muốn
+            // alert('Đã đánh dấu hoàn thành bài học!');
+        } catch (err) {
+            alert('Có lỗi khi đánh dấu hoàn thành.');
+        } finally {
+            setMarkingComplete(false);
+        }
+    };
+
     if (loading) return <div className="text-center py-12 text-gray-500">Đang tải chi tiết bài học...</div>;
     if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
     if (!lesson) return null;
@@ -117,7 +159,7 @@ const LessonDetail = () => {
                 <div className="flex items-center justify-between">
                     <div>
                         <div className="flex items-center gap-4">
-                            <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">{lesson.title}</h1>
                             {lesson.durationMinutes && (
                                 <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">⏱ {lesson.durationMinutes} phút</span>
                             )}
@@ -194,7 +236,7 @@ const LessonDetail = () => {
                                     {lesson.content ? (
                                         <div dangerouslySetInnerHTML={{ __html: lesson.content }} />
                                     ) : (
-                                        <p>Chưa có nội dung chi tiết cho bài học này.</p>
+                                    <p>Chưa có nội dung chi tiết cho bài học này.</p>
                                     )}
                                 </div>
                             )}
@@ -260,7 +302,8 @@ const LessonDetail = () => {
                                                     ))}
                                                 </div>
                                                 <button
-                                                    className="mb-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                                                    className="mb-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                                    disabled={lesson?.isCompleted}
                                                     onClick={() => {
                                                         setQuizState({ loading: true, error: null, data: null });
                                                         setSelectedAnswers({});
@@ -304,7 +347,7 @@ const LessonDetail = () => {
                                             ))}
                                         </ul>
                                     ) : (
-                                        <p>Chưa có tài liệu cho bài học này.</p>
+                                    <p>Chưa có tài liệu cho bài học này.</p>
                                     )}
                                 </div>
                             )}
@@ -313,12 +356,28 @@ const LessonDetail = () => {
 
                     {/* Nút chuyển bài */}
                     <div className="flex justify-between mt-4 gap-4">
-                        <button className="bg-white border border-gray-300 px-6 py-3 rounded-lg text-gray-700 font-medium flex items-center gap-2 hover:bg-gray-100 shadow-sm">
+                        <button
+                            className="bg-white border border-gray-300 px-6 py-3 rounded-lg text-gray-700 font-medium flex items-center gap-2 hover:bg-gray-100 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                            disabled={!prevLesson}
+                            onClick={() => {
+                                if (prevLesson) {
+                                    navigate(`/lessondetail?lessonId=${prevLesson.lessonId}&courseId=${courseId}`);
+                                }
+                            }}
+                        >
                             <ArrowLeft className="w-5 h-5" />
-                            Bài trước: Hậu quả xã hội của việc sử dụng ma túy
+                            {prevLesson ? `Bài trước: ${prevLesson.title}` : 'Không có bài trước'}
                         </button>
-                        <button className="bg-black text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-gray-800 shadow-sm">
-                            Bài tiếp theo: Kỹ năng từ chối và đối phó với áp lực
+                        <button
+                            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 hover:bg-blue-700 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                            disabled={!nextLesson}
+                            onClick={() => {
+                                if (nextLesson) {
+                                    navigate(`/lessondetail?lessonId=${nextLesson.lessonId}&courseId=${courseId}`);
+                                }
+                            }}
+                        >
+                            {nextLesson ? `Bài tiếp theo: ${nextLesson.title}` : 'Không có bài tiếp theo'}
                             <ArrowRight className="w-5 h-5" />
                         </button>
                     </div>
@@ -334,7 +393,7 @@ const LessonDetail = () => {
                             {/* <span className="text-base text-gray-600">--/-- bài học</span> */}
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                            <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${lesson.courseProgressPercentage ?? 0}%` }}></div>
+                            <div className="bg-yellow-400 h-2 rounded-full transition-all duration-300" style={{ width: `${lesson.courseProgressPercentage ?? 0}%` }}></div>
                         </div>
                         <Link
                             to={`/mycoursedetail?courseId=${lesson.courseId || courseId}`}
@@ -345,10 +404,23 @@ const LessonDetail = () => {
                     </div>
 
                     <div className="bg-white rounded-xl p-6 mt-6 shadow">
-                        <h3 className="text-xl font-bold mb-4">Đánh dấu tiến độ</h3>
-                        <button className="w-full  bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors">
+                        <h3 className="text-xl font-bold mb-2">Đánh dấu tiến độ</h3>
+                        <p className="text-gray-600 text-base mb-4">Đánh dấu rằng bạn đã hoàn thành bài học này</p>
+                        <button
+                            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            onClick={handleMarkComplete}
+                            disabled={
+                                markingComplete ||
+                                lesson?.isCompleted ||
+                                !(
+                                    quizState.data &&
+                                    quizState.data.latestQuizResultData &&
+                                    quizState.data.latestQuizResultData.status === 'passed'
+                                )
+                            }
+                        >
                             <CheckCircle className="w-5 h-5" />
-                            Đánh dấu đã hoàn thành
+                            {lesson?.isCompleted ? 'Đã hoàn thành bài học này' : 'Đánh dấu đã hoàn thành'}
                         </button>
                     </div>
 
@@ -356,13 +428,13 @@ const LessonDetail = () => {
                         <h3 className="text-xl font-bold mb-4">Mục tiêu bài học</h3>
                         <ul className="space-y-3">
                             <li className="flex items-start gap-2 text-base">
-                                <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+                                <Target className="w-5 h-5 text-blue-600 mt-1" />
                                 <span>Chưa có mục tiêu cho bài học này.</span>
                             </li>
                         </ul>
                     </div>
 
-                    <div className="bg-white rounded-xl p-6 shadow">
+                    {/* <div className="bg-white rounded-xl p-6 shadow">
                         <h3 className="text-xl font-bold mb-4">Ghi chú</h3>
                         <textarea
                             className="w-full border border-gray-300 rounded-lg p-3 min-h-[80px] mb-4"
@@ -371,7 +443,7 @@ const LessonDetail = () => {
                             onChange={e => setNote(e.target.value)}
                         />
                         <button className="w-full bg-black text-white py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors">Lưu ghi chú</button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
