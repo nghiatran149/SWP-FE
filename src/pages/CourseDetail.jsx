@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/api';
-import { Users, Clock, CheckCircle, BookOpen, BookmarkPlus, SquareCheckBig } from 'lucide-react';
+import { Users, Clock, CheckCircle, BookOpen, BookmarkPlus, ArrowRight, SquareCheckBig } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const TABS = [
@@ -276,7 +276,7 @@ const CourseDetail = () => {
                       <div className="text-sm text-gray-600">Chuyên gia phòng chống ma túy</div>
                     </div>
                   </div>
-                  <p className="text-gray-700 mt-2">TS. Nguyễn Văn A có nhiều năm kinh nghiệm trong lĩnh vực giáo dục phòng chống ma túy cho học sinh, sinh viên.</p>
+                  <p className="text-gray-700 mt-2">{course?.instructorName} đã có nhiều năm kinh nghiệm trong lĩnh vực giáo dục phòng chống ma túy cho học sinh, sinh viên.</p>
                 </div>
               )}
             </div>
@@ -297,13 +297,22 @@ const CourseDetail = () => {
                 Đang tải...
               </button>
             ) : isEnrolled ? (
-              <button
-                disabled
-                className="w-full bg-green-800 text-white py-3 rounded-lg font-medium cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                <SquareCheckBig className="w-5 h-5" />
-                <span>Đã đăng ký</span>
-              </button>
+              <div className="space-y-3">
+                <button
+                  disabled
+                  className="w-full bg-green-800 text-white py-3 rounded-lg font-medium cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <SquareCheckBig className="w-5 h-5" />
+                  <span>Đã đăng ký</span>
+                </button>
+                <button
+                  onClick={() => navigate(`/mycoursedetail?courseId=${courseId}`)}
+                  className="w-full bg-white border-2 border-gray-900 text-gray-900 py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
+                >
+                  <span>Đi đến khóa học</span>
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
             ) : (
               <button
                 onClick={handleEnroll}
@@ -313,11 +322,13 @@ const CourseDetail = () => {
                 {isEnrolling ? 'Đang xử lý...' : 'Đăng ký ngay'}
               </button>
             )}
+
             {/* <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 mb-4">
               <BookmarkPlus className="w-5 h-5 mr-1" />
               <span> Thêm vào danh sách quan tâm</span>
             </button> */}
-            <div className="border-t pt-4 mt-4">
+            
+            {/* <div className="border-t pt-4 mt-4">
               <h4 className="font-semibold mb-2 text-gray-900 text-sm">Khóa học này bao gồm:</h4>
               <ul className="space-y-2 text-gray-700 text-sm">
                 {Array.isArray(course?.includes) && course.includes.length > 0 ? (
@@ -331,7 +342,7 @@ const CourseDetail = () => {
                   <li>Chưa có thông tin</li>
                 )}
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

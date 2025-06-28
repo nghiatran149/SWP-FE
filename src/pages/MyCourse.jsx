@@ -71,8 +71,8 @@ const MyCourse = () => {
 
       <div className="p-8">
         {/* Search Bar */}
-        <div className="mb-5">
-          <div className="relative max-w-md">
+        <div className="flex items-center justify-between mb-5">
+          <div className="relative w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -85,10 +85,14 @@ const MyCourse = () => {
               Lọc
             </button> */}
           </div>
+          <Link to="/courses" className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-4">
+            Đăng ký khóa học mới
+            <Plus className="h-4 w-4 ml-2" />
+          </Link>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center justify-between mb-5">
+        {/* <div className="flex items-center justify-between mb-5">
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
             {tabs.map((tab) => (
               <button
@@ -108,7 +112,7 @@ const MyCourse = () => {
             Đăng ký khóa học mới
             <Plus className="h-4 w-4 ml-2" />
           </Link>
-        </div>
+        </div> */}
 
         {/* Course Grid */}
         {loading ? (
@@ -154,7 +158,7 @@ const MyCourse = () => {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-gray-900 h-2 rounded-full transition-all duration-300"
+                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${course.progressPercentage}%` }}
                       />
                     </div>
@@ -177,13 +181,13 @@ const MyCourse = () => {
                     )}
                   </div>
                   {/* Action Buttons */}
-                  <div className="flex justify-between items-center">
-                    <Link to={`/mycoursedetail?courseId=${course.courseId}`} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-md">
+                  <div className="flex">
+                    <Link
+                      to={`/mycoursedetail?courseId=${course.courseId}`}
+                      className="w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-md font-medium"
+                    >
                       Xem chi tiết
                     </Link>
-                    <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-md">
-                      Tiếp tục học
-                    </button>
                   </div>
                 </div>
               </div>

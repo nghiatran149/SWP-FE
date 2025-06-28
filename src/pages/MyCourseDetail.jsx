@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/api';
 import {
@@ -20,44 +20,44 @@ import {
   Award,
 } from 'lucide-react';
 
-const modules = [
-  {
-    id: 1,
-    title: "Giới thiệu về ma túy và các chất gây nghiện",
-    lessons: [
-      { title: "Định nghĩa và phân loại ma túy", duration: "45 phút", completed: true },
-      { title: "Lịch sử sử dụng ma túy trong xã hội", duration: "30 phút", completed: true },
-      { title: "Tình hình sử dụng ma túy hiện nay", duration: "40 phút", completed: true }
-    ]
-  },
-  {
-    id: 2,
-    title: "Tác động của ma túy đối với cơ thể",
-    lessons: [
-      { title: "Tác động đến hệ thần kinh trung ương", duration: "50 phút", completed: true },
-      { title: "Tác động đến các cơ quan nội tạng", duration: "45 phút", completed: true },
-      { title: "Tác động dài hạn và ngắn hạn", duration: "40 phút", completed: true }
-    ]
-  },
-  {
-    id: 3,
-    title: "Tác động tâm lý và xã hội",
-    lessons: [
-      { title: "Ảnh hưởng đến sức khỏe tâm thần", duration: "55 phút", completed: true },
-      { title: "Tác động đến môi quan hệ gia đình", duration: "50 phút", completed: true },
-      { title: "Hậu quả xã hội của việc sử dụng ma túy", duration: "45 phút", completed: true }
-    ]
-  },
-  {
-    id: 4,
-    title: "Phòng ngừa và can thiệp",
-    lessons: [
-      { title: "Chiến lược phòng ngừa hiệu quả", duration: "60 phút", completed: false },
-      { title: "Kỹ năng từ chối và đối phó với áp lực", duration: "50 phút", completed: false },
-      { title: "Nguồn lực hỗ trợ và can thiệp", duration: "45 phút", completed: false }
-    ]
-  }
-];
+// const modules = [
+//   {
+//     id: 1,
+//     title: "Giới thiệu về ma túy và các chất gây nghiện",
+//     lessons: [
+//       { title: "Định nghĩa và phân loại ma túy", duration: "45 phút", completed: true },
+//       { title: "Lịch sử sử dụng ma túy trong xã hội", duration: "30 phút", completed: true },
+//       { title: "Tình hình sử dụng ma túy hiện nay", duration: "40 phút", completed: true }
+//     ]
+//   },
+//   {
+//     id: 2,
+//     title: "Tác động của ma túy đối với cơ thể",
+//     lessons: [
+//       { title: "Tác động đến hệ thần kinh trung ương", duration: "50 phút", completed: true },
+//       { title: "Tác động đến các cơ quan nội tạng", duration: "45 phút", completed: true },
+//       { title: "Tác động dài hạn và ngắn hạn", duration: "40 phút", completed: true }
+//     ]
+//   },
+//   {
+//     id: 3,
+//     title: "Tác động tâm lý và xã hội",
+//     lessons: [
+//       { title: "Ảnh hưởng đến sức khỏe tâm thần", duration: "55 phút", completed: true },
+//       { title: "Tác động đến môi quan hệ gia đình", duration: "50 phút", completed: true },
+//       { title: "Hậu quả xã hội của việc sử dụng ma túy", duration: "45 phút", completed: true }
+//     ]
+//   },
+//   {
+//     id: 4,
+//     title: "Phòng ngừa và can thiệp",
+//     lessons: [
+//       { title: "Chiến lược phòng ngừa hiệu quả", duration: "60 phút", completed: false },
+//       { title: "Kỹ năng từ chối và đối phó với áp lực", duration: "50 phút", completed: false },
+//       { title: "Nguồn lực hỗ trợ và can thiệp", duration: "45 phút", completed: false }
+//     ]
+//   }
+// ];
 
 const materials = [
   { title: "Sổ tay phòng chống ma túy", type: "PDF", size: "2.4 MB" },
@@ -82,6 +82,7 @@ const MyCourseDetail = () => {
   const [weeks, setWeeks] = useState([]);
   const [weeksLoading, setWeeksLoading] = useState(false);
   const [weeksError, setWeeksError] = useState(null);
+  const navigate = useNavigate();
 
   // Lấy courseId từ query param
   const searchParams = new URLSearchParams(location.search);
@@ -130,6 +131,12 @@ const MyCourseDetail = () => {
       .catch(() => setWeeksError('Không thể tải nội dung khóa học.'))
       .finally(() => setWeeksLoading(false));
   }, [activeTab, user, courseId]);
+
+  // Flatten all lessons from all weeks
+  const allLessons = weeks.flatMap(week => week.lessons || []);
+  const upcomingLessons = allLessons.filter(lesson => !lesson.isCompleted).slice(0, 3);
+  const firstUncompletedLesson = allLessons.find(lesson => !lesson.isCompleted);
+  const firstLesson = allLessons[0];
 
   if (isAuthLoading || loading) return <div className="text-center py-12 text-gray-500">Đang tải chi tiết khóa học...</div>;
   if (error) return <div className="text-center py-12 text-red-500">{error}</div>;
@@ -201,13 +208,23 @@ const MyCourseDetail = () => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
                     <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
                       style={{ width: `${course.courseProgressPercentage}%` }}
                     ></div>
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <button className="flex items-center gap-2 bg-green-600 text-white px-10 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                  <button
+                    className="flex items-center gap-2 bg-green-600 text-white px-10 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    disabled={!firstUncompletedLesson && !firstLesson}
+                    onClick={() => {
+                      if (firstUncompletedLesson) {
+                        navigate(`/lessondetail?lessonId=${firstUncompletedLesson.lessonId}&courseId=${courseId}`);
+                      } else if (firstLesson) {
+                        navigate(`/lessondetail?lessonId=${firstLesson.lessonId}&courseId=${courseId}`);
+                      }
+                    }}
+                  >
                     <Play className="w-4 h-4" />
                     <span>Tiếp tục học</span>
                   </button>
@@ -371,24 +388,25 @@ const MyCourseDetail = () => {
 
             {/* Schedule */}
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4">Lịch học sắp tới</h3>
+              <h3 className="text-lg font-semibold mb-4">Các bài học sắp tới</h3>
               <div className="space-y-4">
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 text-sm">Chiến lược phòng ngừa hiệu quả</div>
-                    <div className="text-xs text-gray-500 mt-1">Thứ 5, 15/05/2023 - 19:00</div>
-                  </div>
-                  <span className="text-xs text-gray-400">Nhắc nhở</span>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-900 text-sm">Kỹ năng từ chối và đối phó với áp lực</div>
-                    <div className="text-xs text-gray-500 mt-1">Thứ 7, 18/05/2023 - 10:00</div>
-                  </div>
-                  <span className="text-xs text-gray-400">Nhắc nhở</span>
-                </div>
+                {upcomingLessons.length === 0 ? (
+                  <div className="text-gray-500 px-2 py-2">Bạn đã hoàn thành tất cả các bài học!</div>
+                ) : (
+                  upcomingLessons.map((lesson, idx) => (
+                    <div key={lesson.lessonId || idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                      <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900 text-sm">{lesson.title}</div>
+                        {/* Có thể hiển thị thêm thông tin tuần hoặc thời lượng nếu muốn */}
+                        {lesson.durationMinutes && (
+                          <div className="text-xs text-gray-500 mt-1">Thời lượng: {lesson.durationMinutes} phút</div>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400">Chưa học</span>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
