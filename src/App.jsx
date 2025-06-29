@@ -24,6 +24,8 @@ import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import MyCampaign from "./pages/MyCampaign";
 import MyCampaignDetail from "./pages/MyCampaignDetail";
+import CampaignManagement from "./pages/CampaignManagement";
+import BlogManagement from "./pages/BlogManagement";
 
 //Detail
 import QuestionDetail from "./pages/QuestionDetail";
@@ -164,7 +166,6 @@ function App() {
               </LayoutDashboard>
             }
           />
-          {/* Thêm route cho MyCampaignDetail */}
           <Route
             path="/my-campaigns/:id"
             element={
@@ -194,6 +195,22 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="myappointment">
                 <MyAppointmentDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/campaignmanagement"
+            element={
+              <LayoutDashboard activeMenuItem="campaignmanagement">
+                <CampaignManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/blogmanagement"
+            element={
+              <LayoutDashboard activeMenuItem="blogmanagement">
+                <BlogManagement />
               </LayoutDashboard>
             }
           />
