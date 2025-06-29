@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Eye, PencilLine, Trash2 } from 'lucide-react';
+import { Plus, Search, Eye, PencilLine, Trash2, X } from 'lucide-react';
 
 const BlogManagement = () => {
   // Mock data cho danh sách bài viết blog
@@ -36,12 +36,124 @@ const BlogManagement = () => {
 
   // State cho chức năng tìm kiếm
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // State để kiểm soát modal thêm mới
+  const [showAddModal, setShowAddModal] = useState(false);
+  
+  // State để kiểm soát modal xem chi tiết
+  const [showViewModal, setShowViewModal] = useState(false);
+  
+  // State để kiểm soát modal chỉnh sửa
+  const [showEditModal, setShowEditModal] = useState(false);
+  
+  // State để lưu trữ bài viết đang được chọn để xem/chỉnh sửa
+  const [selectedBlog, setSelectedBlog] = useState(null);
+  
+  // State cho modal xác nhận xóa
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  // State cho form thêm mới/chỉnh sửa
+  const [formData, setFormData] = useState({
+    name: '',
+    description: ''
+  });
 
   // Lọc bài viết blog theo từ khóa tìm kiếm
   const filteredBlogs = blogs.filter(blog => 
     blog.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     blog.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
+  // Xử lý thay đổi input trong form
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+  
+  // Xử lý mở modal xem chi tiết
+  const handleViewBlog = (blog) => {
+    setSelectedBlog(blog);
+    setShowViewModal(true);
+  };
+  
+  // Xử lý mở modal chỉnh sửa
+  const handleEditBlog = (blog) => {
+    setSelectedBlog(blog);
+    setFormData({
+      name: blog.name,
+      description: blog.description
+    });
+    setShowEditModal(true);
+  };
+  
+  // Xử lý mở modal xác nhận xóa
+  const handleDeleteClick = (blog) => {
+    setSelectedBlog(blog);
+    setShowDeleteModal(true);
+  };
+  
+  // Xử lý xóa bài viết
+  const handleDeleteBlog = () => {
+    setBlogs(blogs.filter(b => b.id !== selectedBlog.id));
+    setShowDeleteModal(false);
+  };
+  
+  // Xử lý thêm bài viết mới
+  const handleAddBlog = (e) => {
+    e.preventDefault();
+    
+    // Tạo timestamp hiện tại
+    const now = new Date().toLocaleString();
+    
+    // Tạo bài viết mới
+    const blog = {
+      id: blogs.length + 1,
+      name: formData.name,
+      description: formData.description,
+      createdAt: now,
+      updatedAt: now,
+    };
+    
+    // Thêm vào state
+    setBlogs([...blogs, blog]);
+    
+    // Đóng modal và reset form
+    setShowAddModal(false);
+    setFormData({
+      name: '',
+      description: ''
+    });
+  };
+  
+  // Xử lý cập nhật bài viết
+  const handleUpdateBlog = (e) => {
+    e.preventDefault();
+    
+    // Tạo timestamp hiện tại
+    const now = new Date().toLocaleString();
+    
+    // Cập nhật bài viết
+    const updatedBlogs = blogs.map(b => {
+      if (b.id === selectedBlog.id) {
+        return {
+          ...b,
+          name: formData.name,
+          description: formData.description,
+          updatedAt: now
+        };
+      }
+      return b;
+    });
+    
+    // Cập nhật state
+    setBlogs(updatedBlogs);
+    
+    // Đóng modal và reset form
+    setShowEditModal(false);
+  };
 
   return (
     <div className="p-6">
@@ -66,7 +178,10 @@ const BlogManagement = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
+        >
           <Plus size={20} className="mr-2" />
           Thêm bài viết
         </button>
@@ -111,13 +226,25 @@ const BlogManagement = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex space-x-3">
-                      <button className="text-blue-600 hover:text-blue-900" title="Xem chi tiết">
+                      <button 
+                        onClick={() => handleViewBlog(blog)} 
+                        className="text-blue-600 hover:text-blue-900" 
+                        title="Xem chi tiết"
+                      >
                         <Eye size={20} />
                       </button>
-                      <button className="text-amber-600 hover:text-amber-900" title="Chỉnh sửa">
+                      <button 
+                        onClick={() => handleEditBlog(blog)} 
+                        className="text-amber-600 hover:text-amber-900" 
+                        title="Chỉnh sửa"
+                      >
                         <PencilLine size={20} />
                       </button>
-                      <button className="text-red-600 hover:text-red-900" title="Xóa">
+                      <button 
+                        onClick={() => handleDeleteClick(blog)} 
+                        className="text-red-600 hover:text-red-900" 
+                        title="Xóa"
+                      >
                         <Trash2 size={20} />
                       </button>
                     </div>
@@ -134,6 +261,219 @@ const BlogManagement = () => {
           </tbody>
         </table>
       </div>
+      
+      {/* Modal thêm mới */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Thêm bài viết mới</h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddBlog}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tiêu đề
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mô tả
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Thêm mới
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal xem chi tiết */}
+      {showViewModal && selectedBlog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Chi tiết bài viết</h3>
+              <button 
+                onClick={() => setShowViewModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-500">Tiêu đề</h4>
+                <p className="mt-1 text-base">{selectedBlog.name}</p>
+              </div>
+              
+              <div>
+                <h4 className="text-sm font-medium text-gray-500">Mô tả</h4>
+                <p className="mt-1 text-base">{selectedBlog.description}</p>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500">Ngày tạo</h4>
+                  <p className="mt-1 text-sm text-gray-500">{selectedBlog.createdAt}</p>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500">Cập nhật lần cuối</h4>
+                  <p className="mt-1 text-sm text-gray-500">{selectedBlog.updatedAt}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-6">
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal chỉnh sửa */}
+      {showEditModal && selectedBlog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Chỉnh sửa bài viết</h3>
+              <button 
+                onClick={() => setShowEditModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleUpdateBlog}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tiêu đề
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Mô tả
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
+                >
+                  Cập nhật
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Modal xác nhận xóa */}
+      {showDeleteModal && selectedBlog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold text-red-600">Xác nhận xóa</h3>
+              <button 
+                onClick={() => setShowDeleteModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <p className="text-gray-700">
+              Bạn có chắc chắn muốn xóa bài viết <span className="font-semibold">{selectedBlog.name}</span>? 
+              Hành động này không thể hoàn tác.
+            </p>
+            
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleDeleteBlog}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
