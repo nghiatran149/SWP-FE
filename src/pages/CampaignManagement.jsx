@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Search, Eye, PencilLine, Trash2, X } from 'lucide-react';
 
 const CampaignManagement = () => {
@@ -156,126 +157,126 @@ const CampaignManagement = () => {
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h1 className="text-2xl font-bold">Quản lý chương trình</h1>
-          <p className="text-gray-600">Xem thông tin và quản lý tất cả các chương trình trên hệ thống</p>
+    <>
+      <div className="bg-white border-b border-gray-200 px-8 py-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Quản lý chương trình</h1>
+            <p className="text-gray-600 mt-1">Xem thông tin và quản lý tất cả các chương trình trên hệ thống</p>
+          </div>
+          <Link to="/home" className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+            Về trang chủ
+          </Link>
         </div>
-        <a href="/home" className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-          Về trang chủ
-        </a>
       </div>
 
-      <div className="flex justify-between items-center mt-6 mb-4">
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên, mô tả..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="px-8 py-4">
+        <div className="flex justify-between items-center">
+          <div className="relative w-full max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên, mô tả..."
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
+          >
+            <Plus size={20} className="mr-2" />
+            Thêm chương trình
+          </button>
         </div>
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="ml-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
-        >
-          <Plus size={20} className="mr-2" />
-          Thêm chương trình
-        </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                NAME
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                DESCRIPTION
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                CREATED AT
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                UPDATED AT
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                ACTIONS
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredCampaigns.length > 0 ? (
-              filteredCampaigns.map((campaign) => (
-                <tr key={campaign.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-blue-600">{campaign.name}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 line-clamp-1">{campaign.description}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{campaign.createdAt}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{campaign.updatedAt}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex space-x-3">
-                      <button 
-                        onClick={() => handleViewCampaign(campaign)} 
-                        className="text-blue-600 hover:text-blue-900" 
-                        title="Xem chi tiết"
-                      >
-                        <Eye size={20} />
-                      </button>
-                      <button 
-                        onClick={() => handleEditCampaign(campaign)} 
-                        className="text-amber-600 hover:text-amber-900" 
-                        title="Chỉnh sửa"
-                      >
-                        <PencilLine size={20} />
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteClick(campaign)} 
-                        className="text-red-600 hover:text-red-900" 
-                        title="Xóa"
-                      >
-                        <Trash2 size={20} />
-                      </button>
-                    </div>
+      <div className="p-5">
+        <div className="bg-white rounded-xl shadow border border-gray-200 overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  NAME
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  DESCRIPTION
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  CREATED AT
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  UPDATED AT
+                </th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  ACTIONS
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredCampaigns.length > 0 ? (
+                filteredCampaigns.map((campaign) => (
+                  <tr key={campaign.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{campaign.name}</td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <div className="line-clamp-1" title={campaign.description}>{campaign.description}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{campaign.createdAt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{campaign.updatedAt}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => handleViewCampaign(campaign)}
+                          className="p-2 rounded hover:bg-blue-50 text-blue-600"
+                          title="Xem chi tiết"
+                        >
+                          <Eye size={20} />
+                        </button>
+                        <button
+                          onClick={() => handleEditCampaign(campaign)}
+                          className="p-2 rounded hover:bg-amber-50 text-amber-500"
+                          title="Chỉnh sửa"
+                        >
+                          <PencilLine size={20} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(campaign)}
+                          className="p-2 rounded hover:bg-red-50 text-red-500"
+                          title="Xóa"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                    Không tìm thấy chương trình nào phù hợp
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
-                  Không tìm thấy chương trình nào phù hợp
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-      
+
       {/* Modal thêm mới */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Thêm chương trình mới</h3>
-              <button 
+              <button
                 onClick={() => setShowAddModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <form onSubmit={handleAddCampaign}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -290,7 +291,7 @@ const CampaignManagement = () => {
                   required
                 />
               </div>
-              
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Mô tả
@@ -304,7 +305,7 @@ const CampaignManagement = () => {
                   required
                 ></textarea>
               </div>
-              
+
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
@@ -324,45 +325,45 @@ const CampaignManagement = () => {
           </div>
         </div>
       )}
-      
+
       {/* Modal xem chi tiết */}
       {showViewModal && selectedCampaign && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Chi tiết chương trình</h3>
-              <button 
+              <button
                 onClick={() => setShowViewModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <h4 className="text-sm font-medium text-gray-500">Tên chương trình</h4>
                 <p className="mt-1 text-base">{selectedCampaign.name}</p>
               </div>
-              
+
               <div>
                 <h4 className="text-sm font-medium text-gray-500">Mô tả</h4>
                 <p className="mt-1 text-base">{selectedCampaign.description}</p>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <h4 className="text-sm font-medium text-gray-500">Ngày tạo</h4>
                   <p className="mt-1 text-sm text-gray-500">{selectedCampaign.createdAt}</p>
                 </div>
-                
+
                 <div>
                   <h4 className="text-sm font-medium text-gray-500">Cập nhật lần cuối</h4>
                   <p className="mt-1 text-sm text-gray-500">{selectedCampaign.updatedAt}</p>
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowViewModal(false)}
@@ -374,21 +375,21 @@ const CampaignManagement = () => {
           </div>
         </div>
       )}
-      
+
       {/* Modal chỉnh sửa */}
       {showEditModal && selectedCampaign && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Chỉnh sửa chương trình</h3>
-              <button 
+              <button
                 onClick={() => setShowEditModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <form onSubmit={handleUpdateCampaign}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -403,7 +404,7 @@ const CampaignManagement = () => {
                   required
                 />
               </div>
-              
+
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Mô tả
@@ -417,7 +418,7 @@ const CampaignManagement = () => {
                   required
                 ></textarea>
               </div>
-              
+
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
@@ -437,26 +438,26 @@ const CampaignManagement = () => {
           </div>
         </div>
       )}
-      
+
       {/* Modal xác nhận xóa */}
       {showDeleteModal && selectedCampaign && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-red-600">Xác nhận xóa</h3>
-              <button 
+              <button
                 onClick={() => setShowDeleteModal(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <p className="text-gray-700">
-              Bạn có chắc chắn muốn xóa chương trình <span className="font-semibold">{selectedCampaign.name}</span>? 
+              Bạn có chắc chắn muốn xóa chương trình <span className="font-semibold">{selectedCampaign.name}</span>?
               Hành động này không thể hoàn tác.
             </p>
-            
+
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowDeleteModal(false)}
@@ -474,7 +475,7 @@ const CampaignManagement = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

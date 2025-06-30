@@ -320,10 +320,10 @@ const SurveyManagement = () => {
                 {filteredSurveys.map((survey) => (
                   <tr key={survey.surveyId} className="hover:bg-gray-50 transition-colors">
                     {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{survey.surveyId}</td> */}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{survey.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">{survey.name}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 max-w-md truncate">{survey.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{survey.createdAt ? new Date(survey.createdAt).toLocaleString() : '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{survey.updatedAt ? new Date(survey.updatedAt).toLocaleString() : '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{survey.createdAt ? new Date(survey.createdAt).toLocaleString() : '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{survey.updatedAt ? new Date(survey.updatedAt).toLocaleString() : '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
                         <button 
