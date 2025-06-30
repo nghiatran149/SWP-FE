@@ -152,13 +152,21 @@ const MyCourse = () => {
                   </h3>
                   {/* Progress Bar */}
                   <div className="mb-4">
-                    <div className="flex justify-between text-sm text-gray-600 mb-2">
-                      <span>Tiến độ: {course.progressPercentage}%</span>
-                      <span>{course.completedLessons}/{course.totalLessons} bài học</span>
-                    </div>
+                    {course.progressPercentage === 100 ? (
+                      <div className="text-center">
+                        <p className="text-sm font-semibold text-green-600 mb-2">Đã hoàn thành khóa học!</p>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Tiến độ: {course.progressPercentage}%</span>
+                        <span>{course.completedLessons}/{course.totalLessons} bài học</span>
+                      </div>
+                    )}
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          course.progressPercentage === 100 ? 'bg-green-500' : 'bg-yellow-400'
+                        }`}
                         style={{ width: `${course.progressPercentage}%` }}
                       />
                     </div>

@@ -17,7 +17,7 @@ import {
   User,
 } from 'lucide-react';
 
-const Sidebar = ({ activeItem = 'overview' }) => {
+const Sidebar = ({ activeMenuItem = 'overview' }) => {
   const { user } = useAuth();
 
   // Define menu items for each role
@@ -40,6 +40,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
       { id: 'surveymanagement', label: 'Quản lý khảo sát', icon: ClipboardPenLine },
       { id: 'coursemanagement', label: 'Quản lý khóa học', icon: NotebookPen },
       { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
+      { id: 'campaignmanagement', label: 'Quản lý chương trình', icon: AppWindow },
     ];
 
     // Return menu items based on user role
@@ -87,6 +88,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
               case 'surveymanagement': to = '/surveymanagement'; break;
               case 'coursemanagement': to = '/coursemanagement'; break;
               case 'blogmanagement': to = '/blogmanagement'; break;
+              case 'campaignmanagement': to = '/campaignmanagement'; break;
               
               default: to = '#';
             }
@@ -94,7 +96,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
               <li key={item.id}>
                 <Link
                   to={to}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeItem === item.id
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeMenuItem === item.id
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
@@ -124,7 +126,7 @@ const Sidebar = ({ activeItem = 'overview' }) => {
               <li key={item.id}>
                 <Link
                   to={to}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeItem === item.id
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${activeMenuItem === item.id
                       ? 'bg-gray-100 text-gray-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}

@@ -311,7 +311,7 @@ const BlogDetail = () => {
         </div>
       </div>
       
-      {/* Featured Image - TÁCH KHỎI HEADER */}
+        
       <div className="max-w-5xl mx-auto px-4 pt-8">
         {blog.image && (
           <div className="mb-8">
