@@ -202,21 +202,29 @@ const MyCourseDetail = () => {
                 </div>
                 {/* Progress Bar */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">Tiến độ: {course.courseProgressPercentage}%</span>
-                    <span className="text-sm text-gray-600">{course.completedLessonsByUser}/{course.totalLessonsInCourse} bài học</span>
-                  </div>
+                  {course.courseProgressPercentage === 100 ? (
+                    <div className="text-center mb-2">
+                      <p className="text-sm font-semibold text-green-600">Đã hoàn thành khóa học!</p>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-medium text-gray-700">Tiến độ: {course.courseProgressPercentage}%</span>
+                      <span className="text-sm text-gray-600">{course.completedLessonsByUser}/{course.totalLessonsInCourse} bài học</span>
+                    </div>
+                  )}
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
                     <div
-                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        course.courseProgressPercentage === 100 ? 'bg-green-500' : 'bg-yellow-400'
+                      }`}
                       style={{ width: `${course.courseProgressPercentage}%` }}
                     ></div>
                   </div>
                 </div>
                 <div className="flex justify-between">
                   <button
-                    className="flex items-center gap-2 bg-green-600 text-white px-10 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                    disabled={!firstUncompletedLesson && !firstLesson}
+                    className="flex items-center gap-2 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-700 disabled:cursor-not-allowed"
+                    disabled={course.courseProgressPercentage === 100}
                     onClick={() => {
                       if (firstUncompletedLesson) {
                         navigate(`/lessondetail?lessonId=${firstUncompletedLesson.lessonId}&courseId=${courseId}`);
@@ -225,13 +233,35 @@ const MyCourseDetail = () => {
                       }
                     }}
                   >
-                    <Play className="w-4 h-4" />
-                    <span>Tiếp tục học</span>
+                    {course.courseProgressPercentage === 100 ? (
+                      <>
+                        <CheckCircle className="w-5 h-5" />
+                        <span>Bạn đã hoàn thành khóa học này</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4" />
+                        <span>Tiếp tục học</span>
+                      </>
+                    )}
                   </button>
-                  <Link to="/certificate" className="flex items-center gap-2 border border-gray-600 text-gray-600 px-10 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <Award className="w-4 h-4" />
-                    <span>Xem chứng chỉ</span>
-                  </Link>
+                  {course.courseProgressPercentage === 100 ? (
+                    <Link
+                      to={`/certificate?courseId=${courseId}`}
+                      className="flex items-center gap-2 border border-green-600 text-green-600 px-10 py-2 rounded-lg hover:bg-green-50 transition-colors"
+                    >
+                      <Award className="w-4 h-4" />
+                      <span>Xem chứng chỉ</span>
+                    </Link>
+                  ) : (
+                    <button
+                      disabled
+                      className="flex items-center gap-2 border border-gray-300 bg-gray-100 text-gray-400 px-4 py-2 rounded-lg cursor-not-allowed"
+                    >
+                      <Award className="w-4 h-4" />
+                      <span className="text-sm text-center">Bạn chưa hoàn thành khóa học này</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
