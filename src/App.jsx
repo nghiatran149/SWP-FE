@@ -23,6 +23,7 @@ import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import CourseManagement from "./pages/CourseManagement";
+import CourseDetailManagement from "./pages/CourseDetailManagement";
 import CampaignManagement from "./pages/CampaignManagement";
 import BlogManagement from "./pages/BlogManagement";
 
@@ -276,6 +277,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="coursemanagement">
                 <CourseManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/coursemanagementdetail/:courseId"
+            element={
+              <LayoutDashboard activeMenuItem="coursemanagement">
+                <CourseDetailManagement />
               </LayoutDashboard>
             }
           />

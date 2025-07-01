@@ -436,12 +436,13 @@ const CourseManagement = () => {
                     <td className="px-6 py-4 text-sm text-gray-500">{course.updatedAt ? new Date(course.updatedAt).toLocaleString() : '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <button 
-                          className="p-2 rounded hover:bg-blue-50 text-blue-600" 
+                        <Link
+                          to={`/coursemanagementdetail/${course.courseId}`}
+                          className="p-2 rounded hover:bg-blue-50 text-blue-600"
                           title="Xem chi tiết"
                         >
                           <Eye className="w-5 h-5" />
-                        </button>
+                        </Link>
                         <button 
                           className="p-2 rounded hover:bg-amber-50 text-amber-500" 
                           title="Sửa thông tin"
