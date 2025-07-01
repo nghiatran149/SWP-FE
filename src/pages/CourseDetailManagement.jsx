@@ -213,8 +213,8 @@ const CourseDetailManagement = () => {
                 content: addLessonForm.content,
                 durationMinutes: Number(addLessonForm.durationMinutes),
                 sequence: Number(addLessonForm.sequence),
-                hasQuiz: !!addLessonForm.hasQuiz,
-                hasPractice: !!addLessonForm.hasPractice
+                hasQuiz: true,
+                hasPractice: true
             }, { headers });
             // Refresh course data
             const res = await api.get(`/Course/${courseId}/manager-content`, { headers });
@@ -270,8 +270,8 @@ const CourseDetailManagement = () => {
                 content: editLessonForm.content,
                 durationMinutes: Number(editLessonForm.durationMinutes),
                 sequence: Number(editLessonForm.sequence),
-                hasQuiz: !!editLessonForm.hasQuiz,
-                hasPractice: !!editLessonForm.hasPractice
+                hasQuiz: true,
+                hasPractice: true
             }, { headers });
             // Refresh course data
             const res = await api.get(`/Course/${courseId}/manager-content`, { headers });
@@ -442,11 +442,9 @@ const CourseDetailManagement = () => {
                                                             <Clock className="w-4 h-4 inline-block text-gray-400" />
                                                             {lesson.durationMinutes}min
                                                         </span>
-                                                        {lesson.hasQuiz && <span className="ml-2 px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-xs font-semibold">Quiz</span>}
-                                                        {/* {lesson.hasPractice && <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-semibold">Practice</span>} */}
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem chi tiết bài học">
+                                                        <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem chi tiết bài học" onClick={() => navigate(`/lessondetailmanagement/${lesson.lessonId}`)}>
                                                             <Eye className="w-5 h-5" />
                                                         </button>
                                                         <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa bài học" onClick={() => handleEditLessonClick(lesson, week.weekId)}>
@@ -613,28 +611,6 @@ const CourseDetailManagement = () => {
                                     className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                             </div>
-                            <div className="flex items-center gap-4">
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="hasQuiz"
-                                        checked={addLessonForm.hasQuiz}
-                                        onChange={handleAddLessonFormChange}
-                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                                    />
-                                    <span>Có Quiz</span>
-                                </label>
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="hasPractice"
-                                        checked={addLessonForm.hasPractice}
-                                        onChange={handleAddLessonFormChange}
-                                        className="h-4 w-4 text-green-600 border-gray-300 rounded"
-                                    />
-                                    <span>Có Practice</span>
-                                </label>
-                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-6">
                             <button
@@ -703,28 +679,6 @@ const CourseDetailManagement = () => {
                                     min="1"
                                     className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="hasQuiz"
-                                        checked={editLessonForm.hasQuiz}
-                                        onChange={handleEditLessonFormChange}
-                                        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-                                    />
-                                    <span>Có Quiz</span>
-                                </label>
-                                <label className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        name="hasPractice"
-                                        checked={editLessonForm.hasPractice}
-                                        onChange={handleEditLessonFormChange}
-                                        className="h-4 w-4 text-green-600 border-gray-300 rounded"
-                                    />
-                                    <span>Có Practice</span>
-                                </label>
                             </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-6">

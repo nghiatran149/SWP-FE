@@ -24,6 +24,7 @@ import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
 import CourseManagement from "./pages/CourseManagement";
 import CourseDetailManagement from "./pages/CourseDetailManagement";
+import LessonDetailManagement from "./pages/LessonDetailManagement";
 import CampaignManagement from "./pages/CampaignManagement";
 import BlogManagement from "./pages/BlogManagement";
 
@@ -31,7 +32,7 @@ import BlogManagement from "./pages/BlogManagement";
 import QuestionDetail from "./pages/QuestionDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
-import LessonDetail from "./pages/LessonDetail";
+import MyLessonDetail from "./pages/MyLessonDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import MyAppointmentDetail from "./pages/MyAppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
@@ -289,6 +290,14 @@ function App() {
             }
           />
           <Route
+            path="/lessondetailmanagement/:lessonId"
+            element={
+              <LayoutDashboard activeMenuItem="coursemanagement">
+                <LessonDetailManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
             path="/mycourse"
             element={
               <LayoutDashboard activeMenuItem="mycourse">
@@ -305,10 +314,10 @@ function App() {
             }
           />
           <Route
-            path="/lessondetail"
+            path="/mylessondetail"
             element={
               <LayoutDashboard activeMenuItem="mycourse">
-                <LessonDetail />
+                <MyLessonDetail />
               </LayoutDashboard>
             }
           />

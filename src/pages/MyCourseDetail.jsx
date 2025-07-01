@@ -227,9 +227,9 @@ const MyCourseDetail = () => {
                     disabled={course.courseProgressPercentage === 100}
                     onClick={() => {
                       if (firstUncompletedLesson) {
-                        navigate(`/lessondetail?lessonId=${firstUncompletedLesson.lessonId}&courseId=${courseId}`);
+                        navigate(`/mylessondetail?lessonId=${firstUncompletedLesson.lessonId}&courseId=${courseId}`);
                       } else if (firstLesson) {
-                        navigate(`/lessondetail?lessonId=${firstLesson.lessonId}&courseId=${courseId}`);
+                        navigate(`/mylessondetail?lessonId=${firstLesson.lessonId}&courseId=${courseId}`);
                       }
                     }}
                   >
@@ -324,14 +324,14 @@ const MyCourseDetail = () => {
                                   <span className="text-sm text-gray-500 w-20 text-left block">{lesson.durationMinutes} phút</span>
                                   {lesson.isCompleted ? (
                                     <Link
-                                      to={`/lessondetail?lessonId=${lesson.lessonId}&courseId=${courseId}`}
+                                      to={`/mylessondetail?lessonId=${lesson.lessonId}&courseId=${courseId}`}
                                       className="text-blue-600 hover:text-blue-800 text-sm w-20 text-left"
                                     >
                                       Xem lại
                                     </Link>
                                   ) : (
                                     <Link
-                                      to={`/lessondetail?lessonId=${lesson.lessonId}&courseId=${courseId}`}
+                                      to={`/mylessondetail?lessonId=${lesson.lessonId}&courseId=${courseId}`}
                                       className="text-green-600 hover:text-green-800 text-sm w-20 text-left"
                                     >
                                       Học ngay
