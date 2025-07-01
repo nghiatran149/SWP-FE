@@ -22,8 +22,7 @@ import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
-import MyCampaign from "./pages/MyCampaign";
-import MyCampaignDetail from "./pages/MyCampaignDetail";
+import CourseManagement from "./pages/CourseManagement";
 import CampaignManagement from "./pages/CampaignManagement";
 import BlogManagement from "./pages/BlogManagement";
 
@@ -45,6 +44,8 @@ import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
 import MyAssessmentResult from "./pages/MyAssessmentResult";
+import MyCampaign from "./pages/MyCampaign";
+import MyCampaignDetail from "./pages/MyCampaignDetail";
 
 
 function App() {
@@ -267,6 +268,14 @@ function App() {
             element={
               <LayoutDashboard activeMenuItem="surveymanagement">
                 <QuestionDetail />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/coursemanagement"
+            element={
+              <LayoutDashboard activeMenuItem="coursemanagement">
+                <CourseManagement />
               </LayoutDashboard>
             }
           />

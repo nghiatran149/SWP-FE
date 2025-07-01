@@ -22,6 +22,7 @@ const QuestionDetail = () => {
         optionText: '',
         scoreValue: 0,
     });
+    const [surveyName, setSurveyName] = useState('');
 
     useEffect(() => {
         const fetchQuestionAndOptions = async () => {
@@ -65,6 +66,26 @@ const QuestionDetail = () => {
             navigate(`/surveydetail/${surveyId}`);
         }
     }, [questionId, surveyId, navigate]);
+
+    useEffect(() => {
+        const fetchSurveyName = async () => {
+            try {
+                const userInfoString = localStorage.getItem('userInfo');
+                let token = null;
+                if (userInfoString) {
+                    const userInfo = JSON.parse(userInfoString);
+                    token = userInfo.token;
+                }
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const res = await api.get(`/Survey/${surveyId}`, { headers });
+                if (res.data && res.data.data && res.data.data.name) {
+                    setSurveyName(res.data.data.name);
+                }
+            } catch {}
+        };
+        if (surveyId) fetchSurveyName();
+    }, [surveyId]);
 
     useEffect(() => {
         // Filter options based on search term
@@ -265,6 +286,14 @@ const QuestionDetail = () => {
     return (
         <>
             <div className="bg-white border-b border-gray-200 px-8 py-6">
+                {/* Breadcrumb */}
+                <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+                    <Link to="/surveymanagement" className="hover:underline">Quản lý khảo sát</Link>
+                    <span>/</span>
+                    <Link to={`/surveydetailmanagement/${surveyId}`} className="hover:underline">{surveyName || 'Khảo sát'}</Link>
+                    <span>/</span>
+                    <span className="text-gray-900 font-semibold">{question ? question.questionText : ''}</span>
+                </div>
                 <div className="flex justify-between items-center">
                     <div className="flex-1 pr-4">
                         <h1 className="text-2xl font-bold text-gray-900">
