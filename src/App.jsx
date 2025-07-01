@@ -22,8 +22,9 @@ import UserManagement from "./pages/UserManagement";
 import ConsultantManagement from "./pages/ConsultantManagement";
 import SurveyManagement from "./pages/SurveyManagement";
 import SurveyDetailManagement from "./pages/SurveyDetailManagement";
-import MyCampaign from "./pages/MyCampaign";
-import MyCampaignDetail from "./pages/MyCampaignDetail";
+import CourseManagement from "./pages/CourseManagement";
+import CourseDetailManagement from "./pages/CourseDetailManagement";
+import LessonDetailManagement from "./pages/LessonDetailManagement";
 import CampaignManagement from "./pages/CampaignManagement";
 import BlogManagement from "./pages/BlogManagement";
 
@@ -31,7 +32,7 @@ import BlogManagement from "./pages/BlogManagement";
 import QuestionDetail from "./pages/QuestionDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
-import LessonDetail from "./pages/LessonDetail";
+import MyLessonDetail from "./pages/MyLessonDetail";
 import CertificateDetail from "./pages/CertificateDetail";
 import MyAppointmentDetail from "./pages/MyAppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
@@ -45,6 +46,8 @@ import MyCourse from "./pages/MyCourse";
 import MyAppointment from "./pages/MyAppointment";
 import MyAssessment from "./pages/MyAssessment";
 import MyAssessmentResult from "./pages/MyAssessmentResult";
+import MyCampaign from "./pages/MyCampaign";
+import MyCampaignDetail from "./pages/MyCampaignDetail";
 
 
 function App() {
@@ -271,6 +274,30 @@ function App() {
             }
           />
           <Route
+            path="/coursemanagement"
+            element={
+              <LayoutDashboard activeMenuItem="coursemanagement">
+                <CourseManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/coursemanagementdetail/:courseId"
+            element={
+              <LayoutDashboard activeMenuItem="coursemanagement">
+                <CourseDetailManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
+            path="/lessondetailmanagement/:lessonId"
+            element={
+              <LayoutDashboard activeMenuItem="coursemanagement">
+                <LessonDetailManagement />
+              </LayoutDashboard>
+            }
+          />
+          <Route
             path="/mycourse"
             element={
               <LayoutDashboard activeMenuItem="mycourse">
@@ -287,10 +314,10 @@ function App() {
             }
           />
           <Route
-            path="/lessondetail"
+            path="/mylessondetail"
             element={
               <LayoutDashboard activeMenuItem="mycourse">
-                <LessonDetail />
+                <MyLessonDetail />
               </LayoutDashboard>
             }
           />

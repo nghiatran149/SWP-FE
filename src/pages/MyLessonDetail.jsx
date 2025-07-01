@@ -16,7 +16,7 @@ function useQuery() {
     return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
-const LessonDetail = () => {
+const MyLessonDetail = () => {
     const query = useQuery();
     const lessonId = query.get('lessonId');
     const courseId = query.get('courseId');
@@ -361,7 +361,7 @@ const LessonDetail = () => {
                             disabled={!prevLesson}
                             onClick={() => {
                                 if (prevLesson) {
-                                    navigate(`/lessondetail?lessonId=${prevLesson.lessonId}&courseId=${courseId}`);
+                                    navigate(`/mylessondetail?lessonId=${prevLesson.lessonId}&courseId=${courseId}`);
                                 }
                             }}
                         >
@@ -373,7 +373,7 @@ const LessonDetail = () => {
                             disabled={!nextLesson}
                             onClick={() => {
                                 if (nextLesson) {
-                                    navigate(`/lessondetail?lessonId=${nextLesson.lessonId}&courseId=${courseId}`);
+                                    navigate(`/mylessondetail?lessonId=${nextLesson.lessonId}&courseId=${courseId}`);
                                 }
                             }}
                         >
@@ -450,4 +450,4 @@ const LessonDetail = () => {
     );
 };
 
-export default LessonDetail;
+export default MyLessonDetail;

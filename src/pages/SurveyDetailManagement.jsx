@@ -52,7 +52,9 @@ const SurveyDetail = () => {
                 // Fetch survey details
                 const surveyResponse = await api.get('/Survey', { headers });
                 if (surveyResponse.data && surveyResponse.data.data) {
-                    setSurvey(surveyResponse.data.data);
+                    // Lấy đúng survey theo surveyId
+                    const foundSurvey = surveyResponse.data.data.find(s => String(s.surveyId) === String(surveyId));
+                    setSurvey(foundSurvey || null);
                 }
 
                 // Fetch questions
@@ -275,6 +277,12 @@ const SurveyDetail = () => {
     return (
         <>
             <div className="bg-white border-b border-gray-200 px-8 py-6">
+                {/* Breadcrumb */}
+                <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+                    <Link to="/surveymanagement" className="hover:underline">Quản lý khảo sát</Link>
+                    <span>/</span>
+                    <span className="text-gray-900 font-semibold">{survey ? survey.name : ''}</span>
+                </div>
                 <div className="flex justify-between items-center">
                     <div className="flex-1 pr-4">
                         <h1 className="text-2xl font-bold text-gray-900">
