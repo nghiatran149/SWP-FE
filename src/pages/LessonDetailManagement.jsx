@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, FileText, FileImage, FileVideo, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, FileText, FileImage, FileVideo, Plus, Eye, Pencil, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 import api from '../api/api';
 
 const LessonDetailManagement = () => {
@@ -13,6 +13,7 @@ const LessonDetailManagement = () => {
     const [quiz, setQuiz] = useState(null);
     const [quizLoading, setQuizLoading] = useState(false);
     const [quizError, setQuizError] = useState(null);
+    const [quizNotFound, setQuizNotFound] = useState(false);
     const [showAddResource, setShowAddResource] = useState(false);
     const [addResourceForm, setAddResourceForm] = useState({ resourceType: 'pdf', resourceUrl: '', description: '' });
     const [addResourceLoading, setAddResourceLoading] = useState(false);
@@ -21,6 +22,23 @@ const LessonDetailManagement = () => {
     const [editResourceForm, setEditResourceForm] = useState({ resourceType: 'pdf', resourceUrl: '', description: '' });
     const [editResourceLoading, setEditResourceLoading] = useState(false);
     const [editResourceError, setEditResourceError] = useState(null);
+    const [showAddQuiz, setShowAddQuiz] = useState(false);
+    const [addQuizForm, setAddQuizForm] = useState({ title: '', description: '', passingScore: 10 });
+    const [addQuizLoading, setAddQuizLoading] = useState(false);
+    const [addQuizError, setAddQuizError] = useState(null);
+    const [showEditQuiz, setShowEditQuiz] = useState(false);
+    const [editQuizForm, setEditQuizForm] = useState({ title: '', description: '', passingScore: 10 });
+    const [editQuizLoading, setEditQuizLoading] = useState(false);
+    const [editQuizError, setEditQuizError] = useState(null);
+    const [openQuestionIds, setOpenQuestionIds] = useState([]);
+    const [showAddQuestion, setShowAddQuestion] = useState(false);
+    const [addQuestionForm, setAddQuestionForm] = useState({ questionText: '', questionType: 'single_choice', sequence: 1 });
+    const [addQuestionLoading, setAddQuestionLoading] = useState(false);
+    const [addQuestionError, setAddQuestionError] = useState(null);
+    const [showEditQuestion, setShowEditQuestion] = useState(false);
+    const [editQuestionForm, setEditQuestionForm] = useState({ questionText: '', questionType: 'single_choice', sequence: 1, questionId: null });
+    const [editQuestionLoading, setEditQuestionLoading] = useState(false);
+    const [editQuestionError, setEditQuestionError] = useState(null);
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -61,17 +79,25 @@ const LessonDetailManagement = () => {
             if (activeTab !== 'exercise') return;
             setQuizLoading(true);
             setQuizError(null);
+            setQuizNotFound(false);
             try {
                 const res = await api.get(`/Quiz/lesson/${lessonId}`);
                 if (res.data && res.data.data) {
                     setQuiz(res.data.data);
+                } else if (res.data && res.data.resultStatus === 'NotFound') {
+                    setQuiz(null);
+                    setQuizNotFound(true);
                 } else {
                     setQuiz(null);
                     setQuizError('Không tìm thấy bài tập cho bài học này.');
                 }
             } catch (err) {
                 setQuiz(null);
-                setQuizError('Không thể tải bài tập.');
+                if (err.response && err.response.status === 404) {
+                    setQuizNotFound(true);
+                } else {
+                    setQuizError('Không thể tải bài tập.');
+                }
             } finally {
                 setQuizLoading(false);
             }
@@ -101,7 +127,7 @@ const LessonDetailManagement = () => {
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
-            await api.post('http://drugpreventionsystem.somee.com/api/LessonResource', {
+            await api.post('/LessonResource', {
                 lessonId: lesson.lessonId,
                 resourceType: addResourceForm.resourceType,
                 resourceUrl: addResourceForm.resourceUrl,
@@ -152,7 +178,7 @@ const LessonDetailManagement = () => {
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
-            await api.put(`http://drugpreventionsystem.somee.com/api/LessonResource/${editResource.resourceId}`, {
+            await api.put(`/LessonResource/${editResource.resourceId}`, {
                 lessonId: lesson.lessonId,
                 resourceType: editResourceForm.resourceType,
                 resourceUrl: editResourceForm.resourceUrl,
@@ -186,7 +212,7 @@ const LessonDetailManagement = () => {
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
-            await api.delete(`http://drugpreventionsystem.somee.com/api/LessonResource/${resource.resourceId}`, { headers });
+            await api.delete(`/LessonResource/${resource.resourceId}`, { headers });
             // Reload lesson data
             const res = await api.get(`/Lesson/${lesson.lessonId}`, { headers });
             if (res.data && res.data.data) {
@@ -194,6 +220,281 @@ const LessonDetailManagement = () => {
             }
         } catch (err) {
             alert('Không thể xóa tài liệu.');
+        }
+    };
+
+    const handleAddQuizChange = (e) => {
+        const { name, value } = e.target;
+        setAddQuizForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddQuizSubmit = async (e) => {
+        e.preventDefault();
+        setAddQuizLoading(true);
+        setAddQuizError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.post('/Quiz', {
+                lessonId: lesson.lessonId,
+                title: addQuizForm.title,
+                description: addQuizForm.description,
+                passingScore: Number(addQuizForm.passingScore)
+            }, { headers });
+            setShowAddQuiz(false);
+            setAddQuizForm({ title: '', description: '', passingScore: 10 });
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            setAddQuizError('Không thể tạo bài tập.');
+            setAddQuizLoading(false);
+        }
+    };
+
+    const handleEditQuizClick = () => {
+        setEditQuizForm({
+            title: quiz.title || '',
+            description: quiz.description || '',
+            passingScore: quiz.passingScore || 10
+        });
+        setShowEditQuiz(true);
+    };
+
+    const handleEditQuizChange = (e) => {
+        const { name, value } = e.target;
+        setEditQuizForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditQuizSubmit = async (e) => {
+        e.preventDefault();
+        setEditQuizLoading(true);
+        setEditQuizError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.put(`/Quiz/${quiz.quizId}`, {
+                title: editQuizForm.title,
+                description: editQuizForm.description,
+                passingScore: Number(editQuizForm.passingScore)
+            }, { headers });
+            setShowEditQuiz(false);
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            setEditQuizError('Không thể cập nhật bài tập.');
+            setEditQuizLoading(false);
+        }
+    };
+
+    const handleToggleQuestion = (questionId) => {
+        setOpenQuestionIds((prev) =>
+            prev.includes(questionId)
+                ? prev.filter((id) => id !== questionId)
+                : [...prev, questionId]
+        );
+    };
+
+    const handleAddQuestionClick = () => {
+        // Tìm sequence tiếp theo
+        let nextSeq = 1;
+        if (quiz && quiz.questions && quiz.questions.length > 0) {
+            nextSeq = Math.max(...quiz.questions.map(q => q.sequence || 0)) + 1;
+        }
+        setAddQuestionForm({ questionText: '', questionType: 'single_choice', sequence: nextSeq });
+        setAddQuestionLoading(false);
+        setAddQuestionError(null);
+        setShowAddQuestion(true);
+    };
+
+    const handleAddQuestionChange = (e) => {
+        const { name, value } = e.target;
+        setAddQuestionForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddQuestionSubmit = async (e) => {
+        e.preventDefault();
+        setAddQuestionLoading(true);
+        setAddQuestionError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.post('/QuizQuestion', {
+                quizId: quiz.quizId,
+                questionText: addQuestionForm.questionText,
+                questionType: 'single_choice',
+                sequence: Number(addQuestionForm.sequence)
+            }, { headers });
+            setShowAddQuestion(false);
+            setAddQuestionForm({ questionText: '', questionType: 'single_choice', sequence: 1 });
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            setAddQuestionError('Không thể tạo câu hỏi.');
+            setAddQuestionLoading(false);
+        }
+    };
+
+    const handleEditQuestionClick = (question) => {
+        setEditQuestionForm({
+            questionText: question.questionText || '',
+            questionType: 'single_choice',
+            sequence: question.sequence || 1,
+            questionId: question.questionId
+        });
+        setShowEditQuestion(true);
+    };
+
+    const handleEditQuestionChange = (e) => {
+        const { name, value } = e.target;
+        setEditQuestionForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditQuestionSubmit = async (e) => {
+        e.preventDefault();
+        setEditQuestionLoading(true);
+        setEditQuestionError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.put(`/QuizQuestion/${editQuestionForm.questionId}`, {
+                questionText: editQuestionForm.questionText,
+                questionType: 'single_choice',
+                sequence: Number(editQuestionForm.sequence)
+            }, { headers });
+            setShowEditQuestion(false);
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            setEditQuestionError('Không thể cập nhật câu hỏi.');
+            setEditQuestionLoading(false);
+        }
+    };
+
+    const handleDeleteQuestion = async (question) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) return;
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.delete(`/QuizQuestion/${question.questionId}`, { headers });
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            alert('Không thể xóa câu hỏi.');
         }
     };
 
@@ -445,27 +746,145 @@ const LessonDetailManagement = () => {
                             {activeTab === 'exercise' && (
                                 <div>
                                     <h3 className="text-lg font-semibold mb-4">Bài tập</h3>
+                                    {quizNotFound && !quizLoading && (
+                                        <>
+                                            <div className="text-gray-600 text-base mb-2">Bài học này hiện chưa có bài tập</div>
+                                            <div className="my-3">
+                                                <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => setShowAddQuiz(true)}>
+                                                    <Plus className="w-5 h-5" />
+                                                    <span>Thêm bài tập</span>
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
                                     {quizLoading && <div className="text-gray-500">Đang tải bài tập...</div>}
                                     {quizError && <div className="text-red-500">{quizError}</div>}
                                     {!quizLoading && !quizError && quiz && (
                                         <div>
-                                            <div className="mb-2 font-bold text-blue-700 text-lg">{quiz.title}</div>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="font-bold text-blue-700 text-lg">{quiz.title}</div>
+                                                <button className="p-2 rounded hover:bg-yellow-50 text-yellow-600" title="Sửa bài tập" onClick={handleEditQuizClick}>
+                                                    <Pencil className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                             <div className="mb-2 text-gray-700">{quiz.description}</div>
                                             <div className="mb-2 text-sm text-gray-500">Điểm đạt: {quiz.passingScore}</div>
+                                            <div className="my-3">
+                                                <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={handleAddQuestionClick}>
+                                                    <Plus className="w-5 h-5" />
+                                                    <span>Thêm câu hỏi</span>
+                                                </button>
+                                            </div>
+                                            {quiz.questions && quiz.questions.length === 0 && (
+                                                <div className="text-gray-500 mb-4">Không có câu hỏi nào.</div>
+                                            )}
                                             <div className="space-y-6 mt-6">
                                                 {quiz.questions && quiz.questions.length > 0 ? quiz.questions.map((q, idx) => (
-                                                    <div key={q.questionId} className="mb-4">
-                                                        <div className="font-medium mb-2">Câu {idx + 1}: {q.questionText}</div>
-                                                        <div className="space-y-2 ml-4">
-                                                            {q.options.map(opt => (
-                                                                <div key={opt.optionId} className={`px-4 py-2 rounded border ${opt.isCorrect ? 'bg-green-50 border-green-400 text-green-700 font-semibold' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
-                                                                    {opt.optionText}
-                                                                    {opt.isCorrect && <span className="ml-2 text-green-600 font-bold">(Đáp án đúng)</span>}
-                                                                </div>
-                                                            ))}
+                                                    <div key={q.questionId} className="bg-white rounded-xl shadow border border-gray-200">
+                                                        <div
+                                                            className="flex items-center justify-between px-6 py-4 cursor-pointer select-none"
+                                                            onClick={() => handleToggleQuestion(q.questionId)}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                {openQuestionIds.includes(q.questionId) ? (
+                                                                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                                                                ) : (
+                                                                    <ChevronRight className="w-5 h-5 text-gray-500" />
+                                                                )}
+                                                                <span className="font-medium text-gray-900">Câu {idx + 1}: {q.questionText}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 flex-shrink-0" onClick={e => e.stopPropagation()}>
+                                                                <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa câu hỏi" onClick={e => { e.stopPropagation(); handleEditQuestionClick(q); }}>
+                                                                    <Pencil className="w-5 h-5" />
+                                                                </button>
+                                                                <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa câu hỏi" onClick={e => { e.stopPropagation(); handleDeleteQuestion(q); }}>
+                                                                    <Trash2 className="w-5 h-5" />
+                                                                </button>
+                                                            </div>
                                                         </div>
+                                                        {openQuestionIds.includes(q.questionId) && (
+                                                            <div className="bg-white border-t border-gray-100 px-8 pb-4 pt-2">
+                                                                <div className="my-3">
+                                                                    <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => {/* TODO: handle add answer */}}>
+                                                                        <Plus className="w-5 h-5" />
+                                                                        <span>Thêm câu trả lời</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div className="space-y-2 ml-4">
+                                                                    {q.options.map(opt => (
+                                                                        <div key={opt.optionId} className={`px-4 py-2 rounded border ${opt.isCorrect ? 'bg-green-50 border-green-400 text-green-700 font-semibold' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                                                                            {opt.optionText}
+                                                                            {opt.isCorrect && <span className="ml-2 text-green-600 font-bold">(Đáp án đúng)</span>}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )) : <div className="text-gray-500">Không có câu hỏi nào.</div>}
+                                                )) : null}
+                                            </div>
+                                        </div>
+                                    )}
+                                    {showAddQuiz && (
+                                        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                                            <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                                                <h2 className="text-xl font-bold mb-4">Tạo bài tập mới</h2>
+                                                <form className="space-y-4" onSubmit={handleAddQuizSubmit}>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Tiêu đề bài tập</label>
+                                                        <input
+                                                            type="text"
+                                                            name="title"
+                                                            value={addQuizForm.title}
+                                                            onChange={handleAddQuizChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            placeholder="Nhập tiêu đề bài tập"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Mô tả</label>
+                                                        <input
+                                                            type="text"
+                                                            name="description"
+                                                            value={addQuizForm.description}
+                                                            onChange={handleAddQuizChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            placeholder="Nhập mô tả bài tập"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Điểm đạt</label>
+                                                        <input
+                                                            type="number"
+                                                            name="passingScore"
+                                                            value={addQuizForm.passingScore}
+                                                            onChange={handleAddQuizChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            min="1"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    {addQuizError && <div className="text-red-500 text-sm">{addQuizError}</div>}
+                                                    <div className="flex justify-end gap-2 mt-6">
+                                                        <button
+                                                            type="button"
+                                                            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                                            onClick={() => setShowAddQuiz(false)}
+                                                            disabled={addQuizLoading}
+                                                        >
+                                                            Hủy
+                                                        </button>
+                                                        <button
+                                                            type="submit"
+                                                            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                                            disabled={addQuizLoading}
+                                                        >
+                                                            {addQuizLoading ? 'Đang lưu...' : 'Tạo'}
+                                                        </button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
                                     )}
@@ -475,6 +894,191 @@ const LessonDetailManagement = () => {
                     </div>
                 )}
             </div>
+            {showEditQuiz && (
+                <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Chỉnh sửa bài tập</h2>
+                        <form className="space-y-4" onSubmit={handleEditQuizSubmit}>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Tiêu đề bài tập</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={editQuizForm.title}
+                                    onChange={handleEditQuizChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nhập tiêu đề bài tập"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Mô tả</label>
+                                <input
+                                    type="text"
+                                    name="description"
+                                    value={editQuizForm.description}
+                                    onChange={handleEditQuizChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nhập mô tả bài tập"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Điểm đạt</label>
+                                <input
+                                    type="number"
+                                    name="passingScore"
+                                    value={editQuizForm.passingScore}
+                                    onChange={handleEditQuizChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    min="1"
+                                    required
+                                />
+                            </div>
+                            {editQuizError && <div className="text-red-500 text-sm">{editQuizError}</div>}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                    onClick={() => setShowEditQuiz(false)}
+                                    disabled={editQuizLoading}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                    disabled={editQuizLoading}
+                                >
+                                    {editQuizLoading ? 'Đang lưu...' : 'Lưu'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {showAddQuestion && (
+                <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Thêm câu hỏi mới</h2>
+                        <form className="space-y-4" onSubmit={handleAddQuestionSubmit}>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Nội dung câu hỏi</label>
+                                <input
+                                    type="text"
+                                    name="questionText"
+                                    value={addQuestionForm.questionText}
+                                    onChange={handleAddQuestionChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nhập nội dung câu hỏi"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Loại câu hỏi</label>
+                                <input
+                                    type="text"
+                                    name="questionType"
+                                    value={addQuestionForm.questionType}
+                                    disabled
+                                    className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Thứ tự</label>
+                                <input
+                                    type="number"
+                                    name="sequence"
+                                    value={addQuestionForm.sequence}
+                                    onChange={handleAddQuestionChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    min="1"
+                                    required
+                                />
+                            </div>
+                            {addQuestionError && <div className="text-red-500 text-sm">{addQuestionError}</div>}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                    onClick={() => setShowAddQuestion(false)}
+                                    disabled={addQuestionLoading}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                    disabled={addQuestionLoading}
+                                >
+                                    {addQuestionLoading ? 'Đang lưu...' : 'Tạo'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {showEditQuestion && (
+                <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Chỉnh sửa câu hỏi</h2>
+                        <form className="space-y-4" onSubmit={handleEditQuestionSubmit}>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Nội dung câu hỏi</label>
+                                <input
+                                    type="text"
+                                    name="questionText"
+                                    value={editQuestionForm.questionText}
+                                    onChange={handleEditQuestionChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nhập nội dung câu hỏi"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Loại câu hỏi</label>
+                                <input
+                                    type="text"
+                                    name="questionType"
+                                    value={editQuestionForm.questionType}
+                                    disabled
+                                    className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Thứ tự</label>
+                                <input
+                                    type="number"
+                                    name="sequence"
+                                    value={editQuestionForm.sequence}
+                                    onChange={handleEditQuestionChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    min="1"
+                                    required
+                                />
+                            </div>
+                            {editQuestionError && <div className="text-red-500 text-sm">{editQuestionError}</div>}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                    onClick={() => setShowEditQuestion(false)}
+                                    disabled={editQuestionLoading}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                    disabled={editQuestionLoading}
+                                >
+                                    {editQuestionLoading ? 'Đang lưu...' : 'Lưu'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </>
     );
 };

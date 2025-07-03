@@ -437,7 +437,7 @@ const CourseManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="flex items-center justify-center gap-2">
                         <Link
-                          to={`/coursemanagementdetail/${course.courseId}`}
+                          to={`/coursedetailmanagement/${course.courseId}`}
                           className="p-2 rounded hover:bg-blue-50 text-blue-600"
                           title="Xem chi tiết"
                         >

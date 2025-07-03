@@ -282,7 +282,7 @@ function App() {
             }
           />
           <Route
-            path="/coursemanagementdetail/:courseId"
+            path="/coursedetailmanagement/:courseId"
             element={
               <LayoutDashboard activeMenuItem="coursemanagement">
                 <CourseDetailManagement />
