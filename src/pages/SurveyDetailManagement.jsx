@@ -3,12 +3,12 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Eye, Pencil, Trash2, Search, ArrowLeft, Plus } from 'lucide-react';
 import api from '../api/api';
 
-const QUESTION_TYPE_OPTIONS = [
-    { value: 'SINGLE_CHOICE', label: 'Chọn một đáp án' },
-    { value: 'MULTIPLE_CHOICE', label: 'Chọn nhiều đáp án' },
-    { value: 'TEXT', label: 'Tự luận' },
-    // { value: 'string', label: 'string' },
-];
+// const QUESTION_TYPE_OPTIONS = [
+//     { value: 'SINGLE_CHOICE', label: 'Chọn một đáp án' },
+//     { value: 'MULTIPLE_CHOICE', label: 'Chọn nhiều đáp án' },
+//     { value: 'TEXT', label: 'Tự luận' },
+//     // { value: 'string', label: 'string' },
+// ];
 
 const SurveyDetail = () => {
     const { surveyId } = useParams();
@@ -58,7 +58,7 @@ const SurveyDetail = () => {
                 }
 
                 // Fetch questions
-                const questionsResponse = await api.get('/SurveyQuestion', { headers });
+                const questionsResponse = await api.get(`/SurveyQuestion/${surveyId}/questions`, { headers });
                 if (questionsResponse.data && questionsResponse.data.data) {
                     // Sort questions by sequence
                     const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
@@ -66,7 +66,7 @@ const SurveyDetail = () => {
                 }
             } catch (err) {
                 console.error('Error fetching survey details:', err);
-                setError('Lỗi khi tải dữ liệu khảo sát. Vui lòng thử lại sau.');
+                // setError('Lỗi khi tải dữ liệu khảo sát. Vui lòng thử lại sau.');
             } finally {
                 setLoading(false);
             }
@@ -134,6 +134,7 @@ const SurveyDetail = () => {
 
             const requestBody = {
                 ...addForm,
+                questionType: 'single choice',
                 surveyId: surveyId,
             };
 
@@ -141,7 +142,7 @@ const SurveyDetail = () => {
 
             if (response.data && response.data.data) {
                 // Refresh the questions list
-                const questionsResponse = await api.get('/SurveyQuestion', { headers });
+                const questionsResponse = await api.get(`/SurveyQuestion/${surveyId}/questions`, { headers });
                 if (questionsResponse.data && questionsResponse.data.data) {
                     const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
                     setQuestions(sortedQuestions);
@@ -206,13 +207,13 @@ const SurveyDetail = () => {
 
             const response = await api.put(
                 `/SurveyQuestion/${editingQuestion.questionId}`,
-                editForm,
+                { ...editForm, questionType: 'single choice' },
                 { headers }
             );
 
             if (response.data && response.data.data) {
                 // Refresh the questions list
-                const questionsResponse = await api.get('/SurveyQuestion', { headers });
+                const questionsResponse = await api.get(`/SurveyQuestion/${surveyId}/questions`, { headers });
                 if (questionsResponse.data && questionsResponse.data.data) {
                     const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
                     setQuestions(sortedQuestions);
@@ -257,7 +258,7 @@ const SurveyDetail = () => {
             await api.delete(`/SurveyQuestion/${questionId}`, { headers });
 
             // Refresh the questions list after successful deletion
-            const questionsResponse = await api.get('/SurveyQuestion', { headers });
+            const questionsResponse = await api.get(`/SurveyQuestion/${surveyId}/questions`, { headers });
             if (questionsResponse.data && questionsResponse.data.data) {
                 const sortedQuestions = [...questionsResponse.data.data].sort((a, b) => a.sequence - b.sequence);
                 setQuestions(sortedQuestions);
@@ -418,18 +419,13 @@ const SurveyDetail = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Loại câu hỏi</label>
-                                <select
+                                <input
+                                    type="text"
                                     name="questionType"
-                                    value={addForm.questionType}
-                                    onChange={handleAddFormChange}
-                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                    {QUESTION_TYPE_OPTIONS.map((type) => (
-                                        <option key={type.value} value={type.value}>
-                                            {type.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    value="single choice"
+                                    disabled
+                                    className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Thứ tự câu hỏi</label>
@@ -486,18 +482,13 @@ const SurveyDetail = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Loại câu hỏi</label>
-                                <select
+                                <input
+                                    type="text"
                                     name="questionType"
-                                    value={editForm.questionType}
-                                    onChange={handleEditFormChange}
-                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                                >
-                                    {QUESTION_TYPE_OPTIONS.map((type) => (
-                                        <option key={type.value} value={type.value}>
-                                            {type.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                    value="single choice"
+                                    disabled
+                                    className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium mb-1">Thứ tự câu hỏi</label>
