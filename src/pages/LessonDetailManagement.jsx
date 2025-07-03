@@ -39,6 +39,14 @@ const LessonDetailManagement = () => {
     const [editQuestionForm, setEditQuestionForm] = useState({ questionText: '', questionType: 'single_choice', sequence: 1, questionId: null });
     const [editQuestionLoading, setEditQuestionLoading] = useState(false);
     const [editQuestionError, setEditQuestionError] = useState(null);
+    const [showAddOption, setShowAddOption] = useState(false);
+    const [addOptionForm, setAddOptionForm] = useState({ questionId: null, optionText: '', isCorrect: false });
+    const [addOptionLoading, setAddOptionLoading] = useState(false);
+    const [addOptionError, setAddOptionError] = useState(null);
+    const [showEditOption, setShowEditOption] = useState(false);
+    const [editOptionForm, setEditOptionForm] = useState({ optionId: null, optionText: '', isCorrect: false });
+    const [editOptionLoading, setEditOptionLoading] = useState(false);
+    const [editOptionError, setEditOptionError] = useState(null);
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -498,6 +506,158 @@ const LessonDetailManagement = () => {
         }
     };
 
+    const handleAddOptionClick = (questionId) => {
+        setAddOptionForm({ questionId, optionText: '', isCorrect: false });
+        setAddOptionLoading(false);
+        setAddOptionError(null);
+        setShowAddOption(true);
+    };
+
+    const handleAddOptionChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setAddOptionForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
+
+    const handleAddOptionSubmit = async (e) => {
+        e.preventDefault();
+        setAddOptionLoading(true);
+        setAddOptionError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.post('/QuizOption', {
+                questionId: addOptionForm.questionId,
+                optionText: addOptionForm.optionText,
+                isCorrect: addOptionForm.isCorrect
+            }, { headers });
+            setShowAddOption(false);
+            setAddOptionForm({ questionId: null, optionText: '', isCorrect: false });
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            setAddOptionError('Không thể tạo đáp án.');
+            setAddOptionLoading(false);
+        }
+    };
+
+    const handleEditOptionClick = (option) => {
+        setEditOptionForm({
+            optionId: option.optionId,
+            optionText: option.optionText,
+            isCorrect: option.isCorrect
+        });
+        setEditOptionLoading(false);
+        setEditOptionError(null);
+        setShowEditOption(true);
+    };
+
+    const handleEditOptionChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setEditOptionForm((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+    };
+
+    const handleEditOptionSubmit = async (e) => {
+        e.preventDefault();
+        setEditOptionLoading(true);
+        setEditOptionError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.put(`/QuizOption/${editOptionForm.optionId}`, {
+                optionText: editOptionForm.optionText,
+                isCorrect: editOptionForm.isCorrect
+            }, { headers });
+            setShowEditOption(false);
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            setEditOptionError('Không thể cập nhật đáp án.');
+            setEditOptionLoading(false);
+        }
+    };
+
+    const handleDeleteOption = async (option) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa đáp án này?')) return;
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.delete(`/QuizOption/${option.optionId}`, { headers });
+            // Reload quiz
+            setQuizLoading(true);
+            setQuizError(null);
+            setQuizNotFound(false);
+            const res = await api.get(`/Quiz/lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setQuiz(res.data.data);
+            } else if (res.data && res.data.resultStatus === 'NotFound') {
+                setQuiz(null);
+                setQuizNotFound(true);
+            } else {
+                setQuiz(null);
+                setQuizError('Không tìm thấy bài tập cho bài học này.');
+            }
+            setQuizLoading(false);
+        } catch (err) {
+            alert('Không thể xóa đáp án.');
+        }
+    };
+
     return (
         <>
             <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -768,7 +928,7 @@ const LessonDetailManagement = () => {
                                                 </button>
                                             </div>
                                             <div className="mb-2 text-gray-700">{quiz.description}</div>
-                                            <div className="mb-2 text-sm text-gray-500">Điểm đạt: {quiz.passingScore}</div>
+                                            <div className="mb-2 font-semibold text-green-500">Điểm đạt: {quiz.passingScore}</div>
                                             <div className="my-3">
                                                 <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={handleAddQuestionClick}>
                                                     <Plus className="w-5 h-5" />
@@ -805,16 +965,23 @@ const LessonDetailManagement = () => {
                                                         {openQuestionIds.includes(q.questionId) && (
                                                             <div className="bg-white border-t border-gray-100 px-8 pb-4 pt-2">
                                                                 <div className="my-3">
-                                                                    <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => {/* TODO: handle add answer */}}>
+                                                                    <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => handleAddOptionClick(q.questionId)}>
                                                                         <Plus className="w-5 h-5" />
-                                                                        <span>Thêm câu trả lời</span>
+                                                                        <span>Thêm đáp án</span>
                                                                     </button>
                                                                 </div>
                                                                 <div className="space-y-2 ml-4">
                                                                     {q.options.map(opt => (
-                                                                        <div key={opt.optionId} className={`px-4 py-2 rounded border ${opt.isCorrect ? 'bg-green-50 border-green-400 text-green-700 font-semibold' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
-                                                                            {opt.optionText}
-                                                                            {opt.isCorrect && <span className="ml-2 text-green-600 font-bold">(Đáp án đúng)</span>}
+                                                                        <div key={opt.optionId} className={`flex items-center justify-between px-4 py-2 rounded border ${opt.isCorrect ? 'bg-green-50 border-green-400 text-green-700 font-semibold' : 'bg-gray-50 border-gray-200 text-gray-700'}`}>
+                                                                            <span>{opt.optionText}{opt.isCorrect && <span className="ml-2 text-green-600 font-bold">(Đáp án đúng)</span>}</span>
+                                                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                                                                <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa đáp án" onClick={() => handleEditOptionClick(opt)}>
+                                                                                    <Pencil className="w-5 h-5" />
+                                                                                </button>
+                                                                                <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa đáp án" onClick={() => handleDeleteOption(opt)}>
+                                                                                    <Trash2 className="w-5 h-5" />
+                                                                                </button>
+                                                                            </div>
                                                                         </div>
                                                                     ))}
                                                                 </div>
@@ -1073,6 +1240,106 @@ const LessonDetailManagement = () => {
                                     disabled={editQuestionLoading}
                                 >
                                     {editQuestionLoading ? 'Đang lưu...' : 'Lưu'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {showAddOption && (
+                <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Thêm đáp án mới</h2>
+                        <form className="space-y-4" onSubmit={handleAddOptionSubmit}>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Nội dung đáp án</label>
+                                <input
+                                    type="text"
+                                    name="optionText"
+                                    value={addOptionForm.optionText}
+                                    onChange={handleAddOptionChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nhập nội dung đáp án"
+                                    required
+                                />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    name="isCorrect"
+                                    checked={addOptionForm.isCorrect}
+                                    onChange={handleAddOptionChange}
+                                    id="isCorrectOption"
+                                    className="w-5 h-5"
+                                />
+                                <label htmlFor="isCorrectOption" className="text-sm font-medium">Là đáp án đúng</label>
+                            </div>
+                            {addOptionError && <div className="text-red-500 text-sm">{addOptionError}</div>}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                    onClick={() => setShowAddOption(false)}
+                                    disabled={addOptionLoading}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                    disabled={addOptionLoading}
+                                >
+                                    {addOptionLoading ? 'Đang lưu...' : 'Tạo'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {showEditOption && (
+                <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                        <h2 className="text-xl font-bold mb-4">Chỉnh sửa đáp án</h2>
+                        <form className="space-y-4" onSubmit={handleEditOptionSubmit}>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Nội dung đáp án</label>
+                                <input
+                                    type="text"
+                                    name="optionText"
+                                    value={editOptionForm.optionText}
+                                    onChange={handleEditOptionChange}
+                                    className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="Nhập nội dung đáp án"
+                                    required
+                                />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    name="isCorrect"
+                                    checked={editOptionForm.isCorrect}
+                                    onChange={handleEditOptionChange}
+                                    id="isCorrectOptionEdit"
+                                    className="w-5 h-5"
+                                />
+                                <label htmlFor="isCorrectOptionEdit" className="text-sm font-medium">Là đáp án đúng</label>
+                            </div>
+                            {editOptionError && <div className="text-red-500 text-sm">{editOptionError}</div>}
+                            <div className="flex justify-end gap-2 mt-6">
+                                <button
+                                    type="button"
+                                    className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                    onClick={() => setShowEditOption(false)}
+                                    disabled={editOptionLoading}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                    disabled={editOptionLoading}
+                                >
+                                    {editOptionLoading ? 'Đang lưu...' : 'Lưu'}
                                 </button>
                             </div>
                         </form>
