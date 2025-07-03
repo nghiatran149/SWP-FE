@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, FileText, FileImage, FileVideo } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, FileText, FileImage, FileVideo, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
 import api from '../api/api';
 
 const LessonDetailManagement = () => {
@@ -13,6 +13,14 @@ const LessonDetailManagement = () => {
     const [quiz, setQuiz] = useState(null);
     const [quizLoading, setQuizLoading] = useState(false);
     const [quizError, setQuizError] = useState(null);
+    const [showAddResource, setShowAddResource] = useState(false);
+    const [addResourceForm, setAddResourceForm] = useState({ resourceType: 'pdf', resourceUrl: '', description: '' });
+    const [addResourceLoading, setAddResourceLoading] = useState(false);
+    const [addResourceError, setAddResourceError] = useState(null);
+    const [editResource, setEditResource] = useState(null);
+    const [editResourceForm, setEditResourceForm] = useState({ resourceType: 'pdf', resourceUrl: '', description: '' });
+    const [editResourceLoading, setEditResourceLoading] = useState(false);
+    const [editResourceError, setEditResourceError] = useState(null);
 
     useEffect(() => {
         const fetchLesson = async () => {
@@ -70,6 +78,124 @@ const LessonDetailManagement = () => {
         };
         fetchQuiz();
     }, [activeTab, lessonId]);
+
+    const handleAddResourceChange = (e) => {
+        const { name, value } = e.target;
+        setAddResourceForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleAddResourceSubmit = async (e) => {
+        e.preventDefault();
+        setAddResourceLoading(true);
+        setAddResourceError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.post('http://drugpreventionsystem.somee.com/api/LessonResource', {
+                lessonId: lesson.lessonId,
+                resourceType: addResourceForm.resourceType,
+                resourceUrl: addResourceForm.resourceUrl,
+                description: addResourceForm.description
+            }, { headers });
+            setShowAddResource(false);
+            setAddResourceForm({ resourceType: 'pdf', resourceUrl: '', description: '' });
+            // Reload lesson data
+            const res = await api.get(`/Lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setLesson(res.data.data);
+            }
+        } catch (err) {
+            setAddResourceError('Không thể thêm tài liệu.');
+        } finally {
+            setAddResourceLoading(false);
+        }
+    };
+
+    const handleEditResourceClick = (resource) => {
+        setEditResource(resource);
+        setEditResourceForm({
+            resourceType: resource.resourceType,
+            resourceUrl: resource.resourceUrl,
+            description: resource.description || ''
+        });
+    };
+
+    const handleEditResourceChange = (e) => {
+        const { name, value } = e.target;
+        setEditResourceForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEditResourceSubmit = async (e) => {
+        e.preventDefault();
+        setEditResourceLoading(true);
+        setEditResourceError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.put(`http://drugpreventionsystem.somee.com/api/LessonResource/${editResource.resourceId}`, {
+                lessonId: lesson.lessonId,
+                resourceType: editResourceForm.resourceType,
+                resourceUrl: editResourceForm.resourceUrl,
+                description: editResourceForm.description
+            }, { headers });
+            setEditResource(null);
+            // Reload lesson data
+            const res = await api.get(`/Lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setLesson(res.data.data);
+            }
+        } catch (err) {
+            setEditResourceError('Không thể cập nhật tài liệu.');
+        } finally {
+            setEditResourceLoading(false);
+        }
+    };
+
+    const handleDeleteResource = async (resource) => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.delete(`http://drugpreventionsystem.somee.com/api/LessonResource/${resource.resourceId}`, { headers });
+            // Reload lesson data
+            const res = await api.get(`/Lesson/${lesson.lessonId}`, { headers });
+            if (res.data && res.data.data) {
+                setLesson(res.data.data);
+            }
+        } catch (err) {
+            alert('Không thể xóa tài liệu.');
+        }
+    };
 
     return (
         <>
@@ -144,28 +270,175 @@ const LessonDetailManagement = () => {
                             {activeTab === 'resources' && (
                                 <div className="space-y-4">
                                     <h3 className="text-lg font-semibold mb-4">Tài liệu học tập</h3>
-                                    {lesson.resources && lesson.resources.length > 0 ? lesson.resources.map(resource => {
-                                        let icon = null;
-                                        if (resource.resourceType === 'pdf') {
-                                            icon = <FileText className="w-6 h-6 text-red-500" />;
-                                        } else if (resource.resourceType === 'video') {
-                                            icon = <FileVideo className="w-6 h-6 text-blue-500" />;
-                                        } else if (resource.resourceType === 'png' || resource.resourceType === 'jpg' || resource.resourceType === 'jpeg' || resource.resourceType === 'image') {
-                                            icon = <FileImage className="w-6 h-6 text-blue-500" />;
-                                        }
-                                        return (
-                                            <div key={resource.resourceId} className="flex items-center gap-4 p-4 border border-gray-300 rounded-lg">
-                                                {icon}
-                                                <div className="flex-1">
-                                                    <div className="font-medium text-gray-900">{resource.description || 'Tài liệu'}</div>
-                                                    <a href={resource.resourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
-                                                        Xem tài liệu
-                                                    </a>
+                                    <div className="my-3">
+                                        <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100" onClick={() => setShowAddResource(true)}>
+                                            <Plus className="w-5 h-5" />
+                                            <span>Thêm tài liệu</span>
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {lesson.resources && lesson.resources.length > 0 ? lesson.resources.map(resource => {
+                                            let icon = null;
+                                            if (resource.resourceType === 'pdf') {
+                                                icon = <FileText className="w-6 h-6 text-red-500" />;
+                                            } else if (resource.resourceType === 'video') {
+                                                icon = <FileVideo className="w-6 h-6 text-blue-500" />;
+                                            } else if (["png", "jpg", "jpeg", "image"].includes(resource.resourceType)) {
+                                                icon = <FileImage className="w-6 h-6 text-blue-500" />;
+                                            }
+                                            return (
+                                                <div key={resource.resourceId} className="flex items-center gap-4 p-4 border border-gray-300 rounded-lg bg-white shadow">
+                                                    {icon}
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="font-medium text-gray-900 truncate">{resource.description || 'Tài liệu'}</div>
+                                                        <a href={resource.resourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
+                                                            Xem tài liệu
+                                                        </a>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                                        <button className="p-2 rounded hover:bg-blue-50 text-blue-600" title="Xem tài liệu" onClick={() => window.open(resource.resourceUrl, '_blank')}>
+                                                            <Eye className="w-5 h-5" />
+                                                        </button>
+                                                        <button className="p-2 rounded hover:bg-amber-50 text-amber-500" title="Sửa tài liệu" onClick={() => handleEditResourceClick(resource)}>
+                                                            <Pencil className="w-5 h-5" />
+                                                        </button>
+                                                        <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa tài liệu" onClick={() => handleDeleteResource(resource)}>
+                                                            <Trash2 className="w-5 h-5" />
+                                                        </button>
+                                                    </div>
                                                 </div>
+                                            );
+                                        }) : (
+                                            <div className="text-gray-500 px-2 py-2">Không có tài liệu</div>
+                                        )}
+                                    </div>
+                                    {showAddResource && (
+                                        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                                            <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                                                <h2 className="text-xl font-bold mb-4">Thêm tài liệu mới</h2>
+                                                <form className="space-y-4" onSubmit={handleAddResourceSubmit}>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Loại tài liệu</label>
+                                                        <select
+                                                            name="resourceType"
+                                                            value={addResourceForm.resourceType}
+                                                            onChange={handleAddResourceChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            required
+                                                        >
+                                                            <option value="pdf">PDF</option>
+                                                            <option value="video">Video</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Đường dẫn tài liệu</label>
+                                                        <input
+                                                            type="text"
+                                                            name="resourceUrl"
+                                                            value={addResourceForm.resourceUrl}
+                                                            onChange={handleAddResourceChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            placeholder="Nhập URL tài liệu"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Mô tả</label>
+                                                        <input
+                                                            type="text"
+                                                            name="description"
+                                                            value={addResourceForm.description}
+                                                            onChange={handleAddResourceChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            placeholder="Nhập mô tả tài liệu"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    {addResourceError && <div className="text-red-500 text-sm">{addResourceError}</div>}
+                                                    <div className="flex justify-end gap-2 mt-6">
+                                                        <button
+                                                            type="button"
+                                                            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                                            onClick={() => setShowAddResource(false)}
+                                                            disabled={addResourceLoading}
+                                                        >
+                                                            Hủy
+                                                        </button>
+                                                        <button
+                                                            type="submit"
+                                                            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                                            disabled={addResourceLoading}
+                                                        >
+                                                            {addResourceLoading ? 'Đang lưu...' : 'Thêm'}
+                                                        </button>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        );
-                                    }) : (
-                                        <div className="text-gray-500">Không có tài liệu</div>
+                                        </div>
+                                    )}
+                                    {editResource && (
+                                        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 flex items-center justify-center z-50 backdrop-blur-sm">
+                                            <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+                                                <h2 className="text-xl font-bold mb-4">Chỉnh sửa tài liệu</h2>
+                                                <form className="space-y-4" onSubmit={handleEditResourceSubmit}>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Loại tài liệu</label>
+                                                        <select
+                                                            name="resourceType"
+                                                            value={editResourceForm.resourceType}
+                                                            onChange={handleEditResourceChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            required
+                                                        >
+                                                            <option value="pdf">PDF</option>
+                                                            <option value="video">Video</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Đường dẫn tài liệu</label>
+                                                        <input
+                                                            type="text"
+                                                            name="resourceUrl"
+                                                            value={editResourceForm.resourceUrl}
+                                                            onChange={handleEditResourceChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            placeholder="Nhập URL tài liệu"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium mb-1">Mô tả</label>
+                                                        <input
+                                                            type="text"
+                                                            name="description"
+                                                            value={editResourceForm.description}
+                                                            onChange={handleEditResourceChange}
+                                                            className="w-full border rounded px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                                                            placeholder="Nhập mô tả tài liệu"
+                                                            required
+                                                        />
+                                                    </div>
+                                                    {editResourceError && <div className="text-red-500 text-sm">{editResourceError}</div>}
+                                                    <div className="flex justify-end gap-2 mt-6">
+                                                        <button
+                                                            type="button"
+                                                            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                                                            onClick={() => setEditResource(null)}
+                                                            disabled={editResourceLoading}
+                                                        >
+                                                            Hủy
+                                                        </button>
+                                                        <button
+                                                            type="submit"
+                                                            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                                                            disabled={editResourceLoading}
+                                                        >
+                                                            {editResourceLoading ? 'Đang lưu...' : 'Lưu'}
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                             )}
