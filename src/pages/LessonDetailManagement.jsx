@@ -658,6 +658,33 @@ const LessonDetailManagement = () => {
         }
     };
 
+    const handleDeleteQuiz = async () => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa bài tập này?')) return;
+        setQuizLoading(true);
+        setQuizError(null);
+        try {
+            const userInfoString = localStorage.getItem('userInfo');
+            let token = null;
+            if (userInfoString) {
+                const userInfo = JSON.parse(userInfoString);
+                token = userInfo.token;
+            }
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            await api.delete(`/Quiz/${quiz.quizId}`, { headers });
+            setQuiz(null);
+            setQuizNotFound(true);
+        } catch (err) {
+            setQuizError('Không thể xóa bài tập.');
+        } finally {
+            setQuizLoading(false);
+        }
+    };
+
     return (
         <>
             <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -923,9 +950,14 @@ const LessonDetailManagement = () => {
                                         <div>
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="font-bold text-blue-700 text-lg">{quiz.title}</div>
-                                                <button className="p-2 rounded hover:bg-yellow-50 text-yellow-600" title="Sửa bài tập" onClick={handleEditQuizClick}>
-                                                    <Pencil className="w-5 h-5" />
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button className="p-2 rounded hover:bg-yellow-50 text-yellow-600" title="Sửa bài tập" onClick={handleEditQuizClick}>
+                                                        <Pencil className="w-5 h-5" />
+                                                    </button>
+                                                    <button className="p-2 rounded hover:bg-red-50 text-red-500" title="Xóa bài tập" onClick={handleDeleteQuiz}>
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="mb-2 text-gray-700">{quiz.description}</div>
                                             <div className="mb-2 font-semibold text-green-500">Điểm đạt: {quiz.passingScore}</div>

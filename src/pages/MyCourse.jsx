@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../api/api';
 
 const MyCourse = () => {
-  const [activeTab, setActiveTab] = useState('learning');
+  const [activeTab, setActiveTab] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [myCourses, setMyCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,11 +46,18 @@ const MyCourse = () => {
   }, [user]);
 
   const tabs = [
-    { id: 'learning', label: 'Đang học', count: myCourses.length },
-    // Có thể bổ sung các tab khác nếu API trả về trạng thái hoàn thành hoặc đề xuất
+    { id: 'all', label: 'Tất cả', count: myCourses.length },
+    { id: 'learning', label: 'Đang học', count: myCourses.filter(c => c.progressPercentage < 100).length },
+    { id: 'completed', label: 'Đã hoàn thành', count: myCourses.filter(c => c.progressPercentage === 100).length },
   ];
 
-  const filteredCourses = myCourses.filter(course =>
+  let filteredCourses = myCourses;
+  if (activeTab === 'learning') {
+    filteredCourses = myCourses.filter(course => course.progressPercentage < 100);
+  } else if (activeTab === 'completed') {
+    filteredCourses = myCourses.filter(course => course.progressPercentage === 100);
+  }
+  filteredCourses = filteredCourses.filter(course =>
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -92,7 +99,7 @@ const MyCourse = () => {
         </div>
 
         {/* Tabs */}
-        {/* <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center justify-between mb-5">
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
             {tabs.map((tab) => (
               <button
@@ -108,11 +115,7 @@ const MyCourse = () => {
               </button>
             ))}
           </div>
-          <Link to="/courses" className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 ml-4">
-            Đăng ký khóa học mới
-            <Plus className="h-4 w-4 ml-2" />
-          </Link>
-        </div> */}
+        </div>
 
         {/* Course Grid */}
         {loading ? (
