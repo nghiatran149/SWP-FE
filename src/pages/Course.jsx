@@ -132,7 +132,7 @@ const Course = () => {
                         {course.description}
                       </p>
 
-                      <button className="w-full bg-gray-900 text-white py-3 px-6 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2">
+                      <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center gap-2">
                         <Link to={`/coursedetail/${course.courseId}`} className="flex items-center gap-2 w-full h-full justify-center">
                           Xem chi tiết
                           <ArrowRight size={16} />
