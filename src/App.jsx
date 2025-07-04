@@ -29,7 +29,7 @@ import CampaignManagement from "./pages/CampaignManagement";
 import BlogManagement from "./pages/BlogManagement";
 
 //Detail
-import QuestionDetail from "./pages/QuestionDetail";
+import CampaignDetail from "./pages/CampaignDetail";
 import CourseDetail from "./pages/CourseDetail";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import MyLessonDetail from "./pages/MyLessonDetail";
@@ -38,8 +38,9 @@ import MyAppointmentDetail from "./pages/MyAppointmentDetail";
 import AssessmentDetail from "./pages/AssessmentDetail";
 import AssessmentResult from "./pages/AssessmentResult";
 import BlogDetail from "./pages/BlogDetail";
+import QuestionDetail from "./pages/QuestionDetail";
 
-//User Dashboard
+//Dashboard
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import MyCourse from "./pages/MyCourse";
@@ -150,6 +151,14 @@ function App() {
             element={
               <Layout>
                 <Campaign />
+              </Layout>
+            }
+          />
+          <Route
+            path="/campaigndetail/:id"
+            element={
+              <Layout>
+                <CampaignDetail />
               </Layout>
             }
           />
