@@ -292,17 +292,17 @@ const ConsultantManagement = () => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">License Number</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Specialization</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Số giấy phép</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Chuyên môn</th>
                 {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Experience</th> */}
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Qualifications</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Bằng cấp</th>
                 {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Consultation Fee</th> */}
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Trạng thái</th>
                 {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Working Hours</th> */}
                 {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Rating</th> */}
                 {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Total Consultations</th> */}
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Account Status</th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">TT tài khoản</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Hành động</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
@@ -366,22 +366,22 @@ const ConsultantManagement = () => {
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
             <h2 className="text-xl font-bold mb-4">Thông tin chuyên viên</h2>
             <div className="space-y-3 text-gray-700">
-              <p><strong>Consultant ID:</strong> {viewingConsultant.consultantId || 'Chưa có (cần tạo thông tin chuyên viên)'}</p>
-              <p><strong>User ID:</strong> {viewingConsultant.userId}</p>
+              {/* <p><strong>Consultant ID:</strong> {viewingConsultant.consultantId || 'Chưa có (cần tạo thông tin chuyên viên)'}</p>
+              <p><strong>User ID:</strong> {viewingConsultant.userId}</p> */}
               <p><strong>Username:</strong> {viewingConsultant.userInfo?.username}</p>
               <p><strong>Email:</strong> {viewingConsultant.userInfo?.email}</p>
-              <p><strong>License Number:</strong> {viewingConsultant.licenseNumber || 'Chưa có'}</p>
-              <p><strong>Specialization:</strong> {viewingConsultant.specialization || 'Chưa có'}</p>
-              <p><strong>Years of Experience:</strong> {viewingConsultant.yearsOfExperience || 'Chưa có'}</p>
-              <p><strong>Qualifications:</strong> {viewingConsultant.qualifications || 'Chưa có'}</p>
+              <p><strong>Số giấy phép:</strong> {viewingConsultant.licenseNumber || 'Chưa có'}</p>
+              <p><strong>Chuyên môn:</strong> {viewingConsultant.specialization || 'Chưa có'}</p>
+              <p><strong>Số năm kinh nghiệm:</strong> {viewingConsultant.yearsOfExperience || 'Chưa có'}</p>
+              <p><strong>Bằng cấp:</strong> {viewingConsultant.qualifications || 'Chưa có'}</p>
               <p><strong>Bio:</strong> {viewingConsultant.bio || 'Chưa có'}</p>
-              <p><strong>Consultation Fee:</strong> {viewingConsultant.consultationFee || 'Chưa có'}</p>
-              <p><strong>Status:</strong> {viewingConsultant.isAvailable ? 'Available' : 'Unavailable'}</p>
-              <p><strong>Working Hours:</strong> {viewingConsultant.workingHours || 'Chưa có'}</p>
-              <p><strong>Rating:</strong> {viewingConsultant.rating || 'N/A'}</p>
-              <p><strong>Total Consultations:</strong> {viewingConsultant.totalConsultations}</p>
-              <p><strong>Account Status:</strong> {viewingConsultant.userInfo?.isActive ? 'Active' : 'Inactive'}</p>
-              <p><strong>Created At:</strong> {viewingConsultant.createdAt ? new Date(viewingConsultant.createdAt).toLocaleString() : '-'}</p>
+              {/* <p><strong>Phí tư vấn:</strong> {viewingConsultant.consultationFee || 'Chưa có'}</p> */}
+              <p><strong>Trạng thái:</strong> {viewingConsultant.isAvailable ? 'Available' : 'Unavailable'}</p>
+              <p><strong>Số giờ làm việc:</strong> {viewingConsultant.workingHours || 'Chưa có'}</p>
+              <p><strong>Đánh giá:</strong> {viewingConsultant.rating || 'N/A'}</p>
+              {/* <p><strong>Total Consultations:</strong> {viewingConsultant.totalConsultations}</p> */}
+              <p><strong>TT tài khoản:</strong> {viewingConsultant.userInfo?.isActive ? 'Active' : 'Inactive'}</p>
+              <p><strong>Ngày tạo:</strong> {viewingConsultant.createdAt ? new Date(viewingConsultant.createdAt).toLocaleString() : '-'}</p>
             </div>
             <div className="flex justify-end mt-4">
               <button 

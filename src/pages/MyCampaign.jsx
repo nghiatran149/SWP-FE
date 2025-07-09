@@ -1,13 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, ArrowRight, Clock, BookOpen, Download, Award, CheckCircle, Users, Plus, MapPin, User } from 'lucide-react';
+import { Calendar, ArrowRight, Lightbulb, X, Download, Award, CheckCircle, Users, Plus, MapPin, User } from 'lucide-react';
 import api from '../api/api';
+
+const SurveyModal = ({ open, onClose, survey, answers, setAnswers, onSubmit }) => {
+  if (!open || !survey) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm">
+      <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative max-h-screen overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-1"><X className="w-6 h-6" /></button>
+        <h2 className="text-xl font-bold mb-2">{survey.title}</h2>
+        <p className="mb-4 text-gray-600">{survey.description}</p>
+        <form onSubmit={onSubmit} className="space-y-4">
+          {survey.questions.map((q) => (
+            <div key={q.questionId}>
+              <label className="font-medium block mb-1">{q.questionText}</label>
+              {q.questionType === 'text' ? (
+                <input
+                  type="text"
+                  className="w-full border rounded px-3 py-2"
+                  value={answers[q.questionId] || ''}
+                  onChange={e => setAnswers(a => ({ ...a, [q.questionId]: e.target.value }))}
+                />
+              ) : (
+                <div className="space-y-1">
+                  {q.answerOptions.map(opt => (
+                    <label key={opt.optionId} className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name={q.questionId}
+                        value={opt.optionId}
+                        checked={answers[q.questionId] === opt.optionId}
+                        onChange={e => setAnswers(a => ({ ...a, [q.questionId]: opt.optionId }))}
+                      />
+                      <span>{opt.optionText}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+          <button type="submit" className="mt-4 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Gửi khảo sát</button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 const MyCampaign = () => {
   const [activeTab, setActiveTab] = useState('registered'); // 'registered', 'completed'
   const [enrolledCampaigns, setEnrolledCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [surveyModalOpen, setSurveyModalOpen] = useState(false);
+  const [surveyData, setSurveyData] = useState(null);
+  const [surveyAnswers, setSurveyAnswers] = useState({});
+  const [surveyLoading, setSurveyLoading] = useState(false);
+  const [surveyProgramId, setSurveyProgramId] = useState(null);
+  const [surveyStatus, setSurveyStatus] = useState({}); // { [programId]: true/false }
 
   // Fetch enrolled campaigns from API
   useEffect(() => {
@@ -105,9 +155,9 @@ const MyCampaign = () => {
     let bgColor = "bg-gray-100 text-gray-600";
     
     if (status === "Hoàn thành") {
-      bgColor = "bg-gray-100 text-gray-600";
+      bgColor = "bg-green-100 text-green-600";
     } else if (status === "Đang tiến hành") {
-      bgColor = "bg-green-100 text-green-800";
+      bgColor = "bg-yellow-100 text-yellow-800";
     } else if (status === "Sắp diễn ra") {
       bgColor = "bg-blue-100 text-blue-800";
     }
@@ -119,17 +169,96 @@ const MyCampaign = () => {
     );
   };
 
+  // Hàm mở modal và lấy khảo sát
+  const handleOpenSurvey = async (programId) => {
+    setSurveyProgramId(programId);
+    setSurveyLoading(true);
+    setSurveyModalOpen(true);
+    setSurveyData(null);
+    setSurveyAnswers({});
+    try {
+      const res = await api.get(`/CommunityProgram/${programId}/survey`);
+      setSurveyData(res.data);
+    } catch (e) {
+      setSurveyData({ title: 'Lỗi', description: 'Không lấy được khảo sát', questions: [] });
+    } finally {
+      setSurveyLoading(false);
+    }
+  };
+
+  // Hàm submit khảo sát (gửi lên server)
+  const handleSubmitSurvey = async (e) => {
+    e.preventDefault();
+    if (!surveyData || !surveyProgramId) return;
+    // Lấy userId từ localStorage
+    const userInfo = localStorage.getItem('userInfo');
+    let userId = '';
+    if (userInfo) {
+      try {
+        userId = JSON.parse(userInfo).userId;
+      } catch {}
+    }
+    if (!userId) {
+      alert('Không tìm thấy thông tin người dùng.');
+      return;
+    }
+    // Chuẩn bị body gửi đi
+    const answers = surveyData.questions.map(q => {
+      if (q.questionType === 'text') {
+        return {
+          questionId: q.questionId,
+          answerText: surveyAnswers[q.questionId] || '',
+          selectedOptionId: null
+        };
+      } else {
+        return {
+          questionId: q.questionId,
+          answerText: null,
+          selectedOptionId: surveyAnswers[q.questionId] || null
+        };
+      }
+    });
+    try {
+      await api.post(`/CommunityProgram/${surveyProgramId}/submit-survey?userId=${userId}`, { answers });
+      alert('Gửi khảo sát thành công!');
+      setSurveyModalOpen(false);
+    } catch (err) {
+      alert('Gửi khảo sát thất bại!');
+    }
+  };
+
+  // Hàm kiểm tra trạng thái khảo sát cho từng campaign đã hoàn thành
+  const checkSurveyStatus = async (programId, userId) => {
+    try {
+      const res = await api.get(`/CommunityProgram/${programId}/survey/completion-status?userId=${userId}`);
+      setSurveyStatus(prev => ({ ...prev, [programId]: res.data.hasSubmitted }));
+    } catch {
+      setSurveyStatus(prev => ({ ...prev, [programId]: false }));
+    }
+  };
+
+  // Khi danh sách completedCampaigns thay đổi, kiểm tra trạng thái khảo sát
+  useEffect(() => {
+    const userInfo = localStorage.getItem('userInfo');
+    let userId = '';
+    if (userInfo) {
+      try {
+        userId = JSON.parse(userInfo).userId;
+      } catch {}
+    }
+    if (!userId) return;
+    completedCampaigns.forEach(campaign => {
+      if (campaign.programId && surveyStatus[campaign.programId] === undefined) {
+        checkSurveyStatus(campaign.programId, userId);
+      }
+    });
+    // eslint-disable-next-line
+  }, [completedCampaigns]);
+
   // Render chương trình đã hoàn thành
   const renderCompletedCampaign = (campaign) => (
     <div key={campaign.programId} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       <div className="relative">
-        {/* Hình ảnh chương trình */}
-        <div className="aspect-[16/9] bg-gray-200 w-full">
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-gray-400">Không có hình ảnh</span>
-          </div>
-        </div>
-        
         {/* Badge trạng thái */}
         <div className="absolute top-3 right-3">
           <StatusBadge status="Hoàn thành" />
@@ -137,29 +266,29 @@ const MyCampaign = () => {
       </div>
 
       <div className="p-5">
-        <h3 className="text-xl font-bold mb-2">{campaign.title}</h3>
-        <p className="text-gray-600 text-sm mb-4">{campaign.description}</p>
+        <h3 className="text-xl font-bold mb-2 max-w-[80%] whitespace-normal break-words">{campaign.title}</h3>
+        <p className="text-gray-600 text-md mb-4">{campaign.description}</p>
         
-        <div className="flex items-start mb-4 gap-2">
-          <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+        <div className="flex items-center mb-4 gap-2">
+          <CheckCircle className="h-5 w-5 text-green-500" />
           <div>
-            <p className="text-xs text-gray-500">Hoàn thành:</p>
-            <p className="text-sm">{formatDate(campaign.endDate)}</p>
+            <p className="text-sm text-gray-500">Hoàn thành:</p>
+            <p className="text-sm">{formatDate(campaign.endDate)} {formatTime(campaign.endDate)}</p>
           </div>
         </div>
 
-        <div className="flex items-start mb-4 gap-2">
-          <MapPin className="h-5 w-5 text-blue-500 mt-0.5" />
+        <div className="flex items-center mb-4 gap-2">
+          <MapPin className="h-5 w-5 text-blue-500" />
           <div>
-            <p className="text-xs text-gray-500">Địa điểm:</p>
+            <p className="text-sm text-gray-500">Địa điểm:</p>
             <p className="text-sm">{campaign.location}</p>
           </div>
         </div>
 
-        <div className="flex items-center mb-4">
-          <Users className="h-4 w-4 text-gray-400 mr-2" />
+        <div className="flex items-center mb-4 gap-2">
+          <Users className="h-5 w-5 text-gray-400" />
           <div>
-            <p className="text-xs text-gray-500">Tham gia:</p>
+            <p className="text-sm text-gray-500">Tham gia:</p>
             <p className="text-sm">{campaign.currentParticipantsCount} / {campaign.maxParticipants} người</p>
           </div>
         </div>
@@ -171,9 +300,21 @@ const MyCampaign = () => {
           >
             Xem chi tiết
           </Link>
-          <button className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 text-md font-medium flex items-center">
-            <Download className="w-4 h-4 mr-1" /> Tải xuống chứng chỉ
-          </button>
+          {surveyStatus[campaign.programId] ? (
+            <button
+              className="px-4 py-3 bg-gray-300 text-gray-500 rounded-md text-md font-medium flex items-center cursor-not-allowed"
+              disabled
+            >
+              <Lightbulb className="w-4 h-4 mr-1" /> Đã làm khảo sát
+            </button>
+          ) : (
+            <button
+              className="px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 text-md font-medium flex items-center"
+              onClick={() => handleOpenSurvey(campaign.programId)}
+            >
+              <Lightbulb className="w-4 h-4 mr-1" /> Làm khảo sát ý kiến
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -183,13 +324,6 @@ const MyCampaign = () => {
   const renderRegisteredCampaign = (campaign) => (
     <div key={campaign.programId} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       <div className="relative">
-        {/* Hình ảnh chương trình */}
-        <div className="aspect-[16/9] bg-gray-200 w-full">
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-gray-400">Không có hình ảnh</span>
-          </div>
-        </div>
-        
         {/* Badge trạng thái */}
         <div className="absolute top-3 right-3">
           <StatusBadge status="Đang tiến hành" />
@@ -198,34 +332,34 @@ const MyCampaign = () => {
 
       <div className="p-5">
         <h3 className="text-xl font-bold mb-2">{campaign.title}</h3>
-        <p className="text-gray-600 text-sm mb-4">{campaign.description}</p>
+        <p className="text-gray-600 text-md mb-4">{campaign.description}</p>
         
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex items-center">
-            <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Bắt đầu:</p>
+              <p className="text-sm text-gray-500">Bắt đầu:</p>
               <p className="text-sm">{formatDate(campaign.startDate)} {formatTime(campaign.startDate)}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Kết thúc:</p>
+              <p className="text-sm text-gray-500">Kết thúc:</p>
               <p className="text-sm">{formatDate(campaign.endDate)} {formatTime(campaign.endDate)}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+            <MapPin className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Địa điểm:</p>
+              <p className="text-sm text-gray-500">Địa điểm:</p>
               <p className="text-sm">{campaign.location}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <Users className="h-4 w-4 text-gray-400 mr-2" />
+            <Users className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Tham gia:</p>
+              <p className="text-sm text-gray-500">Tham gia:</p>
               <p className="text-sm">{campaign.currentParticipantsCount} / {campaign.maxParticipants} người</p>
             </div>
           </div>
@@ -238,8 +372,8 @@ const MyCampaign = () => {
           >
             Xem chi tiết
           </Link>
-          <button className="px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-md font-medium">
-            Tiếp tục chương trình
+          <button className="px-4 py-3 border border-gray-200 bg-yellow-200 text-yellow-800 rounded-md text-md font-medium">
+            Đang diễn ra
           </button>
         </div>
       </div>
@@ -250,13 +384,6 @@ const MyCampaign = () => {
   const renderUpcomingCampaign = (campaign) => (
     <div key={campaign.programId} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
       <div className="relative">
-        {/* Hình ảnh chương trình */}
-        <div className="aspect-[16/9] bg-gray-200 w-full">
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-gray-400">Không có hình ảnh</span>
-          </div>
-        </div>
-        
         {/* Badge trạng thái */}
         <div className="absolute top-3 right-3">
           <StatusBadge status="Sắp diễn ra" />
@@ -265,34 +392,34 @@ const MyCampaign = () => {
 
       <div className="p-5">
         <h3 className="text-xl font-bold mb-2">{campaign.title}</h3>
-        <p className="text-gray-600 text-sm mb-4">{campaign.description}</p>
+        <p className="text-gray-600 text-md mb-4">{campaign.description}</p>
         
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex items-center">
-            <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Bắt đầu:</p>
+              <p className="text-sm text-gray-500">Bắt đầu:</p>
               <p className="text-sm">{formatDate(campaign.startDate)} {formatTime(campaign.startDate)}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+            <Calendar className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Kết thúc:</p>
+              <p className="text-sm text-gray-500">Kết thúc:</p>
               <p className="text-sm">{formatDate(campaign.endDate)} {formatTime(campaign.endDate)}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <MapPin className="h-4 w-4 text-gray-400 mr-2" />
+            <MapPin className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Địa điểm:</p>
+              <p className="text-sm text-gray-500">Địa điểm:</p>
               <p className="text-sm">{campaign.location}</p>
             </div>
           </div>
           <div className="flex items-center">
-            <Users className="h-4 w-4 text-gray-400 mr-2" />
+            <Users className="h-5 w-5 text-gray-400 mr-2" />
             <div>
-              <p className="text-xs text-gray-500">Tham gia:</p>
+              <p className="text-sm text-gray-500">Tham gia:</p>
               <p className="text-sm">{campaign.currentParticipantsCount} / {campaign.maxParticipants} người</p>
             </div>
           </div>
@@ -389,8 +516,8 @@ const MyCampaign = () => {
           <div className="flex items-center justify-between">
             <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
               {[
-                { id: 'registered', label: 'Đã đăng ký', count: registeredCampaigns.length + upcomingCampaigns.length },
-                { id: 'completed', label: 'Hoàn thành', count: completedCampaigns.length },
+                { id: 'registered', label: 'Chưa hoàn thành', count: registeredCampaigns.length + upcomingCampaigns.length },
+                { id: 'completed', label: 'Đã hoàn thành', count: completedCampaigns.length },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -417,6 +544,15 @@ const MyCampaign = () => {
           {renderTabContent()}
         </div>
       </div>
+      {/* Modal khảo sát */}
+      <SurveyModal
+        open={surveyModalOpen}
+        onClose={() => setSurveyModalOpen(false)}
+        survey={surveyData}
+        answers={surveyAnswers}
+        setAnswers={setSurveyAnswers}
+        onSubmit={handleSubmitSurvey}
+      />
     </div>
   );
 };
