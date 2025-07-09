@@ -37,7 +37,7 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
     const adminItems = [
       { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
       { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
-      { id: 'surveymanagement', label: 'Quản lý khảo sát', icon: ClipboardPenLine },
+      { id: 'surveymanagement', label: 'Quản lý bài đánh giá', icon: ClipboardPenLine },
       { id: 'coursemanagement', label: 'Quản lý khóa học', icon: NotebookPen },
       { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
       { id: 'campaignmanagement', label: 'Quản lý chương trình', icon: AppWindow },

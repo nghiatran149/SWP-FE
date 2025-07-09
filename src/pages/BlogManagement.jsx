@@ -198,19 +198,19 @@ const BlogManagement = () => {
             <thead>
               <tr className="bg-gray-50">
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  NAME
+                  Tên bài viết
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  DESCRIPTION
+                  Mô tả
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  CREATED AT
+                  Ngày tạo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  UPDATED AT
+                  Cập nhật lần cuối
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  ACTIONS
+                  Hành động
                 </th>
               </tr>
             </thead>

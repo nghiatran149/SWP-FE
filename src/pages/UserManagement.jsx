@@ -352,11 +352,11 @@ const UserManagement = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Vai trò</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Active</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email Verified</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created At</th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Updated At</th>
+                  {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email Verified</th> */}
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ngày tạo</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Cập nhật lần cuối</th>
                   <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Hành động</th>
                 </tr>
               </thead>
@@ -367,7 +367,7 @@ const UserManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{ROLE_OPTIONS.find(r => r.value === user.roleId)?.label || user.roleName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.isActive ? '✔️' : '❌'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.emailVerified ? '✔️' : '❌'}</td>
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.emailVerified ? '✔️' : '❌'}</td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.createdAt ? new Date(user.createdAt).toLocaleString() : '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.updatedAt ? new Date(user.updatedAt).toLocaleString() : '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
