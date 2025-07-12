@@ -80,6 +80,20 @@ const CampaignManagement = () => {
   const [answerOptionsLoading, setAnswerOptionsLoading] = useState({}); // { [questionId]: boolean }
   const [answerOptionsError, setAnswerOptionsError] = useState({}); // { [questionId]: string }
 
+  // State cho modal thêm đáp án
+  const [showAddAnswerOptionModal, setShowAddAnswerOptionModal] = useState(false);
+  const [addAnswerOptionForm, setAddAnswerOptionForm] = useState({ questionId: '', optionText: '' });
+  const [addAnswerOptionLoading, setAddAnswerOptionLoading] = useState(false);
+  const [addAnswerOptionError, setAddAnswerOptionError] = useState('');
+  const [addAnswerOptionTargetQuestionId, setAddAnswerOptionTargetQuestionId] = useState(null);
+
+  // State cho modal cập nhật đáp án
+  const [showEditAnswerOptionModal, setShowEditAnswerOptionModal] = useState(false);
+  const [editAnswerOptionForm, setEditAnswerOptionForm] = useState({ optionId: '', questionId: '', optionText: '' });
+  const [editAnswerOptionLoading, setEditAnswerOptionLoading] = useState(false);
+  const [editAnswerOptionError, setEditAnswerOptionError] = useState('');
+  const [editAnswerOptionTargetQuestionId, setEditAnswerOptionTargetQuestionId] = useState(null);
+
   // Đặt ngoài useEffect, trong body của component
   const fetchCampaigns = async () => {
     try {
@@ -554,6 +568,83 @@ const CampaignManagement = () => {
       }
     } catch (err) {
       alert('Xóa câu hỏi thất bại!');
+    }
+  };
+
+  // Hàm mở modal thêm đáp án
+  const handleOpenAddAnswerOption = (questionId) => {
+    setAddAnswerOptionForm({ questionId, optionText: '' });
+    setAddAnswerOptionError('');
+    setAddAnswerOptionTargetQuestionId(questionId);
+    setShowAddAnswerOptionModal(true);
+  };
+
+  // Hàm submit thêm đáp án
+  const handleAddAnswerOption = async (e) => {
+    e.preventDefault();
+    setAddAnswerOptionLoading(true);
+    setAddAnswerOptionError('');
+    try {
+      await api.post('/ProgramSurveyAnswerOption', {
+        questionId: addAnswerOptionForm.questionId,
+        optionText: addAnswerOptionForm.optionText,
+      });
+      setShowAddAnswerOptionModal(false);
+      setAddAnswerOptionForm({ questionId: '', optionText: '' });
+      setAddAnswerOptionTargetQuestionId(null);
+      // Reload lại đáp án cho câu hỏi này
+      fetchAnswerOptions(addAnswerOptionForm.questionId);
+    } catch (err) {
+      setAddAnswerOptionError('Thêm đáp án thất bại!');
+    } finally {
+      setAddAnswerOptionLoading(false);
+    }
+  };
+
+  // Hàm mở modal sửa đáp án
+  const handleOpenEditAnswerOption = (opt) => {
+    setEditAnswerOptionForm({
+      optionId: opt.optionId,
+      questionId: opt.questionId,
+      optionText: opt.optionText,
+    });
+    setEditAnswerOptionError('');
+    setEditAnswerOptionTargetQuestionId(opt.questionId);
+    setShowEditAnswerOptionModal(true);
+  };
+
+  // Hàm submit cập nhật đáp án
+  const handleEditAnswerOption = async (e) => {
+    e.preventDefault();
+    setEditAnswerOptionLoading(true);
+    setEditAnswerOptionError('');
+    try {
+      await api.put(`/ProgramSurveyAnswerOption/${editAnswerOptionForm.optionId}`, {
+        questionId: editAnswerOptionForm.questionId,
+        optionText: editAnswerOptionForm.optionText,
+      });
+      setShowEditAnswerOptionModal(false);
+      setEditAnswerOptionForm({ optionId: '', questionId: '', optionText: '' });
+      setEditAnswerOptionTargetQuestionId(null);
+      // Reload lại đáp án cho câu hỏi này
+      fetchAnswerOptions(editAnswerOptionForm.questionId);
+    } catch (err) {
+      setEditAnswerOptionError('Cập nhật đáp án thất bại!');
+    } finally {
+      setEditAnswerOptionLoading(false);
+    }
+  };
+
+  // Hàm xóa đáp án
+  const handleDeleteAnswerOption = async (opt) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa đáp án này?')) return;
+    if (!opt.optionId || !opt.questionId) return;
+    try {
+      await api.delete(`/ProgramSurveyAnswerOption/${opt.optionId}`);
+      // Reload lại đáp án cho câu hỏi này
+      fetchAnswerOptions(opt.questionId);
+    } catch (err) {
+      alert('Xóa đáp án thất bại!');
     }
   };
 
@@ -1149,7 +1240,10 @@ const CampaignManagement = () => {
                               <div className="bg-white border-t border-gray-100 px-8 pb-4 pt-2">
                                 {/* Khung thêm đáp án */}
                                 <div className="my-2">
-                                  <button className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100">
+                                  <button
+                                    className="w-full flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100"
+                                    onClick={() => handleOpenAddAnswerOption(q.questionId)}
+                                  >
                                     <Plus className="w-5 h-5" />
                                     <span>Thêm đáp án</span>
                                   </button>
@@ -1165,10 +1259,10 @@ const CampaignManagement = () => {
                                       <div key={opt.optionId} className="flex items-center justify-between px-4 py-2 rounded border border-gray-300 bg-white">
                                         <span className="text-gray-800">{opt.optionText}</span>
                                         <div className="flex items-center gap-2 flex-shrink-0">
-                                          <button className="p-1 rounded hover:bg-amber-50 text-amber-500" title="Sửa đáp án">
+                                          <button className="p-1 rounded hover:bg-amber-50 text-amber-500" title="Sửa đáp án" onClick={() => handleOpenEditAnswerOption(opt)}>
                                             <PencilLine size={16} />
                                           </button>
-                                          <button className="p-1 rounded hover:bg-red-50 text-red-500" title="Xóa đáp án">
+                                          <button className="p-1 rounded hover:bg-red-50 text-red-500" title="Xóa đáp án" onClick={() => handleDeleteAnswerOption(opt)}>
                                             <Trash2 size={16} />
                                           </button>
                                         </div>
@@ -1372,6 +1466,68 @@ const CampaignManagement = () => {
                 <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => setShowEditSurveyQuestionModal(false)}>Hủy</button>
                 <button type="submit" className="px-4 py-2 rounded bg-amber-600 text-white hover:bg-amber-700" disabled={editSurveyQuestionLoading}>
                   {editSurveyQuestionLoading ? 'Đang cập nhật...' : 'Cập nhật câu hỏi'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal thêm đáp án */}
+      {showAddAnswerOptionModal && (
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Thêm đáp án</h3>
+              <button onClick={() => setShowAddAnswerOptionModal(false)} className="text-gray-500 hover:text-gray-700"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleAddAnswerOption}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Nội dung đáp án</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  value={addAnswerOptionForm.optionText}
+                  onChange={e => setAddAnswerOptionForm(f => ({ ...f, optionText: e.target.value }))}
+                  required
+                />
+              </div>
+              {addAnswerOptionError && <div className="text-red-500 mb-2">{addAnswerOptionError}</div>}
+              <div className="flex justify-end gap-2 mt-6">
+                <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => setShowAddAnswerOptionModal(false)}>Hủy</button>
+                <button type="submit" className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700" disabled={addAnswerOptionLoading}>
+                  {addAnswerOptionLoading ? 'Đang thêm...' : 'Thêm đáp án'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal cập nhật đáp án */}
+      {showEditAnswerOptionModal && (
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Cập nhật đáp án</h3>
+              <button onClick={() => setShowEditAnswerOptionModal(false)} className="text-gray-500 hover:text-gray-700"><X size={20} /></button>
+            </div>
+            <form onSubmit={handleEditAnswerOption}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Nội dung đáp án</label>
+                <input
+                  type="text"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  value={editAnswerOptionForm.optionText}
+                  onChange={e => setEditAnswerOptionForm(f => ({ ...f, optionText: e.target.value }))}
+                  required
+                />
+              </div>
+              {editAnswerOptionError && <div className="text-red-500 mb-2">{editAnswerOptionError}</div>}
+              <div className="flex justify-end gap-2 mt-6">
+                <button type="button" className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={() => setShowEditAnswerOptionModal(false)}>Hủy</button>
+                <button type="submit" className="px-4 py-2 rounded bg-amber-600 text-white hover:bg-amber-700" disabled={editAnswerOptionLoading}>
+                  {editAnswerOptionLoading ? 'Đang cập nhật...' : 'Cập nhật đáp án'}
                 </button>
               </div>
             </form>
