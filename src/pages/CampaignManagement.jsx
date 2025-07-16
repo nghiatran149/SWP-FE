@@ -94,6 +94,18 @@ const CampaignManagement = () => {
   const [editAnswerOptionError, setEditAnswerOptionError] = useState('');
   const [editAnswerOptionTargetQuestionId, setEditAnswerOptionTargetQuestionId] = useState(null);
 
+  // State cho modal xem chi tiết
+  const [campaignDetailLoading, setCampaignDetailLoading] = useState(false);
+  const [campaignDetailError, setCampaignDetailError] = useState('');
+  const [campaignParticipants, setCampaignParticipants] = useState([]);
+
+  // State cho modal xem kết quả khảo sát user
+  const [showUserSurveyModal, setShowUserSurveyModal] = useState(false);
+  const [userSurveyLoading, setUserSurveyLoading] = useState(false);
+  const [userSurveyError, setUserSurveyError] = useState('');
+  const [userSurveyAnswers, setUserSurveyAnswers] = useState([]);
+  const [userSurveyInfo, setUserSurveyInfo] = useState({ userName: '', submittedAt: '', programId: '' });
+
   // Đặt ngoài useEffect, trong body của component
   const fetchCampaigns = async () => {
     try {
@@ -152,11 +164,22 @@ const CampaignManagement = () => {
   };
   
   // Xử lý mở modal xem chi tiết
-  const handleViewCampaign = (campaign) => {
-    // Tìm object gốc theo id
-    const original = rawCampaigns.find(item => item.programId === campaign.id);
-    setSelectedCampaign(original || campaign);
+  const handleViewCampaign = async (campaign) => {
     setShowViewModal(true);
+    setCampaignDetailLoading(true);
+    setCampaignDetailError('');
+    setSelectedCampaign(null);
+    setCampaignParticipants([]);
+    try {
+      const id = campaign.id || campaign.programId;
+      const response = await api.get(`/CommunityProgram/${id}/details-with-participants`);
+      setSelectedCampaign(response.data);
+      setCampaignParticipants(response.data.participants || []);
+    } catch (err) {
+      setCampaignDetailError('Không thể tải chi tiết chương trình.');
+    } finally {
+      setCampaignDetailLoading(false);
+    }
   };
   
   // Xử lý mở modal chỉnh sửa
@@ -648,6 +671,24 @@ const CampaignManagement = () => {
     }
   };
 
+  // Hàm mở modal xem kết quả khảo sát user
+  const handleViewUserSurvey = async (programId, userId, userName) => {
+    setShowUserSurveyModal(true);
+    setUserSurveyLoading(true);
+    setUserSurveyError('');
+    setUserSurveyAnswers([]);
+    setUserSurveyInfo({ userName, submittedAt: '', programId });
+    try {
+      const res = await api.get(`/CommunityProgram/${programId}/User-survey-response?userId=${userId}`);
+      setUserSurveyAnswers(res.data.answers || []);
+      setUserSurveyInfo({ userName, submittedAt: res.data.submittedAt, programId });
+    } catch (err) {
+      setUserSurveyError('Không thể tải kết quả khảo sát.');
+    } finally {
+      setUserSurveyLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -696,18 +737,18 @@ const CampaignManagement = () => {
                   SL tối đa
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  SL đã đăng ký
+                  SL đăng ký
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Khảo sát
+                  Có khảo sát?
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   QL Khảo sát
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Ngày tạo
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Cập nhật lúc
                 </th>
                 <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -947,9 +988,12 @@ const CampaignManagement = () => {
       )}
 
       {/* Modal xem chi tiết */}
-      {showViewModal && selectedCampaign && (
+      {showViewModal && (
         <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] p-6 overflow-y-auto hide-scrollbar">
+            <style>{`
+              .hide-scrollbar::-webkit-scrollbar { display: none; }
+            `}</style>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold">Chi tiết chương trình</h3>
               <button
@@ -959,60 +1003,102 @@ const CampaignManagement = () => {
                 <X size={20} />
               </button>
             </div>
-
-            <div className="space-y-4">
-              {/* <div>
-                <h4 className="text-sm font-medium text-gray-500">ID chương trình</h4>
-                <p className="mt-1 text-base break-all">{selectedCampaign.id || selectedCampaign.programId}</p>
-              </div> */}
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Tên chương trình</h4>
-                <p className="mt-1 text-base">{selectedCampaign.name || selectedCampaign.title}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Mô tả</h4>
-                <p className="mt-1 text-base">{selectedCampaign.description}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Đối tượng</h4>
-                <p className="mt-1 text-base">{selectedCampaign.targetAudience || '-'}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            {campaignDetailLoading ? (
+              <div className="text-center py-8 text-gray-500">Đang tải chi tiết...</div>
+            ) : campaignDetailError ? (
+              <div className="text-center text-red-500 py-8">{campaignDetailError}</div>
+            ) : selectedCampaign ? (
+              <div className="space-y-4">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Ngày bắt đầu</h4>
-                  <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.startDate)}</p>
+                  <h4 className="text-sm font-medium text-gray-500">Tên chương trình</h4>
+                  <p className="mt-1 text-base">{selectedCampaign.name || selectedCampaign.title}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Ngày kết thúc</h4>
-                  <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.endDate)}</p>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-500">Địa điểm</h4>
-                <p className="mt-1 text-base">{selectedCampaign.location || '-'}</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500">Ngày tạo</h4>
-                  <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.createdAt)}</p>
+                  <h4 className="text-sm font-medium text-gray-500">Mô tả</h4>
+                  <p className="mt-1 text-base">{selectedCampaign.description}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500">Cập nhật lần cuối</h4>
-                  <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.updatedAt)}</p>
+                  <h4 className="text-sm font-medium text-gray-500">Đối tượng</h4>
+                  <p className="mt-1 text-base">{selectedCampaign.targetAudience || '-'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Ngày bắt đầu</h4>
+                    <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.startDate)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Ngày kết thúc</h4>
+                    <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.endDate)}</p>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500">Địa điểm</h4>
+                  <p className="mt-1 text-base">{selectedCampaign.location || '-'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Ngày tạo</h4>
+                    <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.createdAt)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Cập nhật lần cuối</h4>
+                    <p className="mt-1 text-sm text-gray-500">{formatDateTime24h(selectedCampaign.updatedAt)}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Số lượng tối đa</h4>
+                    <p className="mt-1 text-base">{selectedCampaign.maxParticipants !== undefined ? selectedCampaign.maxParticipants : '-'}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-500">Số lượng đã đăng ký</h4>
+                    <p className="mt-1 text-base">{selectedCampaign.currentParticipantsCount !== undefined ? selectedCampaign.currentParticipantsCount : '-'}</p>
+                  </div>
+                </div>
+                {/* Bảng danh sách user tham gia */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Danh sách người tham gia</h4>
+                  {campaignParticipants.length === 0 ? (
+                    <div className="text-gray-500">Chưa có người tham gia.</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200 border">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
+                            <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ngày đăng ký</th>
+                            <th className="px-4 py-2 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Đã làm khảo sát?</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {campaignParticipants.map((p) => (
+                            <tr key={p.userId}>
+                              <td className="px-4 py-2 whitespace-nowrap">{p.userName}</td>
+                              <td className="px-4 py-2 whitespace-nowrap">{formatDateTime24h(p.enrollmentDate)}</td>
+                              <td className="px-4 py-2 whitespace-nowrap text-center">
+                                {p.hasSubmittedSurvey ? (
+                                  <span className="inline-flex items-center gap-1 text-green-600 align-middle">
+                                    <span className="flex items-center">✔️</span>
+                                    <button
+                                      type="button"
+                                      className="flex items-center p-1 rounded hover:bg-blue-50 text-blue-600"
+                                      title="Xem bài nộp khảo sát"
+                                      onClick={() => handleViewUserSurvey(selectedCampaign.programId || selectedCampaign.id, p.userId, p.userName)}
+                                    >
+                                      <Eye size={16} />
+                                    </button>
+                                  </span>
+                                ) : '❌'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500">Số lượng tối đa</h4>
-                  <p className="mt-1 text-base">{selectedCampaign.maxParticipants !== undefined ? selectedCampaign.maxParticipants : '-'}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-500">Số lượng đã đăng ký</h4>
-                  <p className="mt-1 text-base">{selectedCampaign.currentParticipantsCount !== undefined ? selectedCampaign.currentParticipantsCount : '-'}</p>
-                </div>
-              </div>
-            </div>
-
+            ) : null}
             <div className="flex justify-end mt-6">
               <button
                 onClick={() => setShowViewModal(false)}
@@ -1531,6 +1617,43 @@ const CampaignManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal xem kết quả khảo sát user */}
+      {showUserSurveyModal && (
+        <div className="fixed inset-0 bg-gradient-to-br from-black/60 to-gray-900/60 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-xl max-h-[90vh] p-6 overflow-y-auto hide-scrollbar">
+            <style>{`.hide-scrollbar::-webkit-scrollbar { display: none; }`}</style>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold">Kết quả khảo sát của {userSurveyInfo.userName}</h3>
+              <button onClick={() => setShowUserSurveyModal(false)} className="text-gray-500 hover:text-gray-700"><X size={20} /></button>
+            </div>
+            {userSurveyLoading ? (
+              <div className="text-center py-8 text-gray-500">Đang tải kết quả...</div>
+            ) : userSurveyError ? (
+              <div className="text-center text-red-500 py-8">{userSurveyError}</div>
+            ) : (
+              <>
+                <div className="mb-4 text-sm text-gray-500">Nộp lúc: {userSurveyInfo.submittedAt ? formatDateTime24h(userSurveyInfo.submittedAt) : '-'}</div>
+                <div className="space-y-4">
+                  {userSurveyAnswers.length === 0 ? (
+                    <div className="text-gray-500">Không có dữ liệu câu trả lời.</div>
+                  ) : userSurveyAnswers.map((ans, idx) => (
+                    <div key={ans.questionId} className="border rounded-lg p-4 bg-gray-50">
+                      <div className="font-medium text-gray-900 mb-1">Câu {idx + 1}: {ans.questionText}</div>
+                      <div className="text-sm text-gray-500 mb-1">Loại: {ans.questionType === 'single choice' ? 'Chọn một đáp án' : ans.questionType === 'text' ? 'Tự luận' : ans.questionType}</div>
+                      {ans.questionType === 'single choice' ? (
+                        <div className="text-base text-blue-600 font-semibold">Đáp án: {ans.selectedOptionText || '-'}</div>
+                      ) : ans.questionType === 'text' ? (
+                        <div className="text-base text-green-600  font-semibold">Trả lời: {ans.answerText || '-'}</div>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -39,8 +39,8 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
       { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
       { id: 'surveymanagement', label: 'Quản lý bài đánh giá', icon: ClipboardPenLine },
       { id: 'coursemanagement', label: 'Quản lý khóa học', icon: NotebookPen },
-      { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
       { id: 'campaignmanagement', label: 'Quản lý chương trình', icon: AppWindow },
+      { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
     ];
 
     // Return menu items based on user role
@@ -87,8 +87,8 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
               case 'consultantmanagement': to = '/consultantmanagement'; break;
               case 'surveymanagement': to = '/surveymanagement'; break;
               case 'coursemanagement': to = '/coursemanagement'; break;
-              case 'blogmanagement': to = '/blogmanagement'; break;
               case 'campaignmanagement': to = '/campaignmanagement'; break;
+              case 'blogmanagement': to = '/blogmanagement'; break;
               
               default: to = '#';
             }
