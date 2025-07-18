@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, ChevronDown, LayoutDashboard, LogOut, Menu, X } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Logo from '../assets/Logo.jpg';
 
 const Header = () => {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -44,11 +45,12 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand Name */}
-          <div className="flex-shrink-0">
+          <Link to="/home" className="flex-shrink-0 flex items-center space-x-2">
+            <img src={Logo} alt="Logo" className="h-8 w-8 rounded-full object-cover" />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
               Drug Prevention
             </h1>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
