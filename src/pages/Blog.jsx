@@ -1,91 +1,93 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Calendar, User, ArrowRight, Image } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../api/api';
 
 const Blog = () => {
   const [activeCategory, setActiveCategory] = useState('Tất cả');
   const [searchTerm, setSearchTerm] = useState('');
+  const [blogPosts, setBlogPosts] = useState([]);
+  const [categories, setCategories] = useState(['Tất cả']);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [allCategories, setAllCategories] = useState([]);
+  const [categoryMap, setCategoryMap] = useState({});
 
-  const categories = [
-    'Tất cả',
-    'Thanh thiếu niên',
-    'Gia đình',
-    'Giáo dục',
-    'Sức khỏe',
-    'Kỹ năng sống'
-  ];
-// mock dữ liệu
-  const blogPosts = [
-    {
-      id: 1,
-      title: '5 Dấu hiệu nhận biết sự dụng ma túy ở thanh thiếu niên',
-      excerpt: 'Làm thế nào để nhận biết sớm các dấu hiệu sử dụng ma túy ở con em mình? Bài viết này sẽ giúp phụ huynh và giáo viên nhận biết các dấu hiệu cảnh báo sớm.',
-      date: '10/5/2023',
-      author: 'TS. Nguyễn Văn A',
-      category: 'Thanh thiếu niên',
-      featured: true,
-      image: true
-    },
-    {
-      id: 2,
-      title: 'Kỹ năng từ chối hiệu quả trong môi trường học đường',
-      excerpt: 'Các kỹ năng giúp học sinh tự tin từ chối khi bị mời sử dụng chất cấm...',
-      date: '22/04/2023',
-      author: 'ThS. Trần Thị B',
-      category: 'Kỹ năng sống',
-      image: true
-    },
-    {
-      id: 3,
-      title: 'Vai trò của gia đình trong phòng chống ma túy',
-      excerpt: 'Gia đình là yếu tố quan trọng nhất trong việc phòng ngừa sử dụng ma túy...',
-      date: '15/04/2023',
-      author: 'PGS.TS. Lê Văn C',
-      category: 'Gia đình',
-      image: true
-    },
-    {
-      id: 4,
-      title: 'Làm thế nào để trò chuyện với con về ma túy',
-      excerpt: 'Hướng dẫn cho phụ huynh cách bắt đầu cuộc trò chuyện khó khăn này...',
-      date: '30/03/2023',
-      author: 'ThS. Phạm Thị D',
-      category: 'Gia đình',
-      image: true
-    },
-    {
-      id: 5,
-      title: 'Tác động của ma túy đối với não bộ đang phát triển',
-      excerpt: 'Nghiên cứu mới về tác động của ma túy đối với não bộ đang phát triển ở thanh thiếu niên...',
-      date: '15/03/2023',
-      author: 'PGS.TS. Hoàng Văn E',
-      category: 'Sức khỏe',
-      image: true
-    },
-    {
-      id: 6,
-      title: 'Các loại ma túy phổ biến và tác hại của chúng',
-      excerpt: 'Tổng quan về các loại ma túy phổ biến hiện nay và tác hại của chúng đối với sức khỏe...',
-      date: '28/02/2023',
-      author: 'TS. Lê Thị F',
-      category: 'Sức khỏe',
-      image: false
-    }
-  ];
-  //Lọc bài viết
+  // Fetch categories first, then blogs
+  useEffect(() => {
+    const fetchCategoriesAndBlogs = async () => {
+      setLoading(true);
+      try {
+        // Fetch categories
+        const catRes = await api.get('/BlogCategory');
+        let categoryData = [];
+        if (catRes.data && Array.isArray(catRes.data)) {
+          categoryData = catRes.data;
+        } else if (catRes.data && Array.isArray(catRes.data.data)) {
+          categoryData = catRes.data.data;
+        }
+        setAllCategories(categoryData);
+        setCategories(['Tất cả', ...categoryData.map(cat => cat.name)]);
+        // Build map id -> name
+        const catMap = {};
+        categoryData.forEach(cat => { catMap[cat.id] = cat.name; });
+        setCategoryMap(catMap);
 
+        // Fetch blogs after categories
+        const blogRes = await api.get('/Blog');
+        const blogs = Array.isArray(blogRes.data) ? blogRes.data : blogRes.data.data || [];
+        // Map categoryId to category name and set date as createdAt
+        const formattedBlogs = blogs.map(blog => ({
+          ...blog,
+          category: catMap[blog.categoryId] || 'Không có danh mục',
+          date: blog.createdAt ? formatDate(blog.createdAt) : (blog.publishedAt ? formatDate(blog.publishedAt) : ''),
+        }));
+        // Only show published blogs
+        setBlogPosts(formattedBlogs.filter(blog => blog.status === 'published'));
+      } catch (err) {
+        setError('Không thể tải dữ liệu');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategoriesAndBlogs();
+  }, []);
+
+  // Helper function to format dates
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('vi-VN');
+  };
+
+  // Filter posts based on category and search term
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = activeCategory === 'Tất cả' || post.category === activeCategory;
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+  
+  // Log filter status for debugging
+  console.log(`Filtering: ${blogPosts.length} posts → ${filteredPosts.length} filtered posts. Active category: "${activeCategory}"`);
+  
 
-  // Phân loại bài viết
+  // Get featured post and regular posts
   const featuredPost = blogPosts.find(post => post.featured);
   const regularPosts = filteredPosts.filter(post => !post.featured);
 
-  // Phần giao diện
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải bài viết...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
@@ -114,22 +116,42 @@ const Blog = () => {
           </div>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
-                  activeCategory === category
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          <div>
+            <div className="mb-3">
+              <h3 className="text-gray-600 text-sm mb-2">Lọc theo danh mục:</h3>
+              <div className="text-lg font-medium text-emerald-700">{activeCategory}</div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {categories.map((cate) => {
+                // Tính số lượng bài viết trong mỗi danh mục
+                const postCount = cate === 'Tất cả' 
+                  ? blogPosts.length 
+                  : blogPosts.filter(post => post.category === cate).length;
+                  
+                return (
+                  <button
+                    key={cate}
+                    onClick={() => setActiveCategory(cate)}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                      activeCategory === cate
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                    }`}
+                  >
+                    {cate} <span className="text-sm opacity-80">({postCount})</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {/* Error message if any */}
+        {error && (
+          <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-8">
+            {error}
+          </div>
+        )}
 
         {/* Featured Article */}
         {featuredPost && (
@@ -138,7 +160,7 @@ const Blog = () => {
               <div className="p-8">
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                  <span>Thanh thiếu niên</span>
+                  <span>{featuredPost.category}</span>
                   <span>•</span>
                   <span>Phòng chống ma túy</span>
                 </div>
@@ -158,10 +180,10 @@ const Blog = () => {
                     <span>{featuredPost.author}</span>
                   </div>
                   <Link
-                  to={`/blog/${featuredPost.id}`}
-                  className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 inline-block"
-                    >
-                      Đọc thêm
+                    to={`/blog/${featuredPost.id}`}
+                    className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 inline-block"
+                  >
+                    Đọc thêm
                   </Link>
                 </div>
               </div>
@@ -173,12 +195,18 @@ const Blog = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {regularPosts.map((post) => (
             <article key={post.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow duration-200">
-              {/* Image Placeholder */}
+              {/* Image */}
               <div className="aspect-video bg-gray-100 flex items-center justify-center">
                 {post.image ? (
-                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <Image className="h-12 w-12 text-gray-400" />
-                  </div>
+                  <img 
+                    src={post.image}
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/300x200?text=Blog+Image";
+                    }}
+                  />
                 ) : (
                   <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                     <div className="text-center">
@@ -197,10 +225,7 @@ const Blog = () => {
                     <Calendar className="h-4 w-4" />
                     <span>{post.date}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <User className="h-4 w-4" />
-                    <span>{post.author}</span>
-                  </div>
+                  {/* Bỏ phần user */}
                 </div>
 
                 {/* Title */}
@@ -228,17 +253,8 @@ const Blog = () => {
           ))}
         </div>
 
-        {/* Load More Button */}
-        {filteredPosts.length > 6 && (
-          <div className="text-center mt-12">
-            <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-200">
-              Xem thêm bài viết
-            </button>
-          </div>
-        )}
-
         {/* No Results */}
-        {filteredPosts.length === 0 && (
+        {filteredPosts.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
               <Search className="h-16 w-16 mx-auto" />
