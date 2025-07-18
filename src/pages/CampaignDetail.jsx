@@ -68,6 +68,7 @@ const CampaignDetail = () => {
     };
 
     // Helper: status
+    const isEnded = campaign && campaign.endDate && new Date() > new Date(campaign.endDate);
     const getStatusBadge = () => {
         if (!campaign?.startDate || !campaign?.endDate) return null;
         const now = new Date();
@@ -84,6 +85,10 @@ const CampaignDetail = () => {
 
     // Đăng ký tham gia
     const handleRegister = async () => {
+        if (isEnded) {
+            alert('Chương trình đã kết thúc, không thể đăng ký.');
+            return;
+        }
         if (!user) {
             alert('Bạn cần đăng nhập để đăng ký chương trình.');
             navigate('/login');
@@ -203,11 +208,11 @@ const CampaignDetail = () => {
                                 </div>
                                 <hr className="my-4" />
                                 <button
-                                    className={`w-full py-3 rounded-lg font-medium transition-colors ${isRegistered ? 'bg-green-800 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                                    className={`w-full py-3 rounded-lg font-medium transition-colors ${isRegistered || isEnded ? 'bg-green-800 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
                                     onClick={handleRegister}
-                                    disabled={isRegistered || isRegistering}
+                                    disabled={isRegistered || isRegistering || isEnded}
                                 >
-                                    {isRegistered ? 'Đã đăng ký' : isRegistering ? 'Đang xử lý...' : 'Đăng ký tham gia'}
+                                    {isEnded ? 'Đã kết thúc' : isRegistered ? 'Đã đăng ký' : isRegistering ? 'Đang xử lý...' : 'Đăng ký tham gia'}
                                 </button>
                             </>
                         ) : null}

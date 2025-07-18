@@ -11,37 +11,41 @@ const SurveyModal = ({ open, onClose, survey, answers, setAnswers, onSubmit }) =
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-1"><X className="w-6 h-6" /></button>
         <h2 className="text-xl font-bold mb-2">{survey.title}</h2>
         <p className="mb-4 text-gray-600">{survey.description}</p>
-        <form onSubmit={onSubmit} className="space-y-4">
-          {survey.questions.map((q) => (
-            <div key={q.questionId}>
-              <label className="font-medium block mb-1">{q.questionText}</label>
-              {q.questionType === 'text' ? (
-                <input
-                  type="text"
-                  className="w-full border rounded px-3 py-2"
-                  value={answers[q.questionId] || ''}
-                  onChange={e => setAnswers(a => ({ ...a, [q.questionId]: e.target.value }))}
-                />
-              ) : (
-                <div className="space-y-1">
-                  {q.answerOptions.map(opt => (
-                    <label key={opt.optionId} className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name={q.questionId}
-                        value={opt.optionId}
-                        checked={answers[q.questionId] === opt.optionId}
-                        onChange={e => setAnswers(a => ({ ...a, [q.questionId]: opt.optionId }))}
-                      />
-                      <span>{opt.optionText}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          <button type="submit" className="mt-4 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Gửi khảo sát</button>
-        </form>
+        {survey.noSurvey ? (
+          <div className="text-center text-gray-500 py-8">Chương trình này chưa có khảo sát.</div>
+        ) : (
+          <form onSubmit={onSubmit} className="space-y-4">
+            {survey.questions.map((q) => (
+              <div key={q.questionId}>
+                <label className="font-medium block mb-1">{q.questionText}</label>
+                {q.questionType === 'text' ? (
+                  <input
+                    type="text"
+                    className="w-full border rounded px-3 py-2"
+                    value={answers[q.questionId] || ''}
+                    onChange={e => setAnswers(a => ({ ...a, [q.questionId]: e.target.value }))}
+                  />
+                ) : (
+                  <div className="space-y-1">
+                    {q.answerOptions.map(opt => (
+                      <label key={opt.optionId} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name={q.questionId}
+                          value={opt.optionId}
+                          checked={answers[q.questionId] === opt.optionId}
+                          onChange={e => setAnswers(a => ({ ...a, [q.questionId]: opt.optionId }))}
+                        />
+                        <span>{opt.optionText}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <button type="submit" className="mt-4 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Gửi khảo sát</button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -180,7 +184,12 @@ const MyCampaign = () => {
       const res = await api.get(`/CommunityProgram/${programId}/survey`);
       setSurveyData(res.data);
     } catch (e) {
-      setSurveyData({ title: 'Lỗi', description: 'Không lấy được khảo sát', questions: [] });
+      setSurveyData({
+        noSurvey: true,
+        title: 'Chương trình này chưa có khảo sát',
+        description: 'Hiện tại chương trình này chưa có khảo sát nào để thực hiện.',
+        questions: []
+      });
     } finally {
       setSurveyLoading(false);
     }
@@ -222,6 +231,7 @@ const MyCampaign = () => {
       await api.post(`/CommunityProgram/${surveyProgramId}/submit-survey?userId=${userId}`, { answers });
       alert('Gửi khảo sát thành công!');
       setSurveyModalOpen(false);
+      setSurveyStatus(prev => ({ ...prev, [surveyProgramId]: true }));
     } catch (err) {
       alert('Gửi khảo sát thất bại!');
     }
@@ -295,7 +305,7 @@ const MyCampaign = () => {
 
         <div className="flex justify-between mt-5">
           <Link 
-            to={`/campaigns/${campaign.programId}`} 
+            to={`/campaigndetail/${campaign.programId}`} 
             className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium"
           >
             Xem chi tiết
@@ -367,7 +377,7 @@ const MyCampaign = () => {
 
         <div className="flex justify-between mt-5">
           <Link 
-            to={`/campaigns/${campaign.programId}`} 
+            to={`/campaigndetail/${campaign.programId}`} 
             className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium"
           >
             Xem chi tiết
@@ -427,7 +437,7 @@ const MyCampaign = () => {
 
         <div className="flex justify-between mt-5">
           <Link 
-            to={`/campaigns/${campaign.programId}`} 
+            to={`/campaigndetail/${campaign.programId}`} 
             className="px-4 py-3 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 text-md font-medium"
           >
             Xem chi tiết

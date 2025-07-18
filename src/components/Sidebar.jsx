@@ -23,18 +23,19 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
   // Define menu items for each role
   const getMenuItemsByRole = () => {
     const commonItems = [
-      { id: 'overview', label: 'Tổng quan', icon: Home },
+      // { id: 'overview', label: 'Tổng quan', icon: Home },
     ];
 
     const memberItems = [
       { id: 'myassessment', label: 'Đánh giá của tôi', icon: FileText },
       { id: 'mycourse', label: 'Khóa học của tôi', icon: BookOpen },
-      { id: 'myappointment', label: 'Lịch hẹn của tôi', icon: Calendar },
+      // { id: 'myappointment', label: 'Lịch hẹn của tôi', icon: Calendar },
       { id: 'mycampaign', label: 'Chương trình của tôi', icon: AppWindow },
     ];
 
     // Admin specific items
     const adminItems = [
+      { id: 'overview', label: 'Tổng quan', icon: Home },
       { id: 'usermanagement', label: 'Quản lý người dùng', icon: Users },
       { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
       { id: 'surveymanagement', label: 'Quản lý bài đánh giá', icon: ClipboardPenLine },
@@ -43,9 +44,28 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
       { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
     ];
 
+    // Manager specific items
+    const managerItems = [
+      { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
+      { id: 'surveymanagement', label: 'Quản lý bài đánh giá', icon: ClipboardPenLine },
+      { id: 'coursemanagement', label: 'Quản lý khóa học', icon: NotebookPen },
+      { id: 'campaignmanagement', label: 'Quản lý chương trình', icon: AppWindow },
+    ];
+
+    // Consultant specific items
+    const consultantItems = [
+      { id: 'blogmanagement', label: 'Quản lý blog', icon: Newspaper },
+    ];
+
     // Return menu items based on user role
     if (user?.roleName === 'Admin') {
       return [...commonItems, ...adminItems];
+    }
+    if (user?.roleName === 'Manager') {
+      return [...commonItems, ...managerItems];
+    }
+    if (user?.roleName === 'Consultant') {
+      return [...commonItems, ...consultantItems];
     }
     if (user?.roleName === 'Member') {
       return [...commonItems, ...memberItems];
@@ -57,7 +77,8 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
   const menuItems = getMenuItemsByRole();
 
   const bottomItems = [
-    { id: 'profile', label: 'Hồ sơ', icon: User },
+    // Chỉ hiển thị 'Hồ sơ' nếu không phải Admin
+    ...(user?.roleName !== 'Admin' ? [{ id: 'profile', label: 'Hồ sơ', icon: User }] : []),
     // { id: 'settings', label: 'Cài đặt', icon: Settings },
     // { id: 'logout', label: 'Đăng xuất', icon: LogOut }
   ];
@@ -80,7 +101,7 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
 
               case 'myassessment': to = '/myassessment'; break;
               case 'mycourse': to = '/mycourse'; break;
-              case 'myappointment': to = '/myappointment'; break;
+              // case 'myappointment': to = '/myappointment'; break;
               case 'mycampaign': to = '/mycampaign'; break;
               
               case 'usermanagement': to = '/usermanagement'; break;

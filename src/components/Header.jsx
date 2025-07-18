@@ -15,7 +15,7 @@ const Header = () => {
     { name: 'Khóa học', href: '/courses' },
     { name: 'Đánh giá', href: '/assessments' },
     { name: 'Chương trình', href: '/campaigns' },
-    { name: 'Đặt lịch', href: '/booking' },
+    // { name: 'Đặt lịch', href: '/booking' },
     { name: 'Blog', href: '/blog' },
   ];
 
@@ -25,8 +25,17 @@ const Header = () => {
     navigate('/home');
   };
 
+  // Xác định dashboard link theo role
+  const getDashboardLink = () => {
+    if (user?.roleName === 'Admin') return '/dashboard';
+    if (user?.roleName === 'Manager') return '/consultantmanagement';
+    if (user?.roleName === 'Consultant') return '/blogmanagement';
+    if (user?.roleName === 'Member') return '/myassessment';
+    return '/dashboard';
+  };
+
   const userMenuItems = [
-    { name: 'Dashboard', icon: User, href: '/dashboard' },
+    { name: 'Dashboard', icon: User, href: getDashboardLink() },
     { name: 'Đăng xuất', icon: LogOut, href: '#', onClick: handleLogout, divider: true },
   ];
 

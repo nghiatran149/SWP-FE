@@ -75,6 +75,14 @@ function App() {
             }
           />
           <Route
+            path="/"
+            element={
+              <Layout>
+                <Homepage />
+              </Layout>
+            }
+          />
+          <Route
             path="/home"
             element={
               <Layout>
@@ -179,7 +187,7 @@ function App() {
             }
           />
           <Route
-            path="/my-campaigns/:id"
+            path="/mycampaigndetail/:id"
             element={
               <LayoutDashboard activeMenuItem="mycampaign">
                 <MyCampaignDetail />

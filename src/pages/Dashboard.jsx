@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { 
@@ -10,6 +10,8 @@ import {
   Clock
 } from 'lucide-react';
 
+import api from '../api/api';
+
 
 const StatsCard = ({ title, value, subtitle, icon: Icon, color = 'blue' }) => {
   const colorClasses = {
@@ -20,16 +22,14 @@ const StatsCard = ({ title, value, subtitle, icon: Icon, color = 'blue' }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
-          <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
-        </div>
-        <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
-          <Icon className="h-6 w-6" />
-        </div>
+    <div className="bg-white rounded-2xl border border-gray-200 p-10 min-h-[220px] flex items-center justify-between shadow-md">
+      <div>
+        <p className="text-lg font-semibold text-gray-600 mb-2">{title}</p>
+        <p className="text-5xl font-extrabold text-gray-900 mb-2">{value}</p>
+        <p className="text-base text-gray-500">{subtitle}</p>
+      </div>
+      <div className={`p-5 rounded-xl ${colorClasses[color]}`}>
+        <Icon className="h-10 w-10" />
       </div>
     </div>
   );
@@ -138,6 +138,30 @@ const AppointmentList = () => {
 
 
 const Dashboard = () => {
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await api.get('/AdminAnalytics/summary');
+        if (res.data && res.data.data) {
+          setSummary(res.data.data);
+        } else {
+          setError('Không lấy được dữ liệu tổng quan.');
+        }
+      } catch (err) {
+        setError('Lỗi khi tải dữ liệu tổng quan.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSummary();
+  }, []);
+
   return (
     <>
         <div className="bg-white border-b border-gray-200 px-8 py-6">
@@ -154,48 +178,42 @@ const Dashboard = () => {
 
         {/* Main Content */}
         <div className="p-8">
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatsCard
-              title="Khóa học đang học"
-              value="2"
-              subtitle="Tiến độ trung bình: 58%"
-              icon={BookOpen}
-              color="blue"
-            />
-            <StatsCard
-              title="Lịch hẹn sắp tới"
-              value="1"
-              subtitle="Lịch hẹn tiếp theo: 2023-05-20"
-              icon={Calendar}
-              color="green"
-            />
-            <StatsCard
-              title="Bài đánh giá đã làm"
-              value="2"
-              subtitle="Đánh giá gần nhất: ASSIST - Nguy cơ thấp"
-              icon={FileText}
-              color="purple"
-            />
-            <StatsCard
-              title="Chương trình đã tham gia"
-              value="3"
-              subtitle="Chương trình gần nhất: Ngày hội phòng chống ma túy"
-              icon={TrendingUp}
-              color="orange"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-            <CourseProgress
-              title="Khóa học của tôi"
-              subtitle="Tiến độ học tập và bài học tiếp theo"
-              buttonText="Tiếp tục học"
-            />
-
-            <AppointmentList />
-          </div>
+          {loading ? (
+            <div className="text-center text-gray-500">Đang tải dữ liệu...</div>
+          ) : error ? (
+            <div className="text-center text-red-500">{error}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8 max-w-4xl mx-auto">
+              <StatsCard
+                title="Tổng số người dùng"
+                value={summary?.totalUsers ?? '-'}
+                subtitle="Tổng số tài khoản đã đăng ký"
+                icon={BookOpen}
+                color="blue"
+              />
+              <StatsCard
+                title="Tổng lượt ghi danh khóa học"
+                value={summary?.totalCourseEnrollments ?? '-'}
+                subtitle="Tổng số lượt đăng ký học"
+                icon={Calendar}
+                color="green"
+              />
+              <StatsCard
+                title="Bài khảo sát đã hoàn thành"
+                value={summary?.totalCompletedSurveys ?? '-'}
+                subtitle="Tổng số bài khảo sát đã làm"
+                icon={FileText}
+                color="purple"
+              />
+              <StatsCard
+                title="Lượt tham gia chương trình"
+                value={summary?.totalProgramParticipations ?? '-'}
+                subtitle="Tổng số lượt tham gia chương trình"
+                icon={TrendingUp}
+                color="orange"
+              />
+            </div>
+          )}
         </div>
     </>
   );

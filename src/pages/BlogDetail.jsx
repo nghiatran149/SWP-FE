@@ -77,12 +77,11 @@ const BlogDetail = () => {
             excerpt: blogData.excerpt || blogData.description || 'Không có mô tả',
             content: blogData.content || '<p>Không có nội dung</p>',
             date: formatDate(blogData.publishedAt || blogData.createdAt),
-            author: blogData.authorName || 'Admin',
+            author: blogData.username || 'Ẩn danh', // Sửa lấy đúng trường tác giả
             categoryId: blogData.categoryId,
             category: categoryName,
             image: blogData.thumbnailUrl,
             tags: blogData.tags ? blogData.tags.split(',').map(tag => tag.trim()) : [],
-            status: blogData.status,
             readTime: calculateReadTime(blogData.content)
           };
           setBlog(formattedBlog);

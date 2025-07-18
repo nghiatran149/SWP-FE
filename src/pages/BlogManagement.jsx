@@ -17,6 +17,12 @@ const extractBlogData = (response) => {
   return null;
 };
 
+// Helper để lấy userId từ localStorage
+const getUserIdFromLocalStorage = () => {
+  const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+  return userInfo.userId || '';
+};
+
 const BlogManagement = () => {
   const navigate = useNavigate();
   // State variables for managing data and UI
@@ -41,7 +47,7 @@ const BlogManagement = () => {
     status: 'draft',
     thumbnailUrl: '',
     // Ensures userId is always taken from localStorage or defaults to empty string
-    userId: localStorage.getItem('currentUserId') || ''
+    userId: getUserIdFromLocalStorage()
   });
 
   // --- Effects ---
@@ -49,7 +55,7 @@ const BlogManagement = () => {
   // Fetch blogs and categories on component mount
   useEffect(() => {
     // Check for userId immediately on mount if it's crucial for general access
-    const storedUserId = localStorage.getItem('currentUserId');
+    const storedUserId = getUserIdFromLocalStorage();
     if (!storedUserId) {
       // Optional: Redirect to login or show an prominent error if userId is mandatory for this page
       // alert('Bạn cần đăng nhập để quản lý bài viết.');
@@ -172,38 +178,6 @@ const BlogManagement = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handles image upload to Cloudinary
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const cloudinaryFormData = new FormData();
-    cloudinaryFormData.append('file', file);
-    // !!! IMPORTANT: REPLACE WITH YOUR ACTUAL CLOUDINARY UPLOAD PRESET !!!
-    cloudinaryFormData.append('upload_preset', 'YOUR_CLOUDINARY_UPLOAD_PRESET');
-
-    try {
-      setLoading(true);
-      // !!! IMPORTANT: REPLACE WITH YOUR ACTUAL CLOUDINARY CLOUD NAME !!!
-      const res = await fetch('https://api.cloudinary.com/v1_1/YOUR_CLOUDINARY_CLOUD_NAME/image/upload', {
-        method: 'POST',
-        body: cloudinaryFormData,
-      });
-      const result = await res.json();
-      if (result.secure_url) {
-        setFormData(prev => ({ ...prev, thumbnailUrl: result.secure_url }));
-        alert('Upload ảnh đại diện thành công! 🖼️');
-      } else {
-        throw new Error('Không nhận được URL ảnh từ Cloudinary.');
-      }
-    } catch (err) {
-      handleApiError(err, 'Không thể upload ảnh');
-      setFormData(prev => ({ ...prev, thumbnailUrl: '' })); // Clear URL on error
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Handles adding a new blog post
   const handleAddBlog = async (e) => {
     e.preventDefault(); // Prevent default form submission behavior
@@ -235,7 +209,7 @@ const BlogManagement = () => {
     // Prepare data for API request
     const blogData = {
       title: formData.title.trim(),
-      userId: 'd649f0f1-3713-47c3-af4a-cac0014f9e9a', // Ensure userId is always a string
+      userId: getUserIdFromLocalStorage(), // Lấy userId động từ localStorage
       content: formData.content.trim(),
       excerpt: formData.excerpt.trim(),
       thumbnailUrl: formData.thumbnailUrl || "", // Send empty string if no thumbnail
@@ -258,7 +232,7 @@ const BlogManagement = () => {
         // Reset form to initial empty state, ensuring userId is refreshed from localStorage
         setFormData({
           title: '', content: '', excerpt: '', categoryId: '', tags: '', status: 'draft', thumbnailUrl: '',
-          userId: localStorage.getItem('currentUserId') || ''
+          userId: getUserIdFromLocalStorage()
         });
       } else {
         throw new Error("Phản hồi API không chứa dữ liệu bài viết mới.");
@@ -374,7 +348,7 @@ const BlogManagement = () => {
         tags: blogData.tags || '',
         status: blogData.status || 'draft',
         categoryId: blogData.categoryId || '',
-        userId: blogData.userId || localStorage.getItem('currentUserId') || ''
+        userId: getUserIdFromLocalStorage()
       });
       setShowEditModal(true);
     } catch (err) {
@@ -388,7 +362,7 @@ const BlogManagement = () => {
         tags: blog.tags || '',
         status: blog.status || 'draft',
         categoryId: blog.categoryId || '',
-        userId: blog.userId || localStorage.getItem('currentUserId') || ''
+        userId: getUserIdFromLocalStorage()
       });
       setShowEditModal(true);
     } finally {
@@ -484,7 +458,7 @@ const BlogManagement = () => {
                 tags: '',
                 status: 'draft',
                 thumbnailUrl: '',
-                userId: 'd649f0f1-3713-47c3-af4a-cac0014f9e9a' // Ensure userId is updated from localStorage
+                userId: getUserIdFromLocalStorage() // Lấy userId động từ localStorage
               });
               setError(null); // Clear any previous errors
             }}
@@ -617,7 +591,7 @@ const BlogManagement = () => {
                   // Reset form on close
                   setFormData({
                     title: '', content: '', excerpt: '', categoryId: '', tags: '', status: 'draft', thumbnailUrl: '',
-                    userId: localStorage.getItem('currentUserId') || ''
+                    userId: getUserIdFromLocalStorage()
                   });
                   setError(null); // Clear error on close
                 }}
@@ -728,11 +702,15 @@ const BlogManagement = () => {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ảnh đại diện (thumbnail)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Ảnh đại diện (thumbnail) - Dán URL ảnh
+                </label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
+                  type="text"
+                  name="thumbnailUrl"
+                  value={formData.thumbnailUrl}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com/image.jpg"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {formData.thumbnailUrl && (
@@ -1002,34 +980,24 @@ const BlogManagement = () => {
                 ></textarea>
               </div>
 
-              {/* Input for changing thumbnail */}
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Thay đổi ảnh đại diện
+                  Ảnh đại diện (thumbnail) - Dán URL ảnh
                 </label>
                 <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
+                  type="text"
+                  name="thumbnailUrl"
+                  value={formData.thumbnailUrl}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com/image.jpg"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
-
-              {/* Display current thumbnail if available */}
-              {selectedBlog.thumbnailUrl && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Hình ảnh hiện tại
-                  </label>
+                {formData.thumbnailUrl && (
                   <div className="mt-2">
-                    <img
-                      src={selectedBlog.thumbnailUrl}
-                      alt="Current thumbnail"
-                      className="w-32 h-32 object-cover border rounded-lg"
-                    />
+                    <img src={formData.thumbnailUrl} alt="thumbnail" className="w-32 h-32 object-cover border rounded-lg" />
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               {error && (
                 <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg">

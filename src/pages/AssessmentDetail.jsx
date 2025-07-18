@@ -27,26 +27,86 @@ const AssessmentDetail = () => {
   const [startError, setStartError] = useState(null);
   const [responseId, setResponseId] = useState(null);
   const navigate = useNavigate();
+  const [surveyInfo, setSurveyInfo] = useState({ name: '', description: '' });
+
+  // useEffect(() => {
+  //   const fetchQuestions = async () => {
+  //     setLoading(true);
+  //     setError(null);
+  //     try {
+  //       const res = await api.get(`/Survey/${surveyId}/questions-with-options`);
+  //       if (res.data && res.data.data) {
+  //         setQuestions(res.data.data);
+  //         setAnswers(Array(res.data.data.length).fill(null));
+  //       } else {
+  //         setQuestions([]);
+  //       }
+  //     } catch (err) {
+  //       setError('Không thể tải câu hỏi.');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   if (surveyId) fetchQuestions();
+  // }, [surveyId]);
 
   useEffect(() => {
     const fetchQuestions = async () => {
       setLoading(true);
       setError(null);
       try {
+        // Lấy danh sách câu hỏi
         const res = await api.get(`/Survey/${surveyId}/questions-with-options`);
-        if (res.data && res.data.data) {
-          setQuestions(res.data.data);
-          setAnswers(Array(res.data.data.length).fill(null));
-        } else {
-          setQuestions([]);
-        }
+        const questions = res.data && res.data.data ? res.data.data : [];
+        // Lấy options cho từng câu hỏi
+        const questionsWithOptions = await Promise.all(
+          questions.map(async (q) => {
+            try {
+              const optRes = await api.get(`/SurveyOption/${q.questionId}/Options`);
+              return {
+                ...q,
+                options: Array.isArray(optRes.data) ? optRes.data : [],
+              };
+            } catch (e) {
+              return {
+                ...q,
+                options: [],
+              };
+            }
+          })
+        );
+        setQuestions(questionsWithOptions);
+        setAnswers(Array(questionsWithOptions.length).fill(null));
       } catch (err) {
-        setError('Không thể tải câu hỏi.');
+        // Kiểm tra lỗi 404 và thông báo từ server
+        if (err.response && err.response.status === 404 && err.response.data && Array.isArray(err.response.data.messages)) {
+          setError('Khảo sát này chưa có câu hỏi.');
+        } else {
+          setError('Không thể tải câu hỏi hoặc lựa chọn.');
+        }
+        console.error('Error:', err);
       } finally {
         setLoading(false);
       }
     };
     if (surveyId) fetchQuestions();
+  }, [surveyId]);
+
+  useEffect(() => {
+    const fetchSurveyInfo = async () => {
+      try {
+        const res = await api.get(`/Survey/${surveyId}`);
+        if (res.data && res.data.data) {
+          setSurveyInfo({
+            name: res.data.data.name || '',
+            description: res.data.data.description || '',
+          });
+        }
+      } catch (err) {
+        setSurveyInfo({ name: '', description: '' });
+      }
+    };
+    if (surveyId) fetchSurveyInfo();
   }, [surveyId]);
 
   const handleStart = async () => {
@@ -132,9 +192,9 @@ const AssessmentDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
       <div className="max-w-3xl w-full">
-        <h1 className="text-4xl font-bold text-center text-gray-900 mb-2">Bài đánh giá ASSIST</h1>
+        <h1 className="text-4xl font-bold text-center text-gray-900 mb-2">{surveyInfo.name || 'Bài đánh giá'}</h1>
         <p className="text-center text-gray-600 mb-8">
-          ASSIST (Alcohol, Smoking and Substance Involvement Screening Test) là công cụ sàng lọc được phát triển bởi Tổ chức Y tế Thế giới (WHO) để đánh giá mức độ nguy cơ liên quan đến việc sử dụng các chất gây nghiện.
+          {surveyInfo.description || 'Không có mô tả.'}
         </p>
         <div className="bg-gray-100 rounded-xl p-6 mb-8">
           <h2 className="text-xl font-semibold mb-2">Hướng dẫn</h2>
@@ -176,18 +236,22 @@ const AssessmentDetail = () => {
                 <div className="mb-6">
                   <p className="text-lg font-semibold mb-4">{questions[current].questionText}</p>
                   <div className="space-y-3">
-                    {questions[current].options.map((opt, idx) => (
-                      <label key={opt.optionId} className="flex items-center bg-gray-50 border rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
-                        <input
-                          type="radio"
-                          name={`q${current}`}
-                          checked={answers[current] === idx}
-                          onChange={() => handleOptionChange(idx)}
-                          className="form-radio h-5 w-5 text-teal-600 mr-3"
-                        />
-                        <span className="text-gray-800">{opt.optionText}</span>
-                      </label>
-                    ))}
+                    {questions[current] && Array.isArray(questions[current].options) && questions[current].options.length > 0 ? (
+                      questions[current].options.map((opt, idx) => (
+                        <label key={opt.optionId} className="flex items-center bg-gray-50 border rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-100 transition">
+                          <input
+                            type="radio"
+                            name={`q${current}`}
+                            checked={answers[current] === idx}
+                            onChange={() => handleOptionChange(idx)}
+                            className="form-radio h-5 w-5 text-teal-600 mr-3"
+                          />
+                          <span className="text-gray-800">{opt.optionText}</span>
+                        </label>
+                      ))
+                    ) : (
+                      <div className="text-red-500">Không có lựa chọn cho câu hỏi này.</div>
+                    )}
                   </div>
                 </div>
                 <div className="flex justify-between mt-8">
