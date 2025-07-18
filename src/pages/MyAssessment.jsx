@@ -54,8 +54,13 @@ const MyAssessment = () => {
           setError(response.data.messages?.[0] || 'Không thể tải dữ liệu đánh giá');
         }
       } catch (err) {
-        console.error('Error fetching survey responses:', err);
-        setError('Lỗi kết nối đến server');
+        // Nếu là lỗi 404 thì coi như không có bài đánh giá nào
+        if (err.response && err.response.status === 404) {
+          setSurveyResponses([]);
+        } else {
+          console.error('Error fetching survey responses:', err);
+          setError('Lỗi kết nối đến server');
+        }
       } finally {
         setLoading(false);
       }

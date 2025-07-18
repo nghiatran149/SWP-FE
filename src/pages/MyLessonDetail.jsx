@@ -303,7 +303,8 @@ const MyLessonDetail = () => {
                                                 </div>
                                                 <button
                                                     className="mb-6 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                                                    disabled={lesson?.isCompleted}
+                                                    disabled={lesson?.isCompleted || quizState.data.latestQuizResultData.status === 'passed'}
+                                                    style={{ display: quizState.data.latestQuizResultData.status === 'passed' ? 'none' : undefined }}
                                                     onClick={() => {
                                                         setQuizState({ loading: true, error: null, data: null });
                                                         setSelectedAnswers({});
