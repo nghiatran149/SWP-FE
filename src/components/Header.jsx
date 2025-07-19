@@ -29,7 +29,7 @@ const Header = () => {
   // Xác định dashboard link theo role
   const getDashboardLink = () => {
     if (user?.roleName === 'Admin') return '/dashboard';
-    if (user?.roleName === 'Manager') return '/consultantmanagement';
+    if (user?.roleName === 'Manager') return '/surveymanagement';
     if (user?.roleName === 'Consultant') return '/blogmanagement';
     if (user?.roleName === 'Member') return '/myassessment';
     return '/dashboard';

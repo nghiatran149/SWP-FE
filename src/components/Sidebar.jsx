@@ -46,7 +46,7 @@ const Sidebar = ({ activeMenuItem = 'overview' }) => {
 
     // Manager specific items
     const managerItems = [
-      { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
+      // { id: 'consultantmanagement', label: 'Quản lý chuyên viên', icon: IdCardLanyard },
       { id: 'surveymanagement', label: 'Quản lý bài đánh giá', icon: ClipboardPenLine },
       { id: 'coursemanagement', label: 'Quản lý khóa học', icon: NotebookPen },
       { id: 'campaignmanagement', label: 'Quản lý chương trình', icon: AppWindow },
