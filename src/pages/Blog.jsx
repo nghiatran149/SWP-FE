@@ -41,6 +41,7 @@ const Blog = () => {
           ...blog,
           category: catMap[blog.categoryId] || 'Không có danh mục',
           date: blog.createdAt ? formatDate(blog.createdAt) : (blog.publishedAt ? formatDate(blog.publishedAt) : ''),
+          image: blog.thumbnailUrl, // Map thumbnailUrl to image field for display
         }));
         // Only show published blogs
         setBlogPosts(formattedBlogs.filter(blog => blog.status === 'published'));
@@ -157,6 +158,21 @@ const Blog = () => {
         {featuredPost && (
           <div className="mb-16">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              {/* Featured Post Image */}
+              {featuredPost.image && (
+                <div className="aspect-video bg-gray-100">
+                  <img 
+                    src={featuredPost.image}
+                    alt={featuredPost.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/800x400?text=Featured+Blog+Image";
+                    }}
+                  />
+                </div>
+              )}
+              
               <div className="p-8">
                 {/* Breadcrumb */}
                 <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
