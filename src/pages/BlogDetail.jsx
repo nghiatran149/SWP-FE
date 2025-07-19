@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Calendar, User, ArrowLeft, Share2, Facebook, Twitter, Linkedin, FileText, ChevronLeft, ChevronRight, Clock, BookOpen } from 'lucide-react';
+import { Calendar, User, ArrowLeft, Share2, Facebook, Twitter, Linkedin, FileText, Clock, BookOpen, ChevronRight } from 'lucide-react';
 import api from '../api/api';
 
 const BlogDetail = () => {
@@ -50,6 +50,31 @@ const BlogDetail = () => {
   };
 
   useEffect(() => {
+    // Define fetchRelatedBlogs function first
+    const fetchRelatedBlogs = async (categoryId, currentBlogId, categoriesData) => {
+      if (!categoryId) return;
+      try {
+        const response = await api.get('/Blog');
+        const blogsData = extractData(response);
+        if (Array.isArray(blogsData)) {
+          const related = blogsData
+            .filter(blog => blog.categoryId === categoryId && blog.id !== currentBlogId && blog.status === 'published')
+            .slice(0, 3)
+            .map(blog => ({
+              id: blog.id,
+              title: blog.title || 'Không có tiêu đề',
+              excerpt: blog.excerpt || blog.description || 'Không có mô tả',
+              date: formatDate(blog.publishedAt || blog.createdAt),
+              category: (Array.isArray(categoriesData) && categoriesData.find(c => c.id === blog.categoryId)?.name) || 'Không có danh mục',
+              image: blog.thumbnailUrl
+            }));
+          setRelatedPosts(related);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
     const fetchAll = async () => {
       setLoading(true);
       setError(null);
@@ -77,11 +102,12 @@ const BlogDetail = () => {
             excerpt: blogData.excerpt || blogData.description || 'Không có mô tả',
             content: blogData.content || '<p>Không có nội dung</p>',
             date: formatDate(blogData.publishedAt || blogData.createdAt),
-            author: blogData.username || 'Ẩn danh', // Sửa lấy đúng trường tác giả
+            author: blogData.authorName || 'Admin',
             categoryId: blogData.categoryId,
             category: categoryName,
             image: blogData.thumbnailUrl,
             tags: blogData.tags ? blogData.tags.split(',').map(tag => tag.trim()) : [],
+            status: blogData.status,
             readTime: calculateReadTime(blogData.content)
           };
           setBlog(formattedBlog);
@@ -96,30 +122,7 @@ const BlogDetail = () => {
         setLoading(false);
       }
     };
-    // Sửa fetchRelatedBlogs để nhận categoriesData
-    const fetchRelatedBlogs = async (categoryId, currentBlogId, categoriesData) => {
-      if (!categoryId) return;
-      try {
-        const response = await api.get('/Blog');
-        const blogsData = extractData(response);
-        if (Array.isArray(blogsData)) {
-          const related = blogsData
-            .filter(blog => blog.categoryId === categoryId && blog.id !== currentBlogId && blog.status === 'published')
-            .slice(0, 3)
-            .map(blog => ({
-              id: blog.id,
-              title: blog.title || 'Không có tiêu đề',
-              excerpt: blog.excerpt || blog.description || 'Không có mô tả',
-              date: formatDate(blog.publishedAt || blog.createdAt),
-              category: (Array.isArray(categoriesData) && categoriesData.find(c => c.id === blog.categoryId)?.name) || 'Không có danh mục',
-              image: blog.thumbnailUrl
-            }));
-          setRelatedPosts(related);
-        }
-      } catch (err) {
-        // ignore
-      }
-    };
+    
     if (id) {
       fetchAll();
     }
@@ -197,7 +200,6 @@ const BlogDetail = () => {
         </div>
       </div>
       
-        
       <div className="max-w-5xl mx-auto px-4 pt-8">
         {blog.image && (
           <div className="mb-8">
@@ -335,30 +337,6 @@ const BlogDetail = () => {
                 </div>
               </div>
             )}
-            
-            {/* Pagination */}
-            <div className="flex justify-between items-center border-t border-gray-200 pt-8">
-              <button
-                onClick={() => navigate(`/blog/${parseInt(id) - 1}`)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                  parseInt(id) <= 1 
-                    ? 'text-gray-400 pointer-events-none' 
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                disabled={parseInt(id) <= 1}
-              >
-                <ChevronLeft className="h-5 w-5" />
-                <span>Bài trước</span>
-              </button>
-              
-              <button
-                onClick={() => navigate(`/blog/${parseInt(id) + 1}`)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100"
-              >
-                <span>Bài tiếp theo</span>
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
