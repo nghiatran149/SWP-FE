@@ -66,7 +66,18 @@ const Register = () => {
       // Check for successful registration - could be 200 or 201
       if (response.status === 200 || response.status === 201) {
         console.log("Registration successful:", response.data);
-        setSuccessMessage("Đăng ký thành công! Đang chuyển hướng...");
+        
+        // Extract message from response and translate if needed
+        const responseMessage = response.data.messages && response.data.messages.length > 0 
+          ? response.data.messages[0] 
+          : "Đăng ký thành công!";
+        
+        // Translate BE message to Vietnamese
+        const translatedMessage = responseMessage === "Member registered.Please check your email to verify your account." 
+          ? "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản."
+          : responseMessage;
+        
+        setSuccessMessage(translatedMessage);
 
         // Clear form data
         setFormData({
@@ -76,10 +87,18 @@ const Register = () => {
           confirmPassword: "",
         });
 
-        // Redirect to login page after showing success message
-        setTimeout(() => {
-          navigate("/login", { replace: true });
-        }, 2000);
+        // Don't auto-redirect if email verification is required
+        if (response.data.data && !response.data.data.emailVerified) {
+          // Show message for longer time for email verification
+          setTimeout(() => {
+            navigate("/login", { replace: true });
+          }, 5000);
+        } else {
+          // Redirect to login page after showing success message
+          setTimeout(() => {
+            navigate("/login", { replace: true });
+          }, 2000);
+        }
       } else {
         // Unexpected status code
         setError("Đăng ký thất bại, vui lòng thử lại");
@@ -97,10 +116,20 @@ const Register = () => {
             err.response.data.message || "Thông tin đăng ký không hợp lệ"
           );
         } else if (err.response.status === 409) {
-          setError("Tài khoản hoặc email đã tồn tại");
+          // Check if it's a duplicated email error
+          if (err.response.data.resultStatus === "Duplicated") {
+            const errorMessage = err.response.data.messages && err.response.data.messages.length > 0
+              ? err.response.data.messages[0]
+              : "Email đã tồn tại";
+            setError(errorMessage === "Email already exists." ? "Email đã tồn tại" : errorMessage);
+          } else {
+            setError("Tài khoản hoặc email đã tồn tại");
+          }
         } else {
           setError(
-            err.response.data.message || "Đăng ký thất bại, vui lòng thử lại"
+            err.response.data.messages && err.response.data.messages.length > 0
+              ? err.response.data.messages[0]
+              : err.response.data.message || "Đăng ký thất bại, vui lòng thử lại"
           );
         }
       } else if (err.request) {

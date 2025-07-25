@@ -8,6 +8,7 @@ import LayoutDashboard from "./components/LayoutDashboard";
 //Authorize
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import VerifySuccessful from "./pages/VerifySuccess";
 
 //Landing
 import Homepage from "./pages/Homepage";
@@ -71,6 +72,14 @@ function App() {
             element={
               <Layout>
                 <Register />
+              </Layout>
+            }
+          />
+          <Route
+            path="/verify-email"
+            element={
+              <Layout>
+                <VerifySuccessful />
               </Layout>
             }
           />
