@@ -228,7 +228,7 @@ const Homepage = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6 inline-block">
+              {/* <div className="bg-white rounded-xl shadow-lg p-6 inline-block">
                 <div className="flex items-center gap-4">
                   <div className="bg-cyan-100 p-3 rounded-lg">
                     <BarChart2 className="h-8 w-8 text-cyan-600" />
@@ -238,7 +238,7 @@ const Homepage = () => {
                     <div className="text-gray-600 text-sm">Bài đánh giá đã thực hiện</div>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

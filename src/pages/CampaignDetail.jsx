@@ -69,6 +69,7 @@ const CampaignDetail = () => {
 
     // Helper: status
     const isEnded = campaign && campaign.endDate && new Date() > new Date(campaign.endDate);
+    const isFull = campaign && campaign.currentParticipantsCount >= campaign.maxParticipants;
     const getStatusBadge = () => {
         if (!campaign?.startDate || !campaign?.endDate) return null;
         const now = new Date();
@@ -89,6 +90,10 @@ const CampaignDetail = () => {
             alert('Chương trình đã kết thúc, không thể đăng ký.');
             return;
         }
+        if (isFull) {
+            alert('Chương trình đã đủ số lượng đăng ký.');
+            return;
+        }
         if (!user) {
             alert('Bạn cần đăng nhập để đăng ký chương trình.');
             navigate('/login');
@@ -102,6 +107,11 @@ const CampaignDetail = () => {
             });
             if (res.data && res.data.participantId) {
                 setIsRegistered(true);
+                // Cập nhật lại số lượng người tham gia sau khi đăng ký thành công
+                setCampaign(prev => ({
+                    ...prev,
+                    currentParticipantsCount: prev.currentParticipantsCount + 1
+                }));
             } else {
                 alert('Đăng ký không thành công.');
             }
@@ -206,13 +216,30 @@ const CampaignDetail = () => {
                                     <Users size={18} />
                                     <span>Số lượng người tham gia: {campaign.maxParticipants} người</span>
                                 </div>
+                                <div className="flex items-center gap-2 text-gray-700 mb-4">
+                                    <Users size={18} />
+                                    <span>Đã đăng ký: {campaign.currentParticipantsCount}/{campaign.maxParticipants} người</span>
+                                </div>
                                 <hr className="my-4" />
                                 <button
-                                    className={`w-full py-3 rounded-lg font-medium transition-colors ${isRegistered || isEnded ? 'bg-green-800 text-white cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                                    className={`w-full py-3 rounded-lg font-medium transition-colors ${
+                                        isRegistered || isEnded || isFull 
+                                            ? 'bg-gray-400 text-white cursor-not-allowed' 
+                                            : 'bg-green-600 text-white hover:bg-green-700'
+                                    }`}
                                     onClick={handleRegister}
-                                    disabled={isRegistered || isRegistering || isEnded}
+                                    disabled={isRegistered || isRegistering || isEnded || isFull}
                                 >
-                                    {isEnded ? 'Đã kết thúc' : isRegistered ? 'Đã đăng ký' : isRegistering ? 'Đang xử lý...' : 'Đăng ký tham gia'}
+                                    {isEnded 
+                                        ? 'Đã kết thúc' 
+                                        : isFull 
+                                            ? 'Chương trình đã đủ số lượng đăng ký'
+                                            : isRegistered 
+                                                ? 'Đã đăng ký' 
+                                                : isRegistering 
+                                                    ? 'Đang xử lý...' 
+                                                    : 'Đăng ký tham gia'
+                                    }
                                 </button>
                             </>
                         ) : null}
