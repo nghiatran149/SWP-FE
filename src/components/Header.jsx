@@ -117,12 +117,20 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="flex items-center space-x-2 text-gray-700 hover:text-teal-600 focus:outline-none focus:text-teal-600 transition-colors duration-200"
-              >
-                <span className="font-medium">Đăng nhập</span>
-              </Link>
+              <div className="flex space-x-8">
+                <Link
+                  to="/login"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-teal-600 focus:outline-none focus:text-teal-600 transition-colors duration-200"
+                >
+                  <span className="font-medium">Đăng nhập</span>
+                </Link>
+                <Link
+                  to="/register"
+                  className="flex items-center space-x-2 text-gray-700 hover:text-teal-600 focus:outline-none focus:text-teal-600 transition-colors duration-200 font-medium"
+                >
+                  <span>Đăng ký</span>
+                </Link>
+              </div>
             )}
           </div>
 
@@ -202,12 +210,20 @@ const Header = () => {
                   </div>
                 </>
               ) : (
-                <Link
-                  to="/login"
-                  className="flex items-center px-5 py-2 text-base font-medium text-gray-700 hover:text-teal-600 transition-colors duration-200"
-                >
-                  Đăng nhập
-                </Link>
+                <>
+                  <Link
+                    to="/login"
+                    className="flex items-center px-5 py-2 text-base font-medium text-gray-700 hover:text-teal-600 transition-colors duration-200"
+                  >
+                    Đăng nhập
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex items-center px-5 py-2 text-base font-medium text-gray-700 hover:text-teal-600 transition-colors duration-200 mt-2"
+                  >
+                    Đăng ký
+                  </Link>
+                </>
               )}
             </div>
           </div>
