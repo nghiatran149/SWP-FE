@@ -1,16 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Shield, ArrowRight, Book, Calendar, Users, ShieldCheck, GraduationCap, Heart, CheckCircle, BarChart2 } from 'lucide-react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 import FeaturedCourses from '../components/FeaturedCourses';
-
-const stats = [
-  { value: "500+", label: "Người đã được hỗ trợ" },
-  { value: "20+", label: "Chuyên viên tư vấn" },
-  { value: "30+", label: "Khóa học trực tuyến" },
-  { value: "15+", label: "Chương trình cộng đồng" },
-];
+import api from '../api/api';
 
 const features = [
   {
@@ -61,6 +55,39 @@ const assessments = [
 const Homepage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [stats, setStats] = useState([
+    { value: "0", label: "Số người dùng" },
+    { value: "0", label: "Số khóa học" },
+    { value: "0", label: "Số bài viết" },
+    { value: "0", label: "Số chương trình cộng đồng" },
+  ]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch dashboard summary data
+  useEffect(() => {
+    const fetchDashboardSummary = async () => {
+      try {
+        const response = await api.get('/AdminAnalytics/summary_home');
+        if (response.data.resultStatus === 'Success') {
+          const data = response.data.data;
+          setStats([
+            { value: `${data.totalUsers}+`, label: "Số người dùng" },
+            { value: `${data.totalCourses}+`, label: "Số khóa học" },
+            { value: `${data.totalblogs}+`, label: "Số bài viết" },
+            { value: `${data.totalPrograms}+`, label: "Số chương trình cộng đồng" },
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard summary:', error);
+        // Keep default values if API fails
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardSummary();
+  }, []);
+
   useEffect(() => {
     if (location.state?.justLoggedIn && !sessionStorage.getItem('justLoggedInToast')) {
       sessionStorage.setItem('justLoggedInToast', '1'); 
@@ -129,7 +156,7 @@ const Homepage = () => {
               >
                 <div className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-teal-300 mb-2">
-                    {stat.value}
+                    {loading ? "..." : stat.value}
                   </div>
                   <div className="text-sm md:text-base text-gray-200 font-medium">
                     {stat.label}
