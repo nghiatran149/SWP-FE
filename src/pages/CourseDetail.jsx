@@ -180,10 +180,10 @@ const CourseDetail = () => {
                     <BookOpen size={18} />
                     <span>{course.lessonCount} bài học</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  {/* <div className="flex items-center gap-1">
                     <Users size={18} />
                     <span>{course.studentCount} học viên</span>
-                  </div>
+                  </div> */}
                   <div className="flex items-center gap-1">
                     <span>Giảng viên:</span>
                     <span className="font-medium text-gray-900">{course.instructorName}</span>

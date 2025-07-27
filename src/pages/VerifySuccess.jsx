@@ -128,14 +128,14 @@ const VerifySuccessful = () => {
         
         {renderContent()}
         
-        <div className="text-center pt-6 border-t border-gray-200">
+        {/* <div className="text-center pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500">
             Bạn cần hỗ trợ?{' '}
             <a href="mailto:support@example.com" className="text-blue-600 hover:text-blue-500">
               Liên hệ với chúng tôi
             </a>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
