@@ -142,9 +142,9 @@ const Homepage = () => {
               Khám phá khóa học
             </Link>
 
-            <Link to="/booking" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-all duration-200">
+            <Link to="/campaigns" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 bg-transparent h-12 px-8 text-base font-semibold flex items-center justify-center gap-2 rounded-md transition-all duration-200">
               <Calendar className="w-4 h-4" />
-              Đặt lịch tư vấn
+              Chương trình cộng đồng
             </Link>
           </div>
 
@@ -272,7 +272,7 @@ const Homepage = () => {
       </section>
 
       {/* Consultation Booking Section */}
-      <section className="py-12 rounded-2xl mx-6 my-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-800 relative overflow-hidden">
+      {/* <section className="py-12 rounded-2xl mx-6 my-6 bg-gradient-to-br from-blue-900 via-blue-800 to-teal-800 relative overflow-hidden">
 
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 right-20 w-40 h-40 border border-white rounded-full"></div>
@@ -343,7 +343,7 @@ const Homepage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 };

@@ -287,7 +287,7 @@ const MyCourseDetail = () => {
                   >
                     Tài liệu
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => setActiveTab('objectives')}
                     className={`px-6 py-3 text-sm font-medium border-b-2 ${activeTab === 'objectives'
                       ? 'border-blue-500 text-blue-600'
@@ -295,7 +295,7 @@ const MyCourseDetail = () => {
                       }`}
                   >
                     Mục tiêu
-                  </button>
+                  </button> */}
                 </nav>
               </div>
 
@@ -441,7 +441,7 @@ const MyCourseDetail = () => {
             </div>
 
             {/* Support */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            {/* <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4">Hỗ trợ</h3>
               <div className="space-y-3">
                 <button className="flex items-center gap-3 w-full text-left p-3 rounded-lg hover:bg-gray-50 transition-colors">
@@ -457,7 +457,7 @@ const MyCourseDetail = () => {
                   <span className="text-gray-700">Báo cáo vấn đề</span>
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
