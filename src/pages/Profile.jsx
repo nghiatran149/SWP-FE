@@ -554,7 +554,7 @@ const ProfilePage = () => {
             </div>
 
             {/* Thông tin chuyên viên */}
-            <div className="bg-white rounded-xl shadow border border-gray-200 mt-6">
+            {/* <div className="bg-white rounded-xl shadow border border-gray-200 mt-6">
               <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-green-600" />
@@ -631,7 +631,7 @@ const ProfilePage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </form>
 
           {/* Action buttons mobile view */}

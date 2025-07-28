@@ -35,7 +35,9 @@ const Course = () => {
       try {
         const res = await api.get('/Course');
         if (res.data && res.data.data) {
-          setCourses(res.data.data);
+          // Chỉ lấy những course có isActive = true
+          const activeCourses = res.data.data.filter(course => course.isActive === true);
+          setCourses(activeCourses);
         } else {
           setCourses([]);
         }
