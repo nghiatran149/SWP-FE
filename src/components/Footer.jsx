@@ -3,16 +3,16 @@ import { Shield, Phone, Mail, MapPin, Facebook, Twitter, Instagram, Youtube, Hea
 
 const Footer = () => {
   const quickLinks = [
-    { name: 'Trang chủ', href: '#' },
-    { name: 'Về chúng tôi', href: '#' },
-    { name: 'Khóa học', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Liên hệ', href: '#' },
+    { name: 'Trang chủ', href: 'home' },
+    { name: 'Khóa học', href: 'courses' },
+    { name: 'Đánh giá', href: 'assessments' },
+    { name: 'Chương trình', href: 'campaigns' },
+    { name: 'Blog', href: 'blog' },
   ];
 
   const supportLinks = [
-    { name: 'Đánh giá nguy cơ', href: '#' },
-    { name: 'Đặt lịch tư vấn', href: '#' },
+    { name: 'Đánh giá nguy cơ', href: 'assessments' },
+    { name: 'Chương trình cộng đồng', href: 'campaigns' },
     { name: 'Hỗ trợ khẩn cấp', href: '#' },
     { name: 'Tài liệu tham khảo', href: '#' },
     { name: 'FAQ', href: '#' },
@@ -44,7 +44,7 @@ const Footer = () => {
       <div className="bg-red-800 py-3">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-white font-semibold">
-            🚨 Cần hỗ trợ khẩn cấp? Gọi ngay đường dây nóng: 
+            🚨 Cần hỗ trợ khẩn cấp? Gọi ngay đường dây nóng:
             <a href="tel:1800-1234" className="ml-2 underline hover:no-underline font-bold">
               1800-1234
             </a>
@@ -67,7 +67,7 @@ const Footer = () => {
             <p className="text-gray-300 mb-6 leading-relaxed">
               Chúng tôi cam kết xây dựng một cộng đồng khỏe mạnh, không ma túy thông qua giáo dục, hỗ trợ và các chương trình phòng ngừa hiệu quả.
             </p>
-            
+
             {/* Contact Info */}
             <div className="space-y-3">
               <div className="flex items-center text-gray-300">
@@ -133,7 +133,7 @@ const Footer = () => {
               {emergencyContacts.map((contact, index) => (
                 <div key={index} className="bg-blue-800 bg-opacity-30 rounded-lg p-4 border border-blue-700 border-opacity-50">
                   <h5 className="font-semibold text-white mb-1">{contact.name}</h5>
-                  <a 
+                  <a
                     href={`tel:${contact.number}`}
                     className="text-teal-300 font-bold text-lg hover:text-teal-200 transition-colors duration-200"
                   >
@@ -190,7 +190,7 @@ const Footer = () => {
                 <Heart className="w-4 h-4 inline text-red-500" /> tại Việt Nam
               </p>
             </div>
-            
+
             <div className="flex flex-wrap justify-center md:justify-end space-x-6">
               {legalLinks.map((link) => (
                 <a

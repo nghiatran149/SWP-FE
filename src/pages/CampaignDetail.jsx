@@ -6,8 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 
 const TABS = [
     { id: 'overview', label: 'Tổng quan' },
-    { id: 'schedule', label: 'Lịch trình' },
-    { id: 'speakers', label: 'Diễn giả' },
+    // { id: 'schedule', label: 'Lịch trình' },
+    // { id: 'speakers', label: 'Diễn giả' },
 ];
 
 const CampaignDetail = () => {
@@ -176,12 +176,12 @@ const CampaignDetail = () => {
                                                 <p className="text-gray-700 mb-2">{campaign.description}</p>
                                             </div>
                                         )}
-                                        {activeTab === 'schedule' && (
+                                        {/* {activeTab === 'schedule' && (
                                             <div className="text-gray-500">Lịch trình sẽ được cập nhật sau.</div>
-                                        )}
-                                        {activeTab === 'speakers' && (
+                                        )} */}
+                                        {/* {activeTab === 'speakers' && (
                                             <div className="text-gray-500">Thông tin diễn giả sẽ được cập nhật sau.</div>
-                                        )}
+                                        )} */}
                                     </div>
                                 </div>
                             </>

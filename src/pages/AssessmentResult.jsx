@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { ArrowRight, ArrowLeft} from 'lucide-react';
 import api from '../api/api';
 
 const AssessmentResult = () => {
@@ -93,7 +94,7 @@ const AssessmentResult = () => {
               </div>
             </div>
             {/* Khuyến nghị */}
-            <div className="bg-white rounded-xl shadow p-5 mb-8">
+            {/* <div className="bg-white rounded-xl shadow p-5 mb-8">
               <h2 className="text-2xl font-bold mb-2">Khuyến nghị</h2>
               <div className="text-gray-500 mb-2 text-sm">Dựa trên kết quả đánh giá, chúng tôi đề xuất những hành động sau</div>
               <ul className="space-y-2 mb-4">
@@ -116,7 +117,7 @@ const AssessmentResult = () => {
                   Đặt lịch tư vấn
                 </Link>
               </div>
-            </div>
+            </div> */}
             <div className="text-gray-400 text-sm text-center mb-8">
               Lưu ý: Kết quả này chỉ mang tính chất tham khảo và không thay thế cho chẩn đoán chuyên nghiệp. Nếu bạn lo lắng về việc sử dụng chất gây nghiện, vui lòng tham khảo ý kiến của chuyên viên tư vấn.
             </div>
@@ -124,14 +125,21 @@ const AssessmentResult = () => {
         ) : null}
         <div className="flex justify-center gap-4">
           <Link to="/assessments"
-            className="border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors"
+            className="flex items-center justify-center border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors"
           >
+            <ArrowLeft className="h-4 w-4 mr-2" />
             Quay lại các bài đánh giá
           </Link>
           <Link to="/home"
             className="border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors"
           >
-            Trang chủ
+            Về trang chủ
+          </Link>
+          <Link to="/courses"
+            className="flex items-center justify-center border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors"
+          >
+            Đến xem các khóa học
+            <ArrowRight className="h-4 w-4 ml-2" />
           </Link>
         </div>
       </div>
