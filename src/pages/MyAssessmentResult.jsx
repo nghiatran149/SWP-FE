@@ -9,6 +9,7 @@ const MyAssessmentResult = () => {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [questionAnswers, setQuestionAnswers] = useState([]);
+  const [survey, setSurvey] = useState(null);
 
   const renderRiskBadge = (risk) => {
     let colorClass = '';
@@ -37,6 +38,19 @@ const MyAssessmentResult = () => {
         const resultRes = await api.get(`/UserSurveyResponse/${responseId}/result`);
         if (resultRes.data && resultRes.data.data) {
           setResult(resultRes.data.data);
+          
+          // Fetch survey information using surveyId
+          if (resultRes.data.data.surveyId) {
+            try {
+              const surveyRes = await api.get(`/Survey/${resultRes.data.data.surveyId}`);
+              if (surveyRes.data && surveyRes.data.data) {
+                setSurvey(surveyRes.data.data);
+              }
+            } catch (surveyErr) {
+              console.error('Không thể lấy thông tin survey:', surveyErr);
+              // Không set error ở đây vì vẫn có thể hiển thị kết quả chính
+            }
+          }
         } else {
           setError('Không lấy được kết quả đánh giá.');
           setLoading(false);
@@ -77,7 +91,9 @@ const MyAssessmentResult = () => {
         </div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Kết quả đánh giá ASSIST</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Kết quả {survey?.name || 'đánh giá'}
+            </h1>
             <p className="text-gray-600 mt-1">
               Dưới đây là kết quả đánh giá nguy cơ sử dụng chất gây nghiện của bạn.
             </p>
@@ -113,17 +129,21 @@ const MyAssessmentResult = () => {
                 {/* Điểm số */}
                 <div className="bg-white rounded-xl shadow p-6">
                   <h2 className="text-2xl font-bold mb-2">Điểm số của bạn: <span className="text-teal-600">{result.totalScore}</span></h2>
-                  <div className="text-gray-500 mb-2 text-sm">Dựa trên câu trả lời của bạn trong bài đánh giá ASSIST</div>
+                  <div className="text-gray-500 mb-2 text-sm">Dựa trên câu trả lời của bạn trong {survey?.name || 'bài đánh giá'}</div>
                   <div className="text-gray-700 mb-2">
                     Điểm số này phản ánh mức độ nguy cơ liên quan đến việc sử dụng chất gây nghiện của bạn. Điểm số càng cao, nguy cơ càng lớn.
                   </div>
                   <div className="text-gray-700">
-                    <div className="font-semibold mb-1">Thang điểm đánh giá:</div>
-                    <ul className="list-disc pl-6 space-y-1">
-                      <li>0-3: Nguy cơ thấp</li>
-                      <li>4-26: Nguy cơ trung bình</li>
-                      <li>27+: Nguy cơ cao</li>
-                    </ul>
+                    {result.scoreInterpretation && result.scoreInterpretation.length > 0 && (
+                      <>
+                        <div className="font-semibold mb-1">{result.scoreInterpretation[0]}</div>
+                        <ul className="list-disc pl-6 space-y-1">
+                          {result.scoreInterpretation.slice(1).map((interpretation, index) => (
+                            <li key={index}>{interpretation}</li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
                   </div>
                   <div className="flex gap-4 mt-5">
                     <Link to="/courses"
